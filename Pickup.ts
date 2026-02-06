@@ -1,3 +1,4 @@
+/*
 const Pickup = new GameDefinition();
 
 // Step 0: Set up the labels
@@ -85,3 +86,4 @@ Pickup.definePhases(gamePhases);
 // Step 5: Instantiate the Game
 
 const game1 = Pickup.createGame();
+*/
