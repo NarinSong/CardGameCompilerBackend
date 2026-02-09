@@ -4,15 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Card Game Compiler Prototype Client</title>
+    <script src="http://localhost:8020/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        // Todo: Actually code the frontend
+        function renderGameState() {
+            // TODO: render the gamestate
+        }
+
+        function elementClick() {
+            // TODO: extract element label and send click event to server
+        }
+
+        function startGame() {
+            // TODO: send socket event to create new game using 52 card pickup
+        }
+    </script>
 </head>
 <body>
     <p>TODO: </p>
     <ul>
-        <li>Add socket.io</li>
         <li>Add frontend gamestate</li>
         <li>Add dynamic pile rendering</li>
         <li>Add click events</li>
-
     </ul>
+
+    <button onclick="startGame">
+        Start Game
+    </button>
 </body>
 </html>

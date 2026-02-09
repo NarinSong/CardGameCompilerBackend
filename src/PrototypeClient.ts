@@ -1,35 +1,26 @@
-// This code will be a placeholder until we hook up the unity front end
-// It will connect to a simple web interface
+const express = require('express');
+const { createServer } = require('node:http');
+const { join } = require('node:path');
+const { Server } = require('socket.io');
 
-import { createServer } from "http";
-import { Server, Socket } from "socket.io";
+export default class PrototypeClient {
+    constructor() {
+        const app = express();
+        const server = createServer(app);
+        const io = new Server(server);
 
-const sockets: Record<string, Socket> = {};
-const httpServer = createServer();
+        app.get('/', (req: any, res: any) => {
+            console.log(__dirname);
+            res.sendFile('C:\\Users\\Sam\\Documents\\code\\CardGameCompiler\\CardGameCompilerBackend\\client-prototype\\index.html');
+        });
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*", // localhost:8020, doesn't matter since it's just a dev env.
-  },
-});
+        io.on('connection', (socket: any) => {
+            console.log('a user connected');
+        });
 
-io.on("connection", (socket: Socket) => {
-  console.log(`Socket connected: ${socket.id}`);
+        server.listen(8020, () => {
+            console.log('server running at http://localhost:8020');
+        });
+    }
+}
 
-  sockets[socket.id] = socket;
-
-  socket.on("example:event", (data: any) => {
-    // This is where Client Triggers will be sent in. We will forward this information to the "Client" class
-    console.log("example:event", data);
-  });
-
-  socket.on("disconnect", (reason: any) => {
-    // When the player leaves, we will need to delete the room they were in as well. We will probably need a game manager to handle this
-    console.log(`Socket disconnected: ${socket.id} (${reason})`);
-    delete sockets[socket.id];
-  });
-});
-
-httpServer.listen(8020, () => {
-  console.log("Socket.IO server listening on port 8020");
-});

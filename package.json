@@ -8,5 +8,9 @@
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec 'ts-node src/index.ts'",
     "prod": "tsc && node dist/Server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
   }
 }
