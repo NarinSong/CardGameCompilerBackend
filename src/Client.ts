@@ -4,3 +4,7 @@
 //      A Client may have an associated player (or not)
 //      A Player may be a robot / AI and have no associated client
 // Clients have a method of sending information to the user (sockets for prototype, whatever Unity uses for that)
+
+export default class Client {
+    
+}
