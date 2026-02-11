@@ -6,5 +6,9 @@
 // Clients have a method of sending information to the user (sockets for prototype, whatever Unity uses for that)
 
 export default class Client {
-    
+    identifier: number;
+
+    constructor()  {
+        
+    }
 }

@@ -4,4 +4,5 @@
 
 import PrototypeClient from './PrototypeClient';
 
-const client = new PrototypeClient();
+const clientHandler = new PrototypeClient();
+
