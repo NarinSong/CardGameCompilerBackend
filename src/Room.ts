@@ -1,11 +1,15 @@
 // This file is where the "Room" object will be stored.
 // There will be many of these, and each one will have a dedicated worker thread
-// Each room can hold multiple players and one gamestate
+// Each room can hold one game
+
+import Game from "./Game/Game";
 
 export default class Room {
-    players: Player[];
-    rules: Rule;
-    gamestate: Gamestate;
+    game: Game | null;
 
-    constructor() {}
+    constructor() {
+        this.game = null;
+    }
+
+    // TODO: initialize game etc.
 }

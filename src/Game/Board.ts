@@ -19,7 +19,7 @@ export default class Board {
 
     initializePiles(definition: PileDefinition[], gameLabels: GameLabels) {
         for (let def of definition) {
-            this.piles.push(new Pile(def, gameLabels))
+            this.piles.push(Pile.fromDefinition(def, gameLabels))
         }
     }
 

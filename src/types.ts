@@ -1,5 +1,7 @@
+import GameState from "./Game/GameState";
+
 export type FilterFn = (value: any) => boolean;
-export type ResultFn = (value: any) => void;
+export type ResultFn = (value: GameState) => void;
 export enum PlayerType { HUMAN, ROBOT, AI };
 export enum PileState {
     SORTED,

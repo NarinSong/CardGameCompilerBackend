@@ -1,8 +1,9 @@
-import Action from "./Rules/ActionDefinition";
-import GameDefinition from "./Rules/GameDefinition";
-import Result from "./Rules/ResultDefinition";
-import Trigger from "./Rules/TriggerDefinition";
-import { PileState, TriggerType, Visibility } from "./types";
+import GameState from "../Game/GameState";
+import Action from "../Rules/ActionDefinition";
+import GameDefinition from "../Rules/GameDefinition";
+import Result from "../Rules/ResultDefinition";
+import Trigger from "../Rules/TriggerDefinition";
+import { PileState, TriggerType, Visibility } from "../types";
 
 const Pickup = new GameDefinition();
 
@@ -31,9 +32,9 @@ const playCard = new Action(
     new Trigger(TriggerType.CLICK, 'Deck'),
     null,
     new Result(
-        (game) => {
-            const pile = game.addPile();
-            game.dealCards(game.getFromLabel('Deck'), pile, 1);
+        (game: GameState) => {
+            const pile = game.addPile({visibility: Visibility.FACE_UP});
+            game.dealCards('Deck', pile, 1);
         }
     )
 );

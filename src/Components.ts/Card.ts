@@ -1,3 +1,4 @@
+import Pile from "../Game/Pile";
 import { PileState, rank, suit } from "../types";
 
 export default class Card {
@@ -14,5 +15,15 @@ export default class Card {
         // TODO: Pile states
 
         return [] as Card[];
+    }
+
+    static dealCards(from: Pile, to: Pile, number: number) {
+        let i = 0;
+        while (i < number && from.cards.length) {
+            const card = from.cards.pop();
+            if (card)
+                to.cards.push(card);
+            i++;
+        }
     }
 }
