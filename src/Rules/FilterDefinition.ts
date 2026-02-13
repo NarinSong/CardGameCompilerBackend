@@ -3,5 +3,12 @@
 // These can run client side to highlight available actions
 //      and server-side to determine if the trigger is legal
 
-type Filter = (value: any) => boolean;
-export default Filter;
+import { FilterFn } from "../types";
+
+export default class Filter {
+    fn: FilterFn;
+
+    constructor( res: FilterFn ) {
+        this.fn = res;
+    }
+}

@@ -3,6 +3,8 @@
 // Each step has associated actions
 // A step must have at least one action
 
+import Action from "./ActionDefinition";
+
 export default class Step {
     actions: Action[];
 

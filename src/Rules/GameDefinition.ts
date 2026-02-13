@@ -3,6 +3,7 @@
 // When a player starts a game, they will pass in a GameDefinition object's Rules component
 
 import BoardDefinition from "./BoardDefinition";
+import GamePhaseDefinition from "./GamePhaseDefinition";
 import PlayerDefinition from "./PlayerDefinition";
 
 export default class GameDefinition {
@@ -11,7 +12,8 @@ export default class GameDefinition {
     board: BoardDefinition;
 
     constructor() {
+        this.phases = [];
         this.players = [];
-        this.board = null;
+        this.board = new BoardDefinition();
     }
 }
