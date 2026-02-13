@@ -8,8 +8,8 @@ export default class PlayerDefinition {
     piles: PileDefinition[];
     counters: CounterDefinition[];
 
-    constructor() {
-        this.piles = [];
-        this.counters = [];
+    constructor(piles?: PileDefinition[], counters?: CounterDefinition[]) {
+        this.piles = piles || [];
+        this.counters = counters || [];
     }
 }

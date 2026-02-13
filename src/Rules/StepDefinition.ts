@@ -4,11 +4,14 @@
 // A step must have at least one action
 
 import Action from "./ActionDefinition";
+import LabelManager, { StepLabel } from "./LabelManager";
 
-export default class Step {
+export default class StepDefinition {
     actions: Action[];
+    label: StepLabel;
 
-    constructor() {
+    constructor(labelManager: LabelManager, name?: string) {
+        this.label = labelManager.createStepLabel(this, name);
         this.actions = [];
     }
 }

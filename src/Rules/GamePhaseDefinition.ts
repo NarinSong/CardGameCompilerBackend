@@ -3,16 +3,19 @@
 // Each phase and step can have associated actions which the players may take
 // One game can have any number of phases associated with it
 
-import Step from "./StepDefinition";
+import LabelManager, { PhaseLabel } from "./LabelManager";
+import StepDefinition from "./StepDefinition";
 
 export default class GamePhaseDefinition {
-    steps: Step[];
+    steps: StepDefinition[];
+    label: PhaseLabel;
 
-    constructor(steps?: Step[]) {
+    constructor(labelManager: LabelManager, name?: string, steps?: StepDefinition[]) {
+        this.label = labelManager.createPhaseLabel(this, name);
         this.steps = steps || [];
     }
 
-    addStep(step: Step) {
+    addStep(step: StepDefinition) {
         this.steps.push(step);
     }
 }

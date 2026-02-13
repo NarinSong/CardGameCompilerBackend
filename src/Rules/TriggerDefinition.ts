@@ -4,7 +4,7 @@
 //      associated actions, which will be filtered and the result run
 
 import { Label } from "./LabelManager";
-import { TriggerType } from "./TypesDefinition";
+import { TriggerType } from "../types";
 
 export default class Trigger {
     type: TriggerType;

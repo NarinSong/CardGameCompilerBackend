@@ -1,36 +1,57 @@
+import CounterDefinition from "./CounterDefinition";
+import GamePhaseDefinition from "./GamePhaseDefinition";
+import PileDefinition from "./PileDefinition";
+import StepDefinition from "./StepDefinition";
+
+export type Label = string;
+export type PhaseLabel = string;
+export type StepLabel = string;
+export type GameObject = PileDefinition | CounterDefinition;
+
 export default class LabelManager {
-    labels: Label[];
+    labels: Record<Label, GameObject>;
+    stepLabels: Record<StepLabel, StepDefinition>;
+    phaseLabels: Record<PhaseLabel, GamePhaseDefinition>;
     #nextId: number;
 
     constructor() {
-        this.labels = [] as Label[];
+        this.labels = {};
+        this.stepLabels = {};
+        this.phaseLabels = {};
         this.#nextId = 1000;
     }
 
-    createLabel(name?: string) {
-        this.labels.push(new Label(name || ''+this.#nextId, this));
+    createLabel(object: GameObject, name?: string) {
+        if (!name || this.getFromLabel(name)) {name = this.nextId;}
+        this.labels[name] = object;
+        return name;
+    }
+
+    createPhaseLabel(phase: GamePhaseDefinition, name?: string) {
+        if (!name || this.getPhaseFromLabel(name)) {name = this.nextId;}
+        this.phaseLabels[name] = phase;
+        return name;
+    }
+
+    createStepLabel(step: StepDefinition, name?: string) {
+        if (!name || this.getStepFromLabel(name)) {name = this.nextId;}
+        this.stepLabels[name] = step;
+        return name;
     }
 
     getFromLabel(l: Label) {
-        return this.labels.filter((value: Label) => {return value === l;})[0] || null;
+        return this.labels[l];
+    }
+
+    getPhaseFromLabel(l: PhaseLabel) {
+        return this.phaseLabels[l];
+    }
+
+    getStepFromLabel(l: StepLabel) {
+        return this.stepLabels[l];
     }
 
     get nextId() {
-        return ++this.#nextId;
-    }
-}
-
-export class Label {
-    name: string;
-    uid: number;
-    item: any;
-
-    constructor(name: string, manager: LabelManager) {
-        this.name = name;
-        this.uid = manager.nextId;
-    }
-
-    setItem(item: any) {
-        this.item = item;
+        return '' + (++this.#nextId);
     }
 }
