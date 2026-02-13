@@ -9,6 +9,6 @@ export default class Client {
     identifier: number;
 
     constructor()  {
-        
+        this.identifier = 0;
     }
 }
