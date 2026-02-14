@@ -31,9 +31,9 @@ export default class GameState {
     addPile(obj: { state?: PileState, name?: string, visibility?: Visibility } = {}) {
         // To the board
         const pile = Pile.create(
-            obj.state || PileState.EMPTY,
-            obj.name || this.gameLabels.nextId,
-            obj.visibility || Visibility.FACE_DOWN,
+            obj.state       ?? PileState.EMPTY,
+            obj.name        ?? this.gameLabels.nextId,
+            obj.visibility  ?? Visibility.FACE_DOWN,
             this.gameLabels
         );
         this.board.piles.push(pile);
