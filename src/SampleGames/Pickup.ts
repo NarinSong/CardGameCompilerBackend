@@ -41,6 +41,4 @@ const playCard = new Action(
 
 Pickup.addActionToStep(step1, playCard);
 
-// Step 5: Instantiate the Game
-
-const game1 = Pickup.createGame();
+export default Pickup;

@@ -1,4 +1,4 @@
-import Card from "../Components.ts/Card";
+import Card from "../Components/Card";
 import { Label } from "../Rules/LabelManager";
 import PileDefinition from "../Rules/PileDefinition";
 import { PileState, Visibility } from "../types";

@@ -4,7 +4,9 @@
 // It's passed down to action results
 
 import GameDefinition from "../Rules/GameDefinition";
-import { PlayerType } from "../types";
+import { Label } from "../Rules/LabelManager";
+import StepDefinition from "../Rules/StepDefinition";
+import { PlayerType, TriggerType } from "../types";
 import GameState from "./GameState";
 import Player from "./Player";
 
@@ -35,7 +37,22 @@ export default class Game {
         }
 
         // Move to step 1
-        this.definition.getStartingStep();
+        this.currentStep = this.definition.getStartingStep();
+    }
+
+    clickAction(label: string) {
+        const actions = this.currentActions;
+        if (!actions) return;
+
+        for (let action of actions) {
+            if (action.trigger.type === TriggerType.CLICK && action.trigger.target == label && action.filter.fn(this.gameState)) {
+                console.log(`Player took action by clicking on label ${label}`);
+                action.result.fn(this.gameState);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     get currentActions() {
@@ -52,5 +69,9 @@ export default class Game {
 
     get gameLabels() {
         return this.gameState.gameLabels;
+    }
+
+    set currentStep(step: StepDefinition | null) {
+        this.gameState.currentStep = step;
     }
 }

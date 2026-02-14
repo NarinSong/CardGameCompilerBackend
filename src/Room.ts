@@ -2,14 +2,30 @@
 // There will be many of these, and each one will have a dedicated worker thread
 // Each room can hold one game
 
+import Client from "./Client";
 import Game from "./Game/Game";
 
 export default class Room {
-    game: Game | null;
+    game: Game;
+    clients: Client[];
+    name: string;
 
-    constructor() {
-        this.game = null;
+    constructor(game: Game, client: Client, name: string) {
+        this.game = game;
+        this.clients = [client];
+        this.name = name;
+
+        game.startGame();
     }
 
-    // TODO: initialize game etc.
+    handlePlayerClick(label: string) {
+        let actionTaken = this.game.clickAction(label); // TODO: player number?
+
+        if (actionTaken) {
+            // Update clients with new gamestate
+            for (let c of this.clients) {
+                c.updateGamestate(this.game.gameState);
+            }
+        }
+    }
 }

@@ -13,6 +13,7 @@ import PlayerDefinition from "./PlayerDefinition";
 import StepDefinition from "./StepDefinition";
 import { PileState, Visibility } from "../types";
 import Game from "../Game/Game";
+import Logger from "../Components/Logger";
 
 export default class GameDefinition {
     phases: GamePhaseDefinition[];
@@ -55,6 +56,7 @@ export default class GameDefinition {
 
     addPhase(name?: string) {
         const phase = new GamePhaseDefinition(this.labelManger, name);
+        this.phases.push(phase);
         return phase.label;
     }
 
@@ -64,6 +66,7 @@ export default class GameDefinition {
             throw new Error("Failed to add step to nonexistent phase");
         
         const step = new StepDefinition(this.labelManger, stepName);
+        phase.addStep(step);
         return step.label;
     }
 
@@ -76,9 +79,13 @@ export default class GameDefinition {
     }
 
     getStartingStep() {
-        if (this.phases.length && this.phases[0]?.steps.length) {
-            return this.phases[0].steps[0];
+        if (this.phases.length != 0 && this.phases[0]?.steps.length != 0) {
+            return this.phases[0]?.steps[0] || null;
         }
+
+        Logger.debug(`No starting step for this game`);
+        Logger.debug(`Phases: ${this.phases.reduce((prev, curr, idx, arr) => `${prev} ${curr.label}`, '')}`);
+        Logger.debug(`Steps: ${this.phases[0] ? this.phases[0].steps.reduce((prev, curr, idx, arr) => `${prev} ${curr.label}`, '') : ' N/A'}`);
 
         return null;
     }

@@ -1,7 +1,7 @@
 // This is what holds the board and players
 // It also has the interactions that actions' results are allowed to use
 
-import Card from "../Components.ts/Card";
+import Card from "../Components/Card";
 import GameDefinition from "../Rules/GameDefinition";
 import { Label } from "../Rules/LabelManager";
 import PileDefinition from "../Rules/PileDefinition";
