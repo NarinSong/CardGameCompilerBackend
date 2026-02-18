@@ -4,7 +4,7 @@
 import Card from "../Components/Card";
 import Logger from "../Components/Logger";
 import GameDefinition from "../Rules/GameDefinition";
-import { Label } from "../Rules/LabelManager";
+import { Label, StepLabel } from "../Rules/LabelManager";
 import PileDefinition from "../Rules/PileDefinition";
 import StepDefinition from "../Rules/StepDefinition";
 import { PileState, Visibility } from "../types";
@@ -76,5 +76,13 @@ export default class GameState {
         if (p1 && p2) {
             Card.dealCards(p1, p2, number);
         }
+    }
+
+    moveToStep(stepName: string) {
+        const step = this.gameLabels.getStepFromLabel(stepName);
+
+        if (!step) return;
+
+        this.currentStep = step;
     }
 }

@@ -9,6 +9,7 @@ import { ActionRole, PlayerType, TriggerType } from "../types";
 import GameState from "./GameState";
 import Player from "./Player";
 import { GamePiece } from "./GameLabels";
+import Logger from "../Components/Logger";
 
 
 export default class Game {
@@ -22,11 +23,13 @@ export default class Game {
 
     // Assuming for now that the player can join. No restrictions on when :)
     handlePlayerJoin(type: PlayerType) {
+        Logger.debug('Player joined');
         if (this.players.length < this.definition.maxPlayers) {
             const p = new Player(this.definition.player, type, this.gameLabels);
             this.players.push(p);
             return p;
         }
+        Logger.debug('Player join failure');
         return null;
     }
 

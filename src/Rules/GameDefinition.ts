@@ -114,6 +114,14 @@ export default class GameDefinition {
         return null;
     }
 
+    get minPlayers () {
+        return this.gameMeta.minPlayers;
+    }
+
+    get maxPlayers () {
+        return this.gameMeta.maxPlayers;
+    }
+
     set minPlayers (minPlayers: number) {
         this.gameMeta.minPlayers = minPlayers;
     }

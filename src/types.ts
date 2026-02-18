@@ -25,6 +25,12 @@ export const RANK = [
     'Seven','Eight','Nine','Ten','Jack','Queen','King'
 ] as const;
 
+export const Rank = Object.fromEntries(
+    RANK.map((name, index) => [name, index])
+) as Record<typeof RANK[number], number>;
+
+
+
 export const SUIT = [
     'Clubs','Diamonds','Hearts','Spades'
 ] as const;

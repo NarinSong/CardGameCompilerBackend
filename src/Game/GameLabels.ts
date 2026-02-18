@@ -1,5 +1,5 @@
 import GamePhaseDefinition from "../Rules/GamePhaseDefinition";
-import LabelManager, { Label } from "../Rules/LabelManager";
+import LabelManager, { Label, StepLabel } from "../Rules/LabelManager";
 import StepDefinition from "../Rules/StepDefinition";
 import Counter from "./Counter";
 import Pile from "./Pile";
@@ -33,6 +33,10 @@ export default class GameLabels {
 
     getFromLabel(label: Label) {
         return this.gameObjectLabels[label];
+    }
+
+    getStepFromLabel(label: StepLabel) {
+        return this.gameStepLabels[label];
     }
 
     get nextId() {

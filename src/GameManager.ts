@@ -5,6 +5,7 @@ import { Socket } from 'socket.io';
 import Client from './Client'
 import Room from './Room';
 import Pickup from './SampleGames/Pickup';
+import War from './SampleGames/War';
 
 export default class GameManager {
     // No constructor, since everything here is static. There is only one.
@@ -25,7 +26,7 @@ export default class GameManager {
     static createPrototypeRoom(client: Client) {
         const name = GameManager.nextRoom;
 
-        const room = new Room(Pickup.createGame(), client, name);
+        const room = new Room(War.createGame(), client, name);
 
         GameManager.rooms[name] = room;
 

@@ -4,6 +4,7 @@
 
 import Client from "./Client";
 import Game from "./Game/Game";
+import { PlayerType } from "./types";
 
 export default class Room {
     game: Game;
@@ -15,7 +16,8 @@ export default class Room {
         this.clients = [client];
         this.name = name;
 
-        game.startGame();
+        this.game.handlePlayerJoin(PlayerType.HUMAN);
+        this.game.startGame();
     }
 
     handlePlayerClick(label: string) {

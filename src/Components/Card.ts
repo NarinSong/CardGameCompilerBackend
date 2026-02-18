@@ -1,5 +1,6 @@
 import Pile from "../Game/Pile";
 import { PileState, RANK, rank, SUIT, suit } from "../types";
+import Logger from "./Logger";
 
 export default class Card {
     rank: rank;
@@ -8,6 +9,13 @@ export default class Card {
     constructor(rank: rank, suit: suit) {
         this.rank = rank;
         this.suit = suit;
+    }
+
+    static numberRank(card: Card) {
+        for (let i in RANK) {
+            if (card.rank == RANK[i]) return +i;
+        }
+        return -1;
     }
 
     static defaultDeck() {
@@ -63,5 +71,18 @@ export default class Card {
                 to.cards.push(card);
             i++;
         }
+    }
+
+    static isBigger(from: Card | undefined, to: Card | undefined) {
+        Logger.debug('Checking which card is bigger');
+        
+        if (!from || !to) return false;
+
+        const indexA = Card.numberRank(from);
+        const indexB = Card.numberRank(to);
+
+        Logger.debug(`${from.rank} is ${indexA} vs ${to.rank} is ${indexB}`);
+
+        return indexA > indexB;
     }
 }
