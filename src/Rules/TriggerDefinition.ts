@@ -3,14 +3,13 @@
 //      will message the server and the server will look for
 //      associated actions, which will be filtered and the result run
 
-import { Label } from "./LabelManager";
-import { TriggerType } from "../types";
+import { ActionRole, TriggerType } from "../types";
 
 export default class Trigger {
     type: TriggerType;
-    target: Label;
+    target: ActionRole;
 
-    constructor(type: TriggerType, target: Label) {
+    constructor(type: TriggerType, target: ActionRole) {
         this.type = type;
         this.target = target;
     }

@@ -25,7 +25,7 @@ export default class Board {
 
     initializeCounters(definition: CounterDefinition[], gameLabels: GameLabels) {
         for (let def of definition) {
-            this.counters.push(new Counter(def, gameLabels))
+            this.counters.push(Counter.fromDefinition(def, gameLabels))
         }
     }
 }

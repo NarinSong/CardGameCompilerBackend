@@ -1,6 +1,7 @@
 import GameState from "../Game/GameState";
 import Action from "../Rules/ActionDefinition";
 import GameDefinition from "../Rules/GameDefinition";
+import { Label } from "../Rules/LabelManager";
 import Result from "../Rules/ResultDefinition";
 import Trigger from "../Rules/TriggerDefinition";
 import { PileState, TriggerType, Visibility } from "../types";
@@ -21,7 +22,7 @@ Pickup.maxPlayers = 4;
 
 // Step 3: Define the Board
 
-Pickup.addBoardPile('Deck', PileState.SHUFFLED, Visibility.FACE_DOWN);
+Pickup.addBoardPile({label: 'Deck', initialValue: PileState.SHUFFLED, visibility: Visibility.FACE_DOWN });
 
 // Step 4: Create the Actions
 
@@ -32,13 +33,26 @@ const playCard = new Action(
     new Trigger(TriggerType.CLICK, 'Deck'),
     null,
     new Result(
-        (game: GameState) => {
-            const pile = game.addPile({visibility: Visibility.FACE_UP});
+        (game: GameState, label: Label) => {
+            const pile = game.addPile({visibility: Visibility.FACE_UP, actionRole: 'Card', displayName: 'Card Pile'});
             game.dealCards('Deck', pile, 1);
         }
     )
 );
 
 Pickup.addActionToStep(step1, playCard);
+
+const restoreCard = new Action(
+    new Trigger(TriggerType.CLICK, 'Card'),
+    null,
+    new Result(
+        (game: GameState, label: Label) => {
+            console.log('Removing ' + label);
+            game.removePileFromBoard({ pile: label, sendCardsTo: 'Deck' });
+        }
+    )
+)
+
+Pickup.addActionToStep(step1, restoreCard);
 
 export default Pickup;

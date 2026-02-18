@@ -4,10 +4,10 @@ import StepDefinition from "../Rules/StepDefinition";
 import Counter from "./Counter";
 import Pile from "./Pile";
 
-type GameObject = Pile | Counter;
+export type GamePiece = Pile | Counter;
 
 export default class GameLabels {
-    gameObjectLabels: Record<Label, GameObject>;
+    gameObjectLabels: Record<Label, GamePiece>;
     gamePhaseLabels: Record<Label, GamePhaseDefinition>;
     gameStepLabels: Record<Label, StepDefinition>;
     #nextId: number;
@@ -25,6 +25,10 @@ export default class GameLabels {
 
     registerCounter(counter: Counter, label: Label) {
         this.gameObjectLabels[label] = counter;
+    }
+
+    unregister(label: Label) {
+        delete this.gameObjectLabels[label];
     }
 
     getFromLabel(label: Label) {

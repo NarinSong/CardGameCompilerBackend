@@ -34,23 +34,47 @@ export default class GameDefinition {
         return new Game(this);
     }
 
-    addPlayerPile(name: string, startingState?: PileState, visibility?: Visibility) {
-        const pile = new PileDefinition(this.labelManger, name, startingState, visibility);
+    addPlayerPile(definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRole?: string | undefined,
+            initialValue?: PileState | undefined,
+            visibility?: Visibility | undefined,
+        }) {
+        const pile = new PileDefinition({ labelManager: this.labelManger, ... definition });
         this.player.piles.push(pile);
     }
 
-    addPlayerCounter(name: string, startingValue?: number) {
-        const counter = new CounterDefinition(this.labelManger, name, startingValue);
+    addPlayerCounter(definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRole?: string | undefined,
+            initialValue?: number | undefined,
+            visibility?: Visibility | undefined,
+        }) {
+        const counter = new CounterDefinition({ labelManager: this.labelManger, ... definition });
         this.player.counters.push(counter);
     }
 
-    addBoardPile(name: string, startingState?: PileState, visibility?: Visibility) {
-        const pile = new PileDefinition(this.labelManger, name, startingState, visibility);
+    addBoardPile(definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRole?: string | undefined,
+            initialValue?: PileState | undefined,
+            visibility?: Visibility | undefined,
+        }) {
+        const pile = new PileDefinition({ labelManager: this.labelManger, ... definition });
         this.board.piles.push(pile);
     }
 
-    addBoardCounter(name: string, startingValue?: number) {
-        const counter = new CounterDefinition(this.labelManger, name, startingValue);
+    addBoardCounter(definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRole?: string | undefined,
+            initialValue?: number | undefined,
+            visibility?: Visibility | undefined,
+        }) {
+        const counter = new CounterDefinition({ labelManager: this.labelManger, ... definition });
         this.board.counters.push(counter);
     }
 

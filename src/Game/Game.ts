@@ -4,11 +4,11 @@
 // It's passed down to action results
 
 import GameDefinition from "../Rules/GameDefinition";
-import { Label } from "../Rules/LabelManager";
 import StepDefinition from "../Rules/StepDefinition";
-import { PlayerType, TriggerType } from "../types";
+import { ActionRole, PlayerType, TriggerType } from "../types";
 import GameState from "./GameState";
 import Player from "./Player";
+import { GamePiece } from "./GameLabels";
 
 
 export default class Game {
@@ -44,10 +44,17 @@ export default class Game {
         const actions = this.currentActions;
         if (!actions) return;
 
+        // Get the object that was clicked on
+        let gameObject : GamePiece | undefined = this.gameLabels.getFromLabel(label);
+
+        if (!gameObject) return;
+
+        let actionRole: ActionRole = gameObject.actionRole;
+
         for (let action of actions) {
-            if (action.trigger.type === TriggerType.CLICK && action.trigger.target == label && action.filter.fn(this.gameState)) {
+            if (action.trigger.type === TriggerType.CLICK && action.trigger.target == actionRole && action.filter.fn(this.gameState)) {
                 console.log(`Player took action by clicking on label ${label}`);
-                action.result.fn(this.gameState);
+                action.result.fn(this.gameState, label);
                 return true;
             }
         }

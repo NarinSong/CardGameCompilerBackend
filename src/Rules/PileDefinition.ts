@@ -5,17 +5,27 @@
 // And type (52-card, dominoes, etc.)
 
 import LabelManager, { Label } from "./LabelManager";
-import { PileState, Visibility } from "../types";
+import { ActionRole, DisplayName, PileState, Visibility } from "../types";
 
 export default class PileDefinition {
     label: Label;
     initialState: PileState;
     visibility: Visibility;
-
-    constructor(labelManager: LabelManager, name: string, initialState?: PileState, visibility?: Visibility) {
-        this.label = labelManager.createLabel(this, name);
-        this.initialState = initialState || PileState.EMPTY;
-        this.visibility = visibility || Visibility.FACE_UP;
+    displayName: DisplayName;
+    actionRole: ActionRole;
+    
+    constructor(definition: {
+        labelManager: LabelManager,
+        label?: string | undefined,
+        displayName?: string | undefined,
+        actionRole?: string | undefined,
+        initialValue?: PileState | undefined,
+        visibility?: Visibility | undefined,
+    }) {
+        this.initialState = definition.initialValue ?? PileState.EMPTY;
+        this.label = definition.labelManager.createLabel(this, definition.label);
+        this.displayName = definition.displayName ?? this.label;
+        this.actionRole = definition.actionRole ?? this.label;
+        this.visibility = definition.visibility ?? Visibility.FACE_UP;
     }
-
 }
