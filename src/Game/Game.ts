@@ -10,7 +10,7 @@ import GameState from "./GameState";
 import Player from "./Player";
 import { GamePiece } from "./GameLabels";
 import Logger from "../Components/Logger";
-import { ActionContext, evaluate } from "../AST/Parser2";
+import { ActionContext, evaluate } from "../Components/TreeParser";
 
 
 export default class Game {

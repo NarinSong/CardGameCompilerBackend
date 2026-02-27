@@ -1,4 +1,4 @@
-import { ValueNode } from "../AST/Parser2";
+import { ValueNode } from "../Components/TreeParser";
 import GameState from "../Game/GameState";
 import Action from "../Rules/ActionDefinition";
 import GameDefinition from "../Rules/GameDefinition";

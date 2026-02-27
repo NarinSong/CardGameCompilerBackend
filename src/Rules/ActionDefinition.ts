@@ -3,7 +3,7 @@
 //      along with a filter (when they can do it)
 //      and a result (what happens when the action is taken)
 
-import { ActionNode, ValueNode } from "../AST/Parser2";
+import { ActionNode, ValueNode } from "../Components/TreeParser";
 import { FilterFn } from "../types";
 import Trigger from "./TriggerDefinition";
 
