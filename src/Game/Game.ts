@@ -15,6 +15,9 @@ import Logger from "../Components/Logger";
 export default class Game {
     definition: GameDefinition;
     gameState: GameState;
+
+    // Player handling
+    #nextPlayerId: number = 0;
     
     constructor(definition: GameDefinition) {
         this.gameState = new GameState(definition);
@@ -24,17 +27,29 @@ export default class Game {
     // Assuming for now that the player can join. No restrictions on when :)
     handlePlayerJoin(type: PlayerType) {
         Logger.debug('Player joined');
-        if (this.players.length < this.definition.maxPlayers) {
-            const p = new Player(this.definition.player, type, this.gameLabels);
-            this.players.push(p);
-            return p;
+        if (this.numPlayers < this.definition.maxPlayers) {
+            // Assign the new player's id
+            let id = this.nextPlayerId;
+
+            const p = new Player(this.definition.player, type, this.gameLabels, id);
+            this.players[id] = p;
+            this.numPlayers++;
+
+            // Create piles and counters
+            for (let pd of this.definition.player.piles) {
+                this.gameState.createPileFromDefinition(pd, id);
+            }
+
+            for (let cd of this.definition.player.counters) {
+                this.gameState.createCounterFromDefinition(cd, id);
+            }
         }
         Logger.debug('Player join failure');
         return null;
     }
 
     startGame() {
-        while (this.players.length < this.definition.minPlayers) {
+        while (this.numPlayers < this.definition.minPlayers) {
             // Add bots
             this.handlePlayerJoin(PlayerType.ROBOT);
         }
@@ -65,12 +80,20 @@ export default class Game {
         return false;
     }
 
+    get nextPlayerId() {
+        return this.#nextPlayerId++;
+    }
+
     get currentActions() {
         return this.currentStep?.actions || [];
     }
 
     get players() {
         return this.gameState.players;
+    }
+
+    get numPlayers() {
+        return this.gameState.numPlayers;
     }
 
     get currentStep() {
@@ -83,5 +106,9 @@ export default class Game {
 
     set currentStep(step: StepDefinition | null) {
         this.gameState.currentStep = step;
+    }
+
+    set numPlayers(numPlayers) {
+        this.gameState.numPlayers = numPlayers;
     }
 }

@@ -3,11 +3,13 @@
 
 import Card from "../Components/Card";
 import Logger from "../Components/Logger";
+import BoardDefinition from "../Rules/BoardDefinition";
+import CounterDefinition from "../Rules/CounterDefinition";
 import GameDefinition from "../Rules/GameDefinition";
 import { Label, StepLabel } from "../Rules/LabelManager";
 import PileDefinition from "../Rules/PileDefinition";
 import StepDefinition from "../Rules/StepDefinition";
-import { PileState, Visibility } from "../types";
+import { BoardID, PileState, PlayerID, PlayerType, Visibility } from "../types";
 import Board from "./Board";
 import Counter from "./Counter";
 import GameLabels from "./GameLabels";
@@ -16,22 +18,48 @@ import Player from "./Player";
 
 export default class GameState {
     gameLabels: GameLabels;
-    players: Player[];
+    players: Record<PlayerID, Player>;
+    numPlayers: number = 0;
     board: Board;
     currentStep: StepDefinition | null;
+    piles: Record<Label, {pile: Pile, owner: PlayerID | BoardID}>;
+    counters: Record<Label, {counter: Counter, owner: PlayerID | BoardID}>;
 
     constructor(definition: GameDefinition) {
         this.gameLabels = new GameLabels(definition.labelManger);
         this.board = new Board(definition.board, this.gameLabels);
-        this.players = [];
+        this.initializeBoard(definition.board);
+        this.players = {};
         this.currentStep = null;
+        this.piles = {};
+        this.counters = {};
     }
-    
+
+    initializeBoard(definition: BoardDefinition) {
+        for (let pd of definition.piles) {
+            this.createPileFromDefinition(pd, -1);
+        }
+
+        for (let cd of definition.counters) {
+            this.createCounterFromDefinition(cd, -1);
+        }
+    }
 
     // --- These functions are available to the "Results" part of actions ---
 
-    addPile(obj: { state?: PileState, name?: string, visibility?: Visibility, actionRole?: string, displayName?: string } = {}) {
-        // To the board
+    createPileFromDefinition(pileDefinition: PileDefinition, id: number) {
+        const pile = Pile.fromDefinition(pileDefinition, this.gameLabels);
+
+        this.piles[pile.label] = { pile: pile, owner: id };
+    }
+
+    createCounterFromDefinition(counterDefinition: CounterDefinition, id: number) {
+        const counter = Counter.fromDefinition(counterDefinition, this.gameLabels);
+
+        this.counters[counter.label] = { counter: counter, owner: id };
+    }
+
+    createPile(obj: { state?: PileState, name?: string, visibility?: Visibility, actionRole?: string, displayName?: string, owner?: PlayerID | BoardID } = {}) {
         const name = obj.name        ?? this.gameLabels.nextId;
 
         const pile = Pile.create(
@@ -42,31 +70,32 @@ export default class GameState {
             obj.actionRole  ?? name,
             obj.displayName ?? name,
         );
-        this.board.piles.push(pile);
+        this.piles[name] = { pile: pile, owner: obj.owner ?? -1 };
 
         return pile.label;
     }
 
-    removePileFromBoard(obj: { pile: Label, sendCardsTo?: Label }) {
-        const pile: Pile | Counter | undefined = this.gameLabels.getFromLabel(obj.pile);
-        const to: Pile | Counter | undefined = obj.sendCardsTo ? this.gameLabels.getFromLabel(obj.sendCardsTo) : undefined;
+    createPileOnBoard(obj: { state?: PileState, name?: string, visibility?: Visibility, actionRole?: string, displayName?: string} = {}) {
+        this.createPile({ ...obj, owner: -1 });
+    }
 
-        if (!pile || !(pile instanceof Pile))
+    createPileForPlayer(obj: { state?: PileState, name?: string, visibility?: Visibility, actionRole?: string, displayName?: string, owner?: PlayerID } = {}) {
+        this.createPile(obj);
+    }
+
+    removePileByLabel(pile: Label, sendCardsTo?: Label) {
+        const mainPile: Pile | undefined = this.piles[pile]?.pile;
+        const to: Pile | undefined = sendCardsTo ? this.piles[sendCardsTo]?.pile : undefined;
+
+        if (!mainPile)
             return;
 
-        const idx = this.board.piles.findIndex((value: Pile) => pile.label == value.label);
-
-        Logger.debug(`Removing pile at index ${idx} from the board. It's label is ${obj.pile}`);
-
-        if (idx === -1)
-            return;
-
-        if (to && to instanceof Pile) {
-            Card.dealCards(pile, to, 100000);
+        if (to) {
+            Card.dealCards(mainPile, to, 100000);
         }
 
-        this.gameLabels.unregister(obj.pile);
-        this.board.piles.splice(idx, 1);
+        this.gameLabels.unregister(pile);
+        delete this.piles[pile];
     }
 
     dealCards(from: Label, to: Label, number: number) {

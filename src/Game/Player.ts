@@ -1,35 +1,17 @@
 import CounterDefinition from "../Rules/CounterDefinition";
 import PileDefinition from "../Rules/PileDefinition";
 import PlayerDefinition from "../Rules/PlayerDefinition";
-import { PlayerType } from "../types";
+import { PlayerID, PlayerType } from "../types";
 import Counter from "./Counter";
 import GameLabels from "./GameLabels";
 import Pile from "./Pile";
 
 export default class Player {
-    piles: Pile[];
-    counters: Counter[];
     type: PlayerType;
+    id: PlayerID;
 
-    constructor(definition: PlayerDefinition, type: PlayerType, gameLabels: GameLabels) {
+    constructor(definition: PlayerDefinition, type: PlayerType, gameLabels: GameLabels, id: PlayerID) {
         this.type = type;
-        this.piles = [];
-        this.counters = [];
-
-        this.initializePiles(definition.piles, gameLabels);
-        this.initializeCounters(definition.counters, gameLabels);
+        this.id = id;
     }
-
-    initializePiles(definition: PileDefinition[], gameLabels: GameLabels) {
-        for (let def of definition) {
-            this.piles.push(Pile.fromDefinition(def, gameLabels))
-        }
-    }
-
-    initializeCounters(definition: CounterDefinition[], gameLabels: GameLabels) {
-        for (let def of definition) {
-            this.counters.push(Counter.fromDefinition(def, gameLabels))
-        }
-    }
-    
 }

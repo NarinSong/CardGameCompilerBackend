@@ -40,3 +40,6 @@ export type rank = string;
 export type suit = string;
 export type DisplayName = string;
 export type ActionRole = string;
+
+export type PlayerID = number;
+export type BoardID = -1;
