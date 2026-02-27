@@ -10,6 +10,7 @@ import GameState from "./GameState";
 import Player from "./Player";
 import { GamePiece } from "./GameLabels";
 import Logger from "../Components/Logger";
+import { ActionContext, evaluate } from "../AST/Parser2";
 
 
 export default class Game {
@@ -43,6 +44,8 @@ export default class Game {
             for (let cd of this.definition.player.counters) {
                 this.gameState.createCounterFromDefinition(cd, id);
             }
+
+            return p;
         }
         Logger.debug('Player join failure');
         return null;
@@ -70,9 +73,11 @@ export default class Game {
         let actionRole: ActionRole = gameObject.actionRole;
 
         for (let action of actions) {
-            if (action.trigger.type === TriggerType.CLICK && action.trigger.target == actionRole && action.filter.fn(this.gameState)) {
+            const ctx: ActionContext = { label: label, trigger: action.trigger };
+            if (action.trigger.type === TriggerType.CLICK && action.trigger.target == actionRole && evaluate(this, ctx, action.filter)) {
+                
                 console.log(`Player took action by clicking on label ${label}`);
-                action.result.fn(this.gameState, label);
+                evaluate(this, ctx, action.result);
                 return true;
             }
         }

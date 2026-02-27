@@ -70,35 +70,32 @@
             if (!currentGameState) return;
 
             const board = document.getElementById("board");
-            board.innerHTML = ""; // wipe everything (prototype behavior)
+            board.innerHTML = ""; // wipe everything
 
-            // ---- Render Board ----
+            // ---- Create Board Section ----
             const boardSection = document.createElement("div");
             boardSection.className = "section";
             boardSection.innerHTML = "<h2>Board</h2>";
-
-            renderPiles(currentGameState.board.piles, boardSection);
-            renderCounters(currentGameState.board.counters, boardSection);
-
             board.appendChild(boardSection);
 
-            // ---- Render Players ----
-            currentGameState.players.forEach((player, index) => {
+            // ---- Create Player Sections ----
+            const playerSections = {};
+            Object.keys(currentGameState.players).forEach(playerID => {
                 const playerSection = document.createElement("div");
                 playerSection.className = "section";
-                playerSection.innerHTML = `<h2>Player ${index}</h2>`;
-
-                renderPiles(player.piles, playerSection);
-                renderCounters(player.counters, playerSection);
-
+                playerSection.innerHTML = `<h2>Player ${playerID}</h2>`;
                 board.appendChild(playerSection);
+                playerSections[playerID] = playerSection;
             });
-        }
 
-        function renderPiles(piles, parent) {
-            if (!piles) return;
+            // ---- Render Piles ----
+            Object.values(currentGameState.piles).forEach(({ pile, owner }) => {
+                if (!pile) return;
 
-            piles.forEach(pile => {
+                const targetDiv =
+                    owner === -1 ? boardSection : playerSections[owner];
+                if (!targetDiv) return; // skip if player section not found
+
                 const pileDiv = document.createElement("div");
                 pileDiv.className = "pile";
                 pileDiv.onclick = () => elementClick(pile.label);
@@ -110,7 +107,9 @@
                 if (pile.visibility === 2) {
                     pileDiv.appendChild(document.createTextNode("NOT VISIBLE"));
                 } else if (pile.visibility === 1) {
-                    pileDiv.appendChild(document.createTextNode(`FACE DOWN (${pile.cards.length} cards)`));
+                    pileDiv.appendChild(
+                        document.createTextNode(`FACE DOWN (${pile.cards.length} cards)`)
+                    );
                 } else {
                     // FACE UP
                     pile.cards.forEach(card => {
@@ -121,18 +120,21 @@
                     });
                 }
 
-                parent.appendChild(pileDiv);
+                targetDiv.appendChild(pileDiv);
             });
-        }
 
-        function renderCounters(counters, parent) {
-            if (!counters) return;
+            // ---- Render Counters ----
+            Object.values(currentGameState.counters).forEach(({ counter, owner }) => {
+                if (!counter) return;
 
-            counters.forEach(counter => {
+                const targetDiv =
+                    owner === -1 ? boardSection : playerSections[owner];
+                if (!targetDiv) return;
+
                 const counterDiv = document.createElement("div");
                 counterDiv.className = "counter";
                 counterDiv.innerText = `${counter.label}: ${counter.value}`;
-                parent.appendChild(counterDiv);
+                targetDiv.appendChild(counterDiv);
             });
         }
 

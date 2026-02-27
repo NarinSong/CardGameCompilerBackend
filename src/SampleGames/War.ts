@@ -1,3 +1,5 @@
+/*
+
 import Card from "../Components/Card";
 import GameState from "../Game/GameState";
 import Pile from "../Game/Pile";
@@ -92,4 +94,4 @@ const restoreCard = new Action(
 
 War.addActionToStep(step1, restoreCard);
 
-export default War;
+export default War;*/

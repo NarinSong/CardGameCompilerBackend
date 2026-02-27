@@ -28,11 +28,11 @@ export default class GameState {
     constructor(definition: GameDefinition) {
         this.gameLabels = new GameLabels(definition.labelManger);
         this.board = new Board(definition.board, this.gameLabels);
-        this.initializeBoard(definition.board);
         this.players = {};
         this.currentStep = null;
         this.piles = {};
         this.counters = {};
+        this.initializeBoard(definition.board);
     }
 
     initializeBoard(definition: BoardDefinition) {
@@ -59,7 +59,7 @@ export default class GameState {
         this.counters[counter.label] = { counter: counter, owner: id };
     }
 
-    createPile(obj: { state?: PileState, name?: string, visibility?: Visibility, actionRole?: string, displayName?: string, owner?: PlayerID | BoardID } = {}) {
+    createPile(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRole?: string | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined } = {}) {
         const name = obj.name        ?? this.gameLabels.nextId;
 
         const pile = Pile.create(
@@ -75,15 +75,15 @@ export default class GameState {
         return pile.label;
     }
 
-    createPileOnBoard(obj: { state?: PileState, name?: string, visibility?: Visibility, actionRole?: string, displayName?: string} = {}) {
-        this.createPile({ ...obj, owner: -1 });
+    createPileOnBoard(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRole?: string | undefined, displayName?: string | undefined } = {}) {
+        return this.createPile({ ...obj, owner: -1 });
     }
 
-    createPileForPlayer(obj: { state?: PileState, name?: string, visibility?: Visibility, actionRole?: string, displayName?: string, owner?: PlayerID } = {}) {
-        this.createPile(obj);
+    createPileForPlayer(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRole?: string | undefined, displayName?: string | undefined, owner?: PlayerID | undefined } = {}) {
+        return this.createPile(obj);
     }
 
-    removePileByLabel(pile: Label, sendCardsTo?: Label) {
+    removePileByLabel(pile: Label, sendCardsTo?: Label | undefined) {
         const mainPile: Pile | undefined = this.piles[pile]?.pile;
         const to: Pile | undefined = sendCardsTo ? this.piles[sendCardsTo]?.pile : undefined;
 

@@ -1,5 +1,4 @@
 import Game from "../Game/Game";
-import Action from "../Rules/ActionDefinition";
 import { Label } from "../Rules/LabelManager";
 import Trigger from "../Rules/TriggerDefinition";
 import { BoardID, PileState, PlayerID, Visibility } from "../types";
@@ -10,6 +9,10 @@ type Undefined = 'UNDEFINED';
 type UnaryOperators = 'NOT';
 type BinaryOperators = 'AND' | 'OR' |  'PLUS' | 'TIMES' | 'DIV' | 'MINUS';
 type TernaryOperators = 'TERNARY';
+
+type GameOperators = 
+    { type: 'CREATE_PILE'; state: ValueNode, name: ValueNode, visibility: ValueNode, actionRole: ValueNode, displayName: ValueNode, owner: ValueNode }
+    | { type: 'CLICKED_LABEL' }
 // TODO: extract game info as a value type
 
 // Game return info
@@ -17,13 +20,15 @@ type PileReturnInfo = PileState | Visibility | PlayerID | BoardID;
 
 type ValueReturn = number | Label | boolean | PileReturnInfo;
 
-type ValueNode =
+export type ValueNode =
   { type: Undefined }
   | { type: Literal; primary: ValueReturn }
   | { type: UnaryOperators; primary: ValueNode }
   | { type: BinaryOperators; primary: ValueNode; secondary: ValueNode }
   | { type: TernaryOperators; primary: ValueNode; secondary: ValueNode; tertiary: ValueNode }
-
+  // Game actions that return labels are also allowed
+  | GameOperators
+  
 
 // Logic and handling
 type GameLogicExecutors = 
@@ -33,11 +38,13 @@ type GameLogicExecutors =
 // Game Actions
 type GameActionExecutors = 
     { type: 'DEAL_CARDS'; primary: ValueNode, secondary: ValueNode, tertiary: ValueNode }
-    | { type: 'CREATE_PILE'; state: ValueNode, name: ValueNode, visibility: ValueNode, actionRole: ValueNode, displayName: ValueNode, owner: ValueNode }
+    | { type: 'REMOVE_PILE'; pile: ValueNode, sendTo: ValueNode }
 
-type ActionNode = GameActionExecutors | GameLogicExecutors;
+export type ActionNode = GameActionExecutors | GameLogicExecutors;
 
-type ActionContext = { trigger: Trigger; label: Label | undefined }
+
+export type ActionContext = { trigger: Trigger; label: Label | undefined }
+export type AST = ValueNode | ActionNode;
 
 // Helper functions
 function executeDealCards(g: Game, c: ActionContext, node: ActionNode) {
@@ -46,21 +53,30 @@ function executeDealCards(g: Game, c: ActionContext, node: ActionNode) {
     g.gameState.dealCards(evaluate(g, c, node.primary) as Label, evaluate(g, c, node.secondary) as Label, evaluate(g, c, node.tertiary) as number);
 }
 
-function executeCreatePile(g: Game, c: ActionContext, node: ActionNode) {
+function executeCreatePile(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'CREATE_PILE') throw new Error("Called executeCreatePile with an invalid node");
     
     // Note: Any of these could be "UNDEFINED" nodes, which will then be given default values
     return g.gameState.createPile({
-                state: evaluate(g, c , node.state) as PileState,
-                name: evaluate(g, c, node.name) as string,
-                visibility: evaluate(g, c, node.visibility) as Visibility,
-                actionRole: evaluate(g, c, node.actionRole) as string,
-                displayName: evaluate(g, c, node.displayName) as string,
-                owner: evaluate(g, c, node.owner) as number
+                state: evaluate(g, c , node.state) as PileState | undefined,
+                name: evaluate(g, c, node.name) as string | undefined,
+                visibility: evaluate(g, c, node.visibility) as Visibility | undefined,
+                actionRole: evaluate(g, c, node.actionRole) as string | undefined,
+                displayName: evaluate(g, c, node.displayName) as string | undefined,
+                owner: evaluate(g, c, node.owner) as number | undefined
             });
 }
 
-function evaluate(g: Game, c: ActionContext, node: ValueNode | ActionNode): ValueReturn | undefined {
+function executeRemovePile(g: Game, c: ActionContext, node: ActionNode) {
+    if (node.type !== 'REMOVE_PILE') throw new Error("Called executeRemovePile with an invalid node");
+
+    g.gameState.removePileByLabel(
+        evaluate(g, c, node.pile) as Label,
+        evaluate(g, c, node.sendTo) as Label | undefined
+    )
+}
+
+export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | undefined {
     switch (node.type) {
         // Literal
         case 'UNDEFINED': return undefined;
@@ -82,6 +98,8 @@ function evaluate(g: Game, c: ActionContext, node: ValueNode | ActionNode): Valu
         // Game Actions
         case 'DEAL_CARDS': executeDealCards(g, c, node); return;
         case 'CREATE_PILE': return executeCreatePile(g, c, node);
+        case 'REMOVE_PILE': executeRemovePile(g, c, node); return;
+        case 'CLICKED_LABEL': return c.label;
     }
 
     //throw new Error(`Unsupported type ${node.type}`);

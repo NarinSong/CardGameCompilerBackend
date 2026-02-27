@@ -3,21 +3,18 @@
 //      along with a filter (when they can do it)
 //      and a result (what happens when the action is taken)
 
+import { ActionNode, ValueNode } from "../AST/Parser2";
 import { FilterFn } from "../types";
-import Filter from "./FilterDefinition";
-import Result from "./ResultDefinition";
 import Trigger from "./TriggerDefinition";
 
-const defaultFilter : FilterFn = () => true;
-
 export default class Action {
-    result: Result;
-    filter: Filter;
+    result: ActionNode;
+    filter: ValueNode;
     trigger: Trigger;
 
-    constructor(trigger: Trigger, filter: Filter | null, result: Result) {
+    constructor(trigger: Trigger, filter: ValueNode | null, result: ActionNode) {
         this.trigger = trigger;
-        this.filter = filter || new Filter(defaultFilter);
+        this.filter = filter || { type: 'LITERAL', primary: true };
         this.result = result;
     }
 }

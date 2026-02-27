@@ -10,7 +10,3 @@ Logger.LOG_LEVEL = 5;
 Logger.log('The server is open for business.');
 
 const clientHandler = new PrototypeClient();
-
-import v from './AST/PrototypeParser';
-
-console.log(v);
