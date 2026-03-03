@@ -1,24 +1,29 @@
 import Game from "../Game/Game";
+import Pile from "../Game/Pile";
 import { Label } from "../Rules/LabelManager";
 import Trigger from "../Rules/TriggerDefinition";
 import { BoardID, PileState, PlayerID, Visibility } from "../types";
+import Card from "./Card";
 
 // Represents one or more nodes that ultimately return a value
 type Literal = 'LITERAL';
 type Undefined = 'UNDEFINED';
 type UnaryOperators = 'NOT';
-type BinaryOperators = 'AND' | 'OR' |  'PLUS' | 'TIMES' | 'DIV' | 'MINUS';
+type BinaryOperators = 'AND' | 'OR' |  'PLUS' | 'TIMES' | 'DIV' | 'MINUS' | 'STRING_EQ' | 'MAP';
 type TernaryOperators = 'TERNARY';
 
 type GameOperators = 
     { type: 'CREATE_PILE'; state: ValueNode, name: ValueNode, visibility: ValueNode, actionRole: ValueNode, displayName: ValueNode, owner: ValueNode }
     | { type: 'CLICKED_LABEL' }
+    | { type: 'RANK'; primary: ValueNode }
+    | { type: 'SUIT'; primary: ValueNode }
+    | { type: 'CTX_CARD' }
 // TODO: extract game info as a value type
 
 // Game return info
 type PileReturnInfo = PileState | Visibility | PlayerID | BoardID;
 
-type ValueReturn = number | Label | boolean | PileReturnInfo;
+type ValueReturn = number | Label | boolean | PileReturnInfo | Card | Pile;
 
 export type ValueNode =
   { type: Undefined }
@@ -43,7 +48,7 @@ type GameActionExecutors =
 export type ActionNode = GameActionExecutors | GameLogicExecutors;
 
 
-export type ActionContext = { trigger: Trigger; label: Label | undefined }
+export type ActionContext = { trigger: Trigger; label: Label | undefined; card?: Card | undefined };
 export type AST = ValueNode | ActionNode;
 
 // Helper functions
@@ -76,6 +81,7 @@ function executeRemovePile(g: Game, c: ActionContext, node: ActionNode) {
     )
 }
 
+// Note: calls to evaluate should *always* be wrapped in a try-catch :)
 export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | undefined {
     switch (node.type) {
         // Literal
@@ -90,6 +96,8 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | un
         case 'TIMES': return (evaluate(g, c, node.primary) as number) * (evaluate(g, c, node.secondary) as number);
         case 'MINUS': return (evaluate(g, c, node.primary) as number) - (evaluate(g, c, node.secondary) as number);
         case 'DIV': return (evaluate(g, c, node.primary) as number) / (evaluate(g, c, node.secondary) as number);
+        // Strings
+        case 'STRING_EQ': return (evaluate(g, c, node.primary) as string) == (evaluate(g, c, node.secondary) as string);
         // Ternary
         case 'TERNARY': return evaluate(g, c, node.primary) ? evaluate(g, c, node.secondary) : evaluate(g, c, node.tertiary);
         // Game Logic
@@ -100,6 +108,12 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | un
         case 'CREATE_PILE': return executeCreatePile(g, c, node);
         case 'REMOVE_PILE': executeRemovePile(g, c, node); return;
         case 'CLICKED_LABEL': return c.label;
+        case 'CTX_CARD': return c.card;
+        // Game info extraction
+        case 'RANK': return (evaluate(g, c, node.primary) as Card).rank;
+        case 'SUIT': return (evaluate(g, c, node.primary) as Card).suit;
+        // Map usage
+        case 'MAP': return (g.definition.gameMeta.maps[ evaluate(g, c, node.secondary) as string ]?.get( evaluate(g, c, node.primary) ));
     }
 
     //throw new Error(`Unsupported type ${node.type}`);
