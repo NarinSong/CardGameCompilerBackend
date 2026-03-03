@@ -19,5 +19,8 @@ export default class Client {
     updateGamestate(gamestate: GameState) {
         // Prototype client
         this.connection.emit('gamestate', gamestate);
+
+        // TODO: create view-sliced gamestate for this specific client
+        
     }
 }
