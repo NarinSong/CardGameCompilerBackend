@@ -1,6 +1,6 @@
 import path from "node:path";
-import GameManager from "./GameManager";
-import Room from "./Room";
+import GameManager from "../GameManager";
+import Room from "../Room";
 
 const express = require('express');
 const { createServer } = require('node:http');

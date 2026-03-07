@@ -59,7 +59,7 @@ export default class GameState {
         this.counters[counter.label] = { counter: counter, owner: id };
     }
 
-    createPile(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRole?: string | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined } = {}) {
+    createPile(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined } = {}) {
         const name = obj.name        ?? this.gameLabels.nextId;
 
         const pile = Pile.create(
@@ -67,7 +67,7 @@ export default class GameState {
             name,
             obj.visibility  ?? Visibility.FACE_DOWN,
             this.gameLabels,
-            obj.actionRole  ?? name,
+            obj.actionRoles ?? [name],
             obj.displayName ?? name,
         );
         this.piles[name] = { pile: pile, owner: obj.owner ?? -1 };
@@ -75,11 +75,11 @@ export default class GameState {
         return pile.label;
     }
 
-    createPileOnBoard(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRole?: string | undefined, displayName?: string | undefined } = {}) {
+    createPileOnBoard(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined } = {}) {
         return this.createPile({ ...obj, owner: -1 });
     }
 
-    createPileForPlayer(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRole?: string | undefined, displayName?: string | undefined, owner?: PlayerID | undefined } = {}) {
+    createPileForPlayer(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | undefined } = {}) {
         return this.createPile(obj);
     }
 

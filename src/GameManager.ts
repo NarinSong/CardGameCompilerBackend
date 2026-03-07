@@ -2,7 +2,7 @@
 // The room list, client list, etc. will be in here
 // This is so that the distinct parts of the server can all grab information that is important to them
 import { Socket } from 'socket.io';
-import Client from './Client'
+import Client from './Client/Client'
 import Room from './Room';
 import Pickup from './SampleGames/Pickup';
 

@@ -48,7 +48,10 @@ const playCard = new Action(
                 secondary: {
                     type: 'CREATE_PILE',
                     visibility: L(Visibility.FACE_UP),
-                    actionRole: L('Card'),
+                    actionRoles: {
+                        type: 'ARRAY',
+                        sequence: [L('Card')]
+                    },
                     displayName: L('Card Pile'),
                     state: { type: 'UNDEFINED' },
                     name: { type: 'UNDEFINED' },

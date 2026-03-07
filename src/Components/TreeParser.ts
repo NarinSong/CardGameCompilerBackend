@@ -7,13 +7,14 @@ import Card from "./Card";
 
 // Represents one or more nodes that ultimately return a value
 type Literal = 'LITERAL';
+type Structures = 'ARRAY';
 type Undefined = 'UNDEFINED';
 type UnaryOperators = 'NOT';
 type BinaryOperators = 'AND' | 'OR' |  'PLUS' | 'TIMES' | 'DIV' | 'MINUS' | 'STRING_EQ' | 'MAP';
 type TernaryOperators = 'TERNARY';
 
 type GameOperators = 
-    { type: 'CREATE_PILE'; state: ValueNode, name: ValueNode, visibility: ValueNode, actionRole: ValueNode, displayName: ValueNode, owner: ValueNode }
+    { type: 'CREATE_PILE'; state: ValueNode, name: ValueNode, visibility: ValueNode, actionRoles: ValueNode, displayName: ValueNode, owner: ValueNode }
     | { type: 'CLICKED_LABEL' }
     | { type: 'RANK'; primary: ValueNode }
     | { type: 'SUIT'; primary: ValueNode }
@@ -23,7 +24,7 @@ type GameOperators =
 // Game return info
 type PileReturnInfo = PileState | Visibility | PlayerID | BoardID;
 
-type ValueReturn = number | Label | boolean | PileReturnInfo | Card | Pile;
+type ValueReturn = number | Label | boolean | PileReturnInfo | Card | Pile | any[];
 
 export type ValueNode =
   { type: Undefined }
@@ -31,6 +32,7 @@ export type ValueNode =
   | { type: UnaryOperators; primary: ValueNode }
   | { type: BinaryOperators; primary: ValueNode; secondary: ValueNode }
   | { type: TernaryOperators; primary: ValueNode; secondary: ValueNode; tertiary: ValueNode }
+  | { type: Structures; sequence: ValueNode[] }
   // Game actions that return labels are also allowed
   | GameOperators
   
@@ -52,6 +54,18 @@ export type ActionContext = { trigger: Trigger; label: Label | undefined; card?:
 export type AST = ValueNode | ActionNode;
 
 // Helper functions
+function executeCreateArray(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== 'ARRAY') throw new Error("Called executeCreateArray with an invalid node");
+
+    const arr = [];
+
+    for (let n of node.sequence) {
+        arr.push(evaluate(g, c, n));
+    }
+
+    return arr;
+}
+
 function executeDealCards(g: Game, c: ActionContext, node: ActionNode) {
     if (node.type !== 'DEAL_CARDS') throw new Error("Called executeDealCards with an invalid node");
     
@@ -66,7 +80,7 @@ function executeCreatePile(g: Game, c: ActionContext, node: ValueNode) {
                 state: evaluate(g, c , node.state) as PileState | undefined,
                 name: evaluate(g, c, node.name) as string | undefined,
                 visibility: evaluate(g, c, node.visibility) as Visibility | undefined,
-                actionRole: evaluate(g, c, node.actionRole) as string | undefined,
+                actionRoles: evaluate(g, c, node.actionRoles) as string[] | undefined,
                 displayName: evaluate(g, c, node.displayName) as string | undefined,
                 owner: evaluate(g, c, node.owner) as number | undefined
             });
@@ -87,6 +101,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | un
         // Literal
         case 'UNDEFINED': return undefined;
         case 'LITERAL': return node.primary;
+        case 'ARRAY': return executeCreateArray(g, c, node);
         // Boolean
         case 'AND': return evaluate(g, c, node.primary) && evaluate(g, c, node.secondary);
         case 'OR': return evaluate(g, c, node.primary) || evaluate(g, c, node.secondary);

@@ -3,7 +3,7 @@
 // It will also be the main file (e.g. execution begins here)
 
 import Logger from './Components/Logger';
-import PrototypeClient from './PrototypeClient';
+import PrototypeClient from './Client/PrototypeClient';
 
 Logger.LOG_LEVEL = 5;
 

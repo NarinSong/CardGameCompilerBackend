@@ -4,11 +4,11 @@
 import ValueMap, { CardValueMap } from "../Components/ValueMap";
 import { Label } from "../Rules/LabelManager";
 import { PlayerID, Visibility } from "../types";
-import Board from "./Board";
-import Counter from "./Counter";
-import Game from "./Game";
-import Pile from "./Pile";
-import Player from "./Player";
+import Board from "../Game/Board";
+import Counter from "../Game/Counter";
+import Game from "../Game/Game";
+import Pile from "../Game/Pile";
+import Player from "../Game/Player";
 
 type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number}[], label: string, displayName: string, actionRoles: string[] };
 type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[] };

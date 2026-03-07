@@ -5,7 +5,10 @@
 //      A Player may be a robot / AI and have no associated client
 // Clients have a method of sending information to the user (sockets for prototype, whatever Unity uses for that)
 
-import GameState from "./Game/GameState";
+import Game from "../Game/Game";
+import GameState from "../Game/GameState";
+import Player from "../Game/Player";
+import ClientView from "./ClientView";
 
 export default class Client {
     identifier: string;
@@ -16,9 +19,10 @@ export default class Client {
         this.connection = connection; // For prototype, this will be a Socket. For Unity, we will find out when we get there :)
     }
 
-    updateGamestate(gamestate: GameState) {
+    // TODO: I expect a reference to "Player" or at least "PlayerID" will be stored in the client class eventually
+    updateGamestate(game: Game, player: Player) {
         // Prototype client
-        this.connection.emit('gamestate', gamestate);
+        this.connection.emit('gamestate', ClientView.fromGamestate(game, player));
 
         // TODO: create view-sliced gamestate for this specific client
         
