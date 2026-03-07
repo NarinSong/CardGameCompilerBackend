@@ -6,7 +6,7 @@ import GameDefinition from "../Rules/GameDefinition";
 import GamePhaseDefinition from "../Rules/GamePhaseDefinition";
 import { verifyClientGameDefintion } from "../schemas/ClientGameDefinition";
 
-function buildGameFromJSON(clientJson: unknown) {
+export function buildGameFromJSON(clientJson: unknown) {
     const data = verifyClientGameDefintion(clientJson);
     if (!data) return null;
 

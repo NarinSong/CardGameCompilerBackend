@@ -6,9 +6,10 @@
 // Clients have a method of sending information to the user (sockets for prototype, whatever Unity uses for that)
 
 import Game from "../Game/Game";
-import GameState from "../Game/GameState";
 import Player from "../Game/Player";
+import GameDefinition from "../Rules/GameDefinition";
 import ClientView from "./ClientView";
+import { buildGameFromJSON } from "./GameBuilder";
 
 export default class Client {
     identifier: string;
@@ -19,12 +20,21 @@ export default class Client {
         this.connection = connection; // For prototype, this will be a Socket. For Unity, we will find out when we get there :)
     }
 
+    submitRulesFromEditor(rules: unknown) {
+        try {
+            const game: GameDefinition | null = buildGameFromJSON(rules);
+            if (game == null) return;
+
+            // TODO: use the game definition somewhere
+        } catch (error) {
+            console.debug(error);
+        }
+    }
+
     // TODO: I expect a reference to "Player" or at least "PlayerID" will be stored in the client class eventually
     updateGamestate(game: Game, player: Player) {
         // Prototype client
         this.connection.emit('gamestate', ClientView.fromGamestate(game, player));
-
-        // TODO: create view-sliced gamestate for this specific client
         
     }
 }
