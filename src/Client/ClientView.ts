@@ -3,7 +3,7 @@
 
 import ValueMap, { CardValueMap } from "../Components/ValueMap";
 import { Label } from "../Rules/LabelManager";
-import { PlayerID, Visibility } from "../types";
+import { PlayerID, Visibility } from "../schemas/types";
 import Board from "../Game/Board";
 import Counter from "../Game/Counter";
 import Game from "../Game/Game";

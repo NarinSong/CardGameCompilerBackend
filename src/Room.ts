@@ -4,7 +4,7 @@
 
 import Client from "./Client/Client";
 import Game from "./Game/Game";
-import { PlayerType } from "./types";
+import { PlayerType } from "./schemas/types";
 
 export default class Room {
     game: Game;

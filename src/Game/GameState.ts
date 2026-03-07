@@ -9,7 +9,7 @@ import GameDefinition from "../Rules/GameDefinition";
 import { Label, StepLabel } from "../Rules/LabelManager";
 import PileDefinition from "../Rules/PileDefinition";
 import StepDefinition from "../Rules/StepDefinition";
-import { BoardID, PileState, PlayerID, PlayerType, Visibility } from "../types";
+import { BoardID, PileState, PlayerID, PlayerType, Visibility } from "../schemas/types";
 import Board from "./Board";
 import Counter from "./Counter";
 import GameLabels from "./GameLabels";

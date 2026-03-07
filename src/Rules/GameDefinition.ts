@@ -11,7 +11,7 @@ import LabelManager, { PhaseLabel, StepLabel } from "./LabelManager";
 import PileDefinition from "./PileDefinition";
 import PlayerDefinition from "./PlayerDefinition";
 import StepDefinition from "./StepDefinition";
-import { PileState, Visibility } from "../types";
+import { PileState, Visibility } from "../schemas/types";
 import Game from "../Game/Game";
 import Logger from "../Components/Logger";
 

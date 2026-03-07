@@ -1,7 +1,7 @@
 import CounterDefinition from "../Rules/CounterDefinition";
 import PileDefinition from "../Rules/PileDefinition";
 import PlayerDefinition from "../Rules/PlayerDefinition";
-import { PlayerID, PlayerType } from "../types";
+import { PlayerID, PlayerType } from "../schemas/types";
 import Counter from "./Counter";
 import GameLabels from "./GameLabels";
 import Pile from "./Pile";

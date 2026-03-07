@@ -1,7 +1,7 @@
 import Card from "../Components/Card";
 import { Label } from "../Rules/LabelManager";
 import PileDefinition from "../Rules/PileDefinition";
-import { ActionRole, DisplayName, PileState, Visibility } from "../types";
+import { ActionRole, DisplayName, PileState, Visibility } from "../schemas/types";
 import GameLabels from "./GameLabels";
 
 export default class Pile {

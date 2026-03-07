@@ -1,10 +1,10 @@
-import { ValueNode } from "../Components/TreeParser";
+import { ValueNode } from "../schemas/AST";
 import GameState from "../Game/GameState";
 import Action from "../Rules/ActionDefinition";
 import GameDefinition from "../Rules/GameDefinition";
 import { Label } from "../Rules/LabelManager";
 import Trigger from "../Rules/TriggerDefinition";
-import { PileState, TriggerType, Visibility } from "../types";
+import { PileState, TriggerType, Visibility } from "../schemas/types";
 
 const Pickup = new GameDefinition();
 

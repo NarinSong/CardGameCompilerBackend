@@ -3,7 +3,7 @@
 //      will message the server and the server will look for
 //      associated actions, which will be filtered and the result run
 
-import { ActionRole, TriggerType } from "../types";
+import { ActionRole, TriggerType } from "../schemas/types";
 
 export default class Trigger {
     type: TriggerType;

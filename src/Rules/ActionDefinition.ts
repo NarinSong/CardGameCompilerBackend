@@ -3,8 +3,7 @@
 //      along with a filter (when they can do it)
 //      and a result (what happens when the action is taken)
 
-import { ActionNode, ValueNode } from "../Components/TreeParser";
-import { FilterFn } from "../types";
+import { ActionNode, ValueNode } from "../schemas/AST";
 import Trigger from "./TriggerDefinition";
 
 export default class Action {

@@ -1,6 +1,6 @@
 import CounterDefinition from "../Rules/CounterDefinition";
 import { Label } from "../Rules/LabelManager";
-import { ActionRole, DisplayName, Visibility } from "../types";
+import { ActionRole, DisplayName, Visibility } from "../schemas/types";
 import GameLabels from "./GameLabels";
 
 export default class Counter {

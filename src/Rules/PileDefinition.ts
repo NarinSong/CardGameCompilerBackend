@@ -5,7 +5,7 @@
 // And type (52-card, dominoes, etc.)
 
 import LabelManager, { Label } from "./LabelManager";
-import { ActionRole, DisplayName, PileState, Visibility } from "../types";
+import { ActionRole, DisplayName, PileState, Visibility } from "../schemas/types";
 
 export default class PileDefinition {
     label: Label;

@@ -5,7 +5,7 @@
 
 import GameDefinition from "../Rules/GameDefinition";
 import StepDefinition from "../Rules/StepDefinition";
-import { ActionRole, PlayerType, TriggerType } from "../types";
+import { ActionRole, PlayerType, TriggerType } from "../schemas/types";
 import GameState from "./GameState";
 import Player from "./Player";
 import { GamePiece } from "./GameLabels";

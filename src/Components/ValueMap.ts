@@ -1,6 +1,7 @@
 import Game from "../Game/Game";
 import Card from "./Card";
-import { ActionContext, evaluate, ValueNode } from "./TreeParser";
+import { ActionContext, ValueNode } from "../schemas/AST";
+import { evaluate } from "./TreeParser";
 
 export default class ValueMap<T extends string | number, N> implements ValueMap<T,N> {
     #mapping: Record<T,N>;

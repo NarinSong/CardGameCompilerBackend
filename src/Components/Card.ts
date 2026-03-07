@@ -1,14 +1,15 @@
 import Pile from "../Game/Pile";
-import { PileState, RANK, rank, SUIT, suit } from "../types";
+import { CardArgs } from "../schemas/GameComponentArgs";
+import { PileState, RANK, rank, SUIT, suit } from "../schemas/types";
 import Logger from "./Logger";
 
 export default class Card {
     rank: rank;
     suit: suit;
 
-    constructor(rank: rank, suit: suit) {
-        this.rank = rank;
-        this.suit = suit;
+    constructor(args: CardArgs) {
+        this.rank = args.rank;
+        this.suit = args.suit;
     }
 
     static numberRank(card: Card) {
@@ -23,7 +24,7 @@ export default class Card {
 
         for (const suit of SUIT) {
             for (const rank of RANK) {
-                cards.push(new Card(rank, suit));
+                cards.push(new Card({rank: rank, suit: suit}));
             }
         }
 
