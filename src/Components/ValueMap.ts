@@ -46,6 +46,15 @@ export const DEFAULT_CARD_RANK_MAP = new ValueMap<string, number>({
     'king': 12,
 })
 
+export const DEFAULT_CLIENT_VIEW_RANK_MAP = DEFAULT_CARD_RANK_MAP;
+export const DEFAULT_CLIENT_VIEW_SUIT_MAP = new ValueMap<string, number>({
+    'Clubs': 0,
+    'Diamonds': 1,
+    'Spades': 2,
+    'Hearts': 3,
+    'Jokers': 4,
+});
+
 export const DEFAULT_VALUE_MAP = new CalculationMap<Card, number>(
     {
         type: 'MAP', primary: {

@@ -8,7 +8,7 @@ export default class Pile {
     cards: Card[];
     label: Label;
     visibility: Visibility;
-    actionRole: ActionRole;
+    actionRoles: ActionRole[];
     displayName: DisplayName;
 
     private constructor(
@@ -16,13 +16,13 @@ export default class Pile {
         label: Label,
         visibility: Visibility,
         gameLabels: GameLabels,
-        actionRole: ActionRole,
+        actionRoles: ActionRole[],
         displayName: DisplayName,
     ) {
         this.cards = Card.fromInitialState(initialState);
         this.label = label;
         this.visibility = visibility;
-        this.actionRole = actionRole;
+        this.actionRoles = actionRoles;
         this.displayName = displayName;
 
         gameLabels.registerPile(this, this.label);
@@ -34,7 +34,7 @@ export default class Pile {
             definition.label,
             definition.visibility,
             gameLabels,
-            definition.actionRole,
+            definition.actionRoles,
             definition.displayName,
         );
     }
@@ -44,9 +44,9 @@ export default class Pile {
         label: Label,
         visibility: Visibility,
         gameLabels: GameLabels,
-        actionRole: ActionRole,
+        actionRoles: ActionRole[],
         displayName: DisplayName,
     ) {
-        return new Pile(initialState, label, visibility, gameLabels, actionRole, displayName);
+        return new Pile(initialState, label, visibility, gameLabels, actionRoles, displayName);
     }
 }

@@ -6,7 +6,7 @@ import GameLabels from "./GameLabels";
 export default class Counter {
     label: Label;
     value: number;
-    actionRole: ActionRole;
+    actionRoles: ActionRole[];
     displayName: DisplayName;
     visibility: Visibility;
     
@@ -15,13 +15,13 @@ export default class Counter {
         label: Label,
         visibility: Visibility,
         gameLabels: GameLabels,
-        actionRole: ActionRole,
+        actionRoles: ActionRole[],
         displayName: DisplayName,
     ) {
         this.value = initialState;
         this.label = label;
         this.visibility = visibility;
-        this.actionRole = actionRole;
+        this.actionRoles = actionRoles;
         this.displayName = displayName;
 
         gameLabels.registerCounter(this, this.label);
@@ -33,7 +33,7 @@ export default class Counter {
             definition.label,
             definition.visibility,
             gameLabels,
-            definition.actionRole,
+            definition.actionRoles,
             definition.displayName,
         );
     }
@@ -43,9 +43,9 @@ export default class Counter {
         label: Label,
         visibility: Visibility,
         gameLabels: GameLabels,
-        actionRole: ActionRole,
+        actionRoles: ActionRole[],
         displayName: DisplayName,
     ) {
-        return new Counter(initialState, label, visibility, gameLabels, actionRole, displayName);
+        return new Counter(initialState, label, visibility, gameLabels, actionRoles, displayName);
     }
 }
