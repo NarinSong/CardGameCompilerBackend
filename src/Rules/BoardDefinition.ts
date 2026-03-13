@@ -5,10 +5,19 @@
 import CounterDefinition from "./CounterDefinition";
 import PileDefinition from "./PileDefinition";
 
+
+/**
+ * Defines the piles and counters that make up the game board.
+ * 
+ *  A BoardDefinition contains the piles and counters associated with the game board itself rather than with an individual player.
+ */
 export default class BoardDefinition {
     piles: PileDefinition[];
     counters: CounterDefinition[];
 
+    /**
+     * Creates a new board definition.
+     */
     constructor() {
         this.piles = [];
         this.counters = [];
