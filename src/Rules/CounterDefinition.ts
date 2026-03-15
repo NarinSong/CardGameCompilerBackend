@@ -1,6 +1,12 @@
 import { ActionRole, DisplayName, Visibility } from "../schemas/types";
 import LabelManager, { Label } from "./LabelManager";
 
+
+/**
+ * Defines the properties that make up a counter in a game.
+ * 
+ * A CounterDefinition describes the initial value, label, display name, action roles, and visibility used when creating a counter.
+ */
 export default class CounterDefinition {
     number: number;
     label: Label;
@@ -8,6 +14,10 @@ export default class CounterDefinition {
     actionRoles: ActionRole[];
     visibility: Visibility;
 
+    /**
+     * Creates a new counter.
+     * @param definition - Configuration for the counter, including its label manager, label, display name, action roles, initial value, and visibility.
+     */
     constructor(definition: {
         labelManager: LabelManager,
         label?: string | undefined,

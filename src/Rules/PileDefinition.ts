@@ -7,13 +7,21 @@
 import LabelManager, { Label } from "./LabelManager";
 import { ActionRole, DisplayName, PileState, Visibility } from "../schemas/types";
 
+/**
+ * Defines the properties that make up a pile in a game.
+ * 
+ * A PileDefinition contains the label, initial state, visibility, display name, and action roles needed to create a pile.
+ */
 export default class PileDefinition {
     label: Label;
     initialState: PileState;
     visibility: Visibility;
     displayName: DisplayName;
     actionRoles: ActionRole[];
-    
+    /**
+     * Creates a new pile definition.
+     * @param definition - Configuration for the pile, including its label manager, label, display name, action roles, initial value, and visibility.
+     */
     constructor(definition: {
         labelManager: LabelManager,
         label?: string | undefined,

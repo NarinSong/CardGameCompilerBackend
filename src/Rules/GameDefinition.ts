@@ -15,6 +15,12 @@ import { PileState, Visibility } from "../schemas/types";
 import Game from "../Game/Game";
 import Logger from "../Components/Logger";
 
+
+/**
+ *   Defines the static rules, structure, and metadata for a game.
+ * 
+ *  A GameDefinition contains the phases, steps, board/player definitions, and action rules needed to create a runtime Game instance.
+ */
 export default class GameDefinition {
     phases: GamePhaseDefinition[];
     player: PlayerDefinition;
@@ -22,6 +28,9 @@ export default class GameDefinition {
     labelManger: LabelManager;
     gameMeta: GameMeta;
 
+    /**
+     * Creates a new game definition.
+     */
     constructor() {
         this.phases = [];
         this.player = new PlayerDefinition();
@@ -30,10 +39,19 @@ export default class GameDefinition {
         this.gameMeta = new GameMeta();
     }
 
+    /**
+     *  Creates a runtime Game instance from this game definition.
+     * 
+     * @returns A new game initialized from this definition.
+     */
     createGame() {
         return new Game(this);
     }
 
+    /**
+     *  Adds a pile definition to a player.
+     * @param definition - Configuration for the pile, including its label, display name, action role, initial value, and visibility.
+     */
     addPlayerPile(definition: {
             label?: string | undefined,
             displayName?: string | undefined,
@@ -45,6 +63,10 @@ export default class GameDefinition {
         this.player.piles.push(pile);
     }
 
+    /**
+     *  Adds a counter definition to a player
+     * @param definition - Configuration for the counter, including its label, display name, action role, initial value, and visibility.
+     */
     addPlayerCounter(definition: {
             label?: string | undefined,
             displayName?: string | undefined,
@@ -56,6 +78,10 @@ export default class GameDefinition {
         this.player.counters.push(counter);
     }
 
+    /**
+     *  Adds a pile definition to the board
+     * @param definition - Configuration for the pile, including its label, display name, action role, initial value, and visibility.
+     */
     addBoardPile(definition: {
             label?: string | undefined,
             displayName?: string | undefined,
@@ -67,6 +93,10 @@ export default class GameDefinition {
         this.board.piles.push(pile);
     }
 
+    /**
+     *  Adds a counter definition to the board
+     * @param definition - Configuration for the counter, including its label, display name, action role, initial value, and visibility.
+     */
     addBoardCounter(definition: {
             label?: string | undefined,
             displayName?: string | undefined,
@@ -78,12 +108,26 @@ export default class GameDefinition {
         this.board.counters.push(counter);
     }
 
+    /**
+     * Adds a phase to the game definition.
+     * 
+     * @param name - Optional name of the phase.
+     * @returns The label assigned to the new phase.
+     */
     addPhase(name?: string) {
         const phase = new GamePhaseDefinition(this.labelManger, name);
         this.phases.push(phase);
         return phase.label;
     }
 
+    /**
+     *  Adds a step to an existing phase.
+     * 
+     * @param phaseName - Label of the phase to add the step to.
+     * @param stepName - Optional Name of the step.
+     * @returns Label assigned to the new step.
+     * @throws Error if the phase does not exist.
+     */
     addStepToPhase(phaseName: PhaseLabel, stepName?: string) {
         const phase = this.labelManger.getPhaseFromLabel(phaseName);
         if (!phase)
@@ -94,6 +138,13 @@ export default class GameDefinition {
         return step.label;
     }
 
+    /**
+     *  Adds an action to an existing step.
+     * 
+     * @param stepName - Label of the step to add the action to.
+     * @param action - An action to append to the step.
+     * @throws Error if the step doesn't exist.
+     */
     addActionToStep(stepName: StepLabel, action: Action) {
         const step = this.labelManger.getStepFromLabel(stepName);
         if (!step)
@@ -102,6 +153,13 @@ export default class GameDefinition {
         step.actions.push(action);
     }
 
+    /**
+     *  Returns the first step of the first phase.
+     * 
+     * This is treated as the starting step for the game definition.
+     * 
+     * @returns The starting step, or null if no valid starting step exists.
+     */
     getStartingStep() {
         if (this.phases.length != 0 && this.phases[0]?.steps.length != 0) {
             return this.phases[0]?.steps[0] || null;
@@ -114,18 +172,30 @@ export default class GameDefinition {
         return null;
     }
 
+    /**
+     *  The minimum number of players supported by this game.
+     */
     get minPlayers () {
         return this.gameMeta.minPlayers;
     }
 
+    /**
+     *  The maximum number of players supported by this game.
+     */
     get maxPlayers () {
         return this.gameMeta.maxPlayers;
     }
 
+    /**
+     *  Sets the minimum number of players supported by this game.
+     */
     set minPlayers (minPlayers: number) {
         this.gameMeta.minPlayers = minPlayers;
     }
 
+    /**
+     *  Sets the maximum number of players supported by this game.
+     */
     set maxPlayers (maxPlayers: number) {
         this.gameMeta.maxPlayers = maxPlayers;
     }

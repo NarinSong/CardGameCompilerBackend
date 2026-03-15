@@ -1,28 +1,43 @@
 import { z } from "zod";
 
+/**
+ * Types of players supported by the game.
+ */
 export const PlayerTypeSchema = z.enum([
   "HUMAN",
   "ROBOT",
   "AI"
 ]);
 
+/**
+ * Possible states for a pile of cards.
+ */
 export const PileStateSchema = z.enum([
   "SORTED",
   "EMPTY",
   "SHUFFLED"
 ]);
 
+/**
+ * Possible states of visibility for piles or cards.
+ */
 export const VisibilitySchema = z.enum([
   "FACE_UP",
   "FACE_DOWN",
   "INVISIBLE"
 ]);
 
+/**
+ * Types of triggers that can execute actions.
+ */
 export const TriggerTypeSchema = z.enum([
   "CLICK"
 ]);
 
 
+/**
+ * Standard card ranks used by the game.
+ */
 export const RANK = [
   "Ace","Two","Three","Four","Five","Six",
   "Seven","Eight","Nine","Ten","Jack","Queen","King"
@@ -30,10 +45,16 @@ export const RANK = [
 
 export const RankSchema = z.enum(RANK);
 
+/**
+ * Look up table mapping a rank name to its numeric rank index
+ */
 export const RankIndex = Object.fromEntries(
   RANK.map((name, index) => [name, index])
 ) as Record<rank, number>;
 
+/**
+ * Standard card suits.
+ */
 export const SUIT = [
   "Clubs",
   "Diamonds",
