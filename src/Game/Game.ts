@@ -10,7 +10,8 @@ import GameState from "./GameState";
 import Player from "./Player";
 import { GamePiece } from "./GameLabels";
 import Logger from "../Components/Logger";
-import { ActionContext, evaluate } from "../Components/TreeParser";
+import { ActionContext } from "../schemas/AST";
+import { evaluate } from "../Components/TreeParser";
 
 
 export default class Game {
@@ -70,11 +71,11 @@ export default class Game {
 
         if (!gameObject) return;
 
-        let actionRole: ActionRole = gameObject.actionRole;
+        let actionRoles: ActionRole[] = gameObject.actionRoles;
 
         for (let action of actions) {
             const ctx: ActionContext = { label: label, trigger: action.trigger };
-            if (action.trigger.type === TriggerType.CLICK && action.trigger.target == actionRole && evaluate(this, ctx, action.filter)) {
+            if (action.trigger.type === TriggerType.CLICK && actionRoles.includes(action.trigger.target) && evaluate(this, ctx, action.filter)) {
                 
                 console.log(`Player took action by clicking on label ${label}`);
                 evaluate(this, ctx, action.result);

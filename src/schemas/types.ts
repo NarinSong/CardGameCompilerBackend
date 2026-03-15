@@ -44,6 +44,7 @@ export const SUIT = [
 export const SuitSchema = z.enum(SUIT);
 export const DisplayNameSchema = z.string();
 export const ActionRoleSchema = z.string();
+export const ActionRolesSchema = z.array(z.string());
 export const PlayerIDSchema = z.number();
 
 /* BoardID must equal -1 */

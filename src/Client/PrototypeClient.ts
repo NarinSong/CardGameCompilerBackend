@@ -14,7 +14,7 @@ export default class PrototypeClient {
         const io = new Server(server);
 
         app.get('/', (req: any, res: any) => {
-            res.sendFile(path.join(__dirname, '..', 'client-prototype', 'index.html'));
+            res.sendFile(path.join(__dirname, '..', '..', 'client-prototype', 'index.html'));
         });
 
         // NOTE: the following prototype client logic was created by ChatGPT

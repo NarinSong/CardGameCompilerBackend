@@ -49,7 +49,7 @@ const ValueReturnSchema: z.ZodType<any> = z.union([
 ]);
 
 export const ValueNodeSchema: z.ZodType<any> = z.lazy(() =>
-  z.union([
+  z.discriminatedUnion("type", [
 
     z.object({
       type: Undefined
@@ -114,7 +114,7 @@ export const ValueNodeSchema: z.ZodType<any> = z.lazy(() =>
 );
 
 export const ActionNodeSchema: z.ZodType<any> = z.lazy(() =>
-  z.union([
+  z.discriminatedUnion("type", [
 
     /* Logic */
 

@@ -4,7 +4,7 @@
 import { Socket } from 'socket.io';
 import Client from './Client/Client'
 import Room from './Room';
-import Pickup from './SampleGames/Pickup';
+import Pickup from './SampleGames/JsonReader';
 
 export default class GameManager {
     // No constructor, since everything here is static. There is only one.

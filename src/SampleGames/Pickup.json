@@ -1,0 +1,72 @@
+{
+    "gameMeta": {
+        "minPlayers": 1,
+        "maxPlayers": 1
+    },
+    "playerDefinition": {
+        "piles": []
+    },
+    "boardDefinition": {
+        "piles": [
+            {
+                "label": "Deck",
+                "initialState": "SHUFFLED",
+                "visibility": "FACE_DOWN"
+            }
+        ]
+    },
+    "phases": [
+        {
+            "name": "Main",
+            "steps": [
+                {
+                    "name": "step1",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "Deck" },
+                            "filter": null,
+                            "result": {
+                                "type": "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": {
+                                            "type": "CLICKED_LABEL"
+                                        },
+                                        "secondary": {
+                                            "type": "CREATE_PILE",
+                                            "visibility": {"type": "LITERAL", "primary": "FACE_UP"},
+                                            "actionRoles": {
+                                                "type": "ARRAY",
+                                                "sequence": [
+                                                    {"type": "LITERAL", "primary": "Card"}
+                                                ]
+                                            },
+                                            "state": { "type": "UNDEFINED" },
+                                            "name": { "type": "UNDEFINED" },
+                                            "displayName": { "type": "UNDEFINED" },
+                                            "owner": {"type": "LITERAL", "primary": -1}
+                                        },
+                                        "tertiary": {"type": "LITERAL", "primary": 1}
+                                    }
+                                ]
+                            }
+                        },
+
+                        {
+                            "trigger": {"type":"CLICK", "target": "Card"},
+                            "filter": null,
+                            "result": {
+                                "type": "REMOVE_PILE",
+                                "pile": {
+                                    "type": "CLICKED_LABEL"
+                                },
+                                "sendTo": { "type": "LITERAL", "primary": "Deck" }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

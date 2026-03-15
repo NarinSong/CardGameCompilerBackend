@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ActionNodeSchema, ValueNodeSchema } from "./AST";
 import { CardArgsSchema } from "./GameComponentArgs";
-import { ActionRoleSchema, PileStateSchema, TriggerTypeSchema, VisibilitySchema } from "./types";
+import { ActionRoleSchema, ActionRolesSchema, PileStateSchema, TriggerTypeSchema, VisibilitySchema } from "./types";
 
 // Arguments to definitions
 export const GameMetaArgsSchema = z.object({
@@ -17,7 +17,7 @@ export const PileSchema = z.object({
     initialState: PileStateSchema.optional(),
     visibility: VisibilitySchema.optional(),
     displayName: z.string().optional(),
-    actionRoles: ActionRoleSchema.optional(),
+    actionRoles: ActionRolesSchema.optional(),
 });
 
 export const CounterSchema = z.object({
@@ -25,7 +25,7 @@ export const CounterSchema = z.object({
     number: z.number().optional(),
     visibility: VisibilitySchema.optional(),
     displayName: z.string().optional(),
-    actionRoles: ActionRoleSchema.optional(),
+    actionRoles: ActionRolesSchema.optional(),
 });
 
 export const PlayerSchema = z.object({
