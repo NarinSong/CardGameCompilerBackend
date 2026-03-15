@@ -9,6 +9,14 @@ import Card from "./Card";
 import { ActionContext, ValueNode, ActionNode, AST, ValueReturn } from "../schemas/AST";
 
 // Helper functions
+/**
+ *  Evaluates an ARRAY value node and returns its computed array contents.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - ARRAY node to evaluate.
+ * @returns The evaluated array.
+ * @throws Error if the node is not an ARRAY node.
+ */
 function executeCreateArray(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'ARRAY') throw new Error("Called executeCreateArray with an invalid node");
 
@@ -21,12 +29,27 @@ function executeCreateArray(g: Game, c: ActionContext, node: ValueNode) {
     return arr;
 }
 
+/**
+ * Executes a "DEAL_CARDS" action node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - DEAL_CARDS action node to execute.
+ * @throws Error if the node is not a DEAL_CARDS node.
+ */
 function executeDealCards(g: Game, c: ActionContext, node: ActionNode) {
     if (node.type !== 'DEAL_CARDS') throw new Error("Called executeDealCards with an invalid node");
     
     g.gameState.dealCards(evaluate(g, c, node.primary) as Label, evaluate(g, c, node.secondary) as Label, evaluate(g, c, node.tertiary) as number);
 }
 
+/**
+ * Executes a "CREATE_PILE" value node and returns the created pile label.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - CREATE_PILE node to execute.
+ * @returns The label of the created pile.
+ * @throws Error if the node is not a CREATE_PILE node.
+ */
 function executeCreatePile(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'CREATE_PILE') throw new Error("Called executeCreatePile with an invalid node");
     
@@ -41,6 +64,13 @@ function executeCreatePile(g: Game, c: ActionContext, node: ValueNode) {
             });
 }
 
+/**
+ * Executes a "REMOVE_PILE" action node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - REMOVE_PILE action node to execute.
+ * @throws Error if the node is not a REMOVE_PILE node.
+ */
 function executeRemovePile(g: Game, c: ActionContext, node: ActionNode) {
     if (node.type !== 'REMOVE_PILE') throw new Error("Called executeRemovePile with an invalid node");
 
@@ -51,6 +81,19 @@ function executeRemovePile(g: Game, c: ActionContext, node: ActionNode) {
 }
 
 // Note: calls to evaluate should *always* be wrapped in a try-catch :)
+/**
+ * Evaluates an AST node within the current game and action context.
+ * 
+ * Depending on the node type, this function could:
+ * - return a computed value.
+ * - execute a game action with side effects.
+ * - return undefined for nodes that do not produce a value.
+ * 
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - AST node to evaluate.
+ * @returns The evaluated value or undefined if the node does not produce a value.
+ */
 export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | undefined {
     switch (node.type) {
         // Literal
