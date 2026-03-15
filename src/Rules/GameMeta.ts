@@ -32,6 +32,8 @@ export default class GameMeta {
     /**
      * Sets the minimum number of players supported by the game.
      *
+     * If the minimum number of players is greater than the maximum, the maximum number of players will also be updated to the same size as the minimum.
+     * 
      * @param minPlayers - Value of the minimum number of players supported.
      */
     set minPlayers(minPlayers: number) {
@@ -43,6 +45,8 @@ export default class GameMeta {
 
     /**
      * Sets the maximum number of players supported by the game.
+     * 
+     * If the maximum number of players is less than the minimum, the minimum number of players will also be updated to the same size as the maximum.
      * 
      * @param maxPlayers - Value of the maximum number of players supported.
      */
