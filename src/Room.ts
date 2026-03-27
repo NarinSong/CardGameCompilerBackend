@@ -8,12 +8,12 @@ import { PlayerType } from "./schemas/types";
 
 export default class Room {
     game: Game;
-    clients: Client[];
+    clients: number[];
     name: string;
 
-    constructor(game: Game, client: Client, name: string) {
+    constructor(game: Game, clientId: number, name: string) {
         this.game = game;
-        this.clients = [client];
+        this.clients = [clientId];
         this.name = name;
 
         this.game.handlePlayerJoin(PlayerType.HUMAN);
@@ -27,7 +27,11 @@ export default class Room {
             // Update clients with new gamestate
             for (let c of this.clients) {
                 if (!this.game.players[0]) continue;
-                c.updateGamestate(this.game, this.game.players[0]); // TODO: switch to player number instead of always 0
+                
+                const client = Client.clientFromId(c);
+                if (!client) continue;
+
+                client.updateGamestate(this.game, this.game.players[0]); // TODO: switch to player number instead of always 0
             }
         }
     }

@@ -7,17 +7,20 @@
 
 import Game from "../Game/Game";
 import Player from "../Game/Player";
+import GameManager from "../GameManager";
+import Room from "../Room";
 import GameDefinition from "../Rules/GameDefinition";
 import ClientView from "./ClientView";
 import { buildGameFromJSON } from "./GameBuilder";
+import { sendClientGamestate } from "..";
 
 export default class Client {
-    identifier: string;
-    connection: any;
+    static #nextId : number = 1000;
+    identifier: number;
+    room: Room | null = null;
 
-    constructor(id: string, connection: any)  {
-        this.identifier = id;
-        this.connection = connection; // For prototype, this will be a Socket. For Unity, we will find out when we get there :)
+    constructor()  {
+        this.identifier = Client.nextId;
     }
 
     submitRulesFromEditor(rules: unknown) {
@@ -31,10 +34,18 @@ export default class Client {
         }
     }
 
+    static clientFromId(clientId: number) {
+        const client = GameManager.clients[clientId];
+        if (!client) return null;
+        return client;
+    }
+
     // TODO: I expect a reference to "Player" or at least "PlayerID" will be stored in the client class eventually
     updateGamestate(game: Game, player: Player) {
-        // Prototype client
-        this.connection.emit('gamestate', ClientView.fromGamestate(game, player));
-        
+        sendClientGamestate(this.identifier, ClientView.fromGamestate(game, player));
+    }
+
+    static get nextId() {
+        return Client.#nextId++;
     }
 }
