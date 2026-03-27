@@ -1,0 +1,110 @@
+{
+    "nodes": [
+        {
+            "name": "DEAL_CARDS",
+            "displayName": "Deal Cards",
+            "returnType": "void",
+            "arguments": [
+                {
+                    "name": "primary",
+                    "displayName": "From",
+                    "type": "PileLabel",
+                    "optional": false
+                },
+                {
+                    "name": "secondary",
+                    "displayName": "To",
+                    "type": "PileLabel",
+                    "optional": false
+                },
+                {
+                    "name": "tertiary",
+                    "displayName": "number",
+                    "type": "Number",
+                    "optional": false
+                }
+            ]
+        },
+        {
+            "name": "CREATE_PILE",
+            "displayName": "Create Pile",
+            "returnType": "PileLabel",
+            "arguments": [
+                {
+                    "name": "state",
+                    "displayName": "Initial State",
+                    "type": "PileStateEnum",
+                    "optional": true
+                },
+                {
+                    "name": "name",
+                    "displayName": "Name",
+                    "type": "PileLabel",
+                    "optional": true
+                },
+                {
+                    "name": "visibility",
+                    "displayName": "Visibility",
+                    "type": "VisibilityEnum",
+                    "optional": true
+                },
+                {
+                    "name": "displayName",
+                    "displayName": "Display Name",
+                    "type": "string",
+                    "optional": true
+                },
+                {
+                    "name": "actionRoles",
+                    "displayName": "Action Roles",
+                    "type": "ActionRoleArray",
+                    "optional": true
+                }
+            ]
+        },
+        {
+            "name": "REMOVE_PILE",
+            "displayName": "Delete Pile",
+            "returnType": "void",
+            "arguments": [
+                {
+                    "name": "pile",
+                    "displayName": "Pile",
+                    "type": "PileLabel",
+                    "optional": false
+                },
+                {
+                    "name": "sendTo",
+                    "displayName": "To",
+                    "type": "PileLabel",
+                    "optional": true
+                }
+            ]
+        },
+        {
+            "name": "IF",
+            "displayName": "if",
+            "returnType": "void",
+            "arguments": [
+                {
+                    "name": "primary",
+                    "displayName": "Condition",
+                    "type": "Boolean",
+                    "optional": false
+                },
+                {
+                    "name": "secondary",
+                    "displayName": "Then",
+                    "type": "void",
+                    "optional": false
+                },
+                {
+                    "name": "tertiary",
+                    "displayName": "Else",
+                    "type": "void",
+                    "optional": true
+                }
+            ]
+        }
+    ]
+}

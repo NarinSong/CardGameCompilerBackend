@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager';
 import ClientView from './Client/ClientView';
 import Logger from './Components/Logger';
-import { clientRequestClickLabel, clientRequestGetAvailableGames, clientRequestStartNewGame } from './Client/ClientRequestParser';
+import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestStartNewGame } from './Client/ClientRequestParser';
 
 // Execution begins here
 // All socket connections come through here. Incoming AND outgoing.
@@ -31,6 +31,8 @@ io.on('connection', (socket: Socket) => {
 
     // Listeners
     socket.on('getAvailableGames', (callback) => {clientRequestGetAvailableGames(id, callback);});
+
+    socket.on('getAvailableBlocks', (callback) => {clientRequestGetAvailableBlocks(id, callback);});
 
     socket.on('startNewGame', (gameId, callback) => {clientRequestStartNewGame(id, gameId, callback);});
     socket.on('playerClickEvent', (label, callback) => {clientRequestClickLabel(id, label, callback);});

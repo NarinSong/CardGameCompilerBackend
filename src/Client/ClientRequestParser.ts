@@ -1,6 +1,7 @@
 import { z } from "zod";
 import GameManager from "../GameManager";
 import Client from "./Client";
+import CodeBlocks from "./CodeBlocks.json";
 
 // This file is for handling incoming socket requests from the client
 // All incoming requests come through here
@@ -14,6 +15,12 @@ function clientRequestGetAvailableGames(clientId: number, callback: (games: Reco
     const games: Record<string,number> = {'Pickup': 0, 'War': 1}; //TODO: replace with database call
 
     callback(games);
+}
+
+function clientRequestGetAvailableBlocks(clientId: number, callback: (games: typeof CodeBlocks) => void) {
+    // Send the available code blocks to the client
+
+    callback(CodeBlocks);
 }
 
 function clientRequestStartNewGame(clientId: number, game: unknown, callback: (succeeded: string | null) => void) {
@@ -47,6 +54,7 @@ function clientRequestClickLabel(clientId: number, label: unknown, callback: (su
 
 export {
     clientRequestGetAvailableGames,
+    clientRequestGetAvailableBlocks,
     clientRequestStartNewGame,
     clientRequestClickLabel,
 }
