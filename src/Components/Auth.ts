@@ -19,7 +19,7 @@ export default class Auth {
     // Despite NonSharedBuffer being deprecated, it's what the randomBytes built-in function returns, so it's what we're using
     static async randomBytes(): Promise<NonSharedBuffer | null> {
         // Have to wrap the callback-based randomBytes function in a promise
-         return new Promise((resolve) => {
+        return new Promise((resolve) => {
             randomBytes(128, (err, buf) => {
                 if (err) {
                     console.error(err);
@@ -31,18 +31,18 @@ export default class Auth {
         });
     }
 
-    static async authenticateUser(username: string, password: string): Promise<string> {
+    static async authenticateUser(username: string, password: string): Promise<string | null> {
         const passwordHashArray = await Database.getHashByUsername(username);
         
-        if (!passwordHashArray || !passwordHashArray[0]) return '';
+        if (!passwordHashArray || !passwordHashArray[0]) return null;
 
         const passwordHash = passwordHashArray[0].password; // Grab the first result from the database
         const matched = await argon2.verify(passwordHash, password);
 
-        if (!matched) return '';
+        if (!matched) return null;
 
         const buf = await Auth.randomBytes();
-        if (!buf) return '';
+        if (!buf) return null;
 
         const sessionId = buf.toString('hex');
         ACTIVE_USERS[sessionId] = username;
