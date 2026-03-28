@@ -14,17 +14,17 @@ function clientRequestPing(clientId: number, callback: (msg: string) => void) {
     callback(`Hello there ${clientId}`);
 }
 
-function clientRequestGetAvailableGames(clientId: number, callback: (games: Record<string,number>) => void) {
+function clientRequestGetAvailableGames(clientId: number, callback: (games: string) => void) {
     // Get the available games from the database and send those to the client
     const games: Record<string,number> = {'Pickup': 0, 'War': 1}; //TODO: replace with database call
 
-    callback(games);
+    callback(JSON.stringify(games));
 }
 
-function clientRequestGetAvailableBlocks(clientId: number, callback: (games: typeof CodeBlocks) => void) {
+function clientRequestGetAvailableBlocks(clientId: number, callback: (games: string) => void) {
     // Send the available code blocks to the client
 
-    callback(CodeBlocks);
+    callback(JSON.stringify(CodeBlocks));
 }
 
 function clientRequestStartNewGame(clientId: number, game: unknown, callback: (succeeded: string | null) => void) {
