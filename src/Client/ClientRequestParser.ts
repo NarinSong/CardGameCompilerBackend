@@ -10,6 +10,10 @@ import CodeBlocks from "./CodeBlocks.json";
 // All of the functions have a callback. Anything that doesn't return data will indicate either success or failure
 // Note: callback returns void, so return callback(arg); is the same as callback(arg); return;
 
+function clientRequestPing(clientId: number, callback: (msg: string) => void) {
+    callback(`Hello there ${clientId}`);
+}
+
 function clientRequestGetAvailableGames(clientId: number, callback: (games: Record<string,number>) => void) {
     // Get the available games from the database and send those to the client
     const games: Record<string,number> = {'Pickup': 0, 'War': 1}; //TODO: replace with database call
@@ -53,6 +57,7 @@ function clientRequestClickLabel(clientId: number, label: unknown, callback: (su
 
 
 export {
+    clientRequestPing,
     clientRequestGetAvailableGames,
     clientRequestGetAvailableBlocks,
     clientRequestStartNewGame,
