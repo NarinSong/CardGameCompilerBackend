@@ -81,16 +81,16 @@ export default class Game {
     /**
      * Evaluates and performs a click-triggered action for a labeled game object.
      * @param label - The label of the clicked game object.
-     * @returns True if a valid action was found and executed, false if no valid action was found, or undefined if the label does not map to a game object.
+     * @returns True if a valid action was found and executed, false if no valid action was found or if the label does not map to a game object.
      */
-    clickAction(label: string) {
+    clickAction(label: string): boolean {
         const actions = this.currentActions;
-        if (!actions) return;
+        if (!actions) return false;
 
         // Get the object that was clicked on
         let gameObject : GamePiece | undefined = this.gameLabels.getFromLabel(label);
 
-        if (!gameObject) return;
+        if (!gameObject) return false;
 
         let actionRoles: ActionRole[] = gameObject.actionRoles;
 

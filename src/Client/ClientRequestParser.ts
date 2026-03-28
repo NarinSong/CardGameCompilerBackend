@@ -44,7 +44,7 @@ function clientRequestClickLabel(clientId: number, label: unknown, callback: (su
     if (!result.success)
         return callback(false);
 
-    const client = Client.clientFromId(clientId);
+    const client = GameManager.clientFromId(clientId);
     if (!client) return callback(false);
 
     const room = client.room;

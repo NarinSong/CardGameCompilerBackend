@@ -2,7 +2,7 @@
 // The room list, client list, etc. will be in here
 // This is so that the distinct parts of the server can all grab information that is important to them
 import Client from './Client/Client'
-import Room from './Room';
+import Room from './Components/Room';
 import GameDefinition from './Rules/GameDefinition';
 
 export default class GameManager {
@@ -22,10 +22,16 @@ export default class GameManager {
         return client;
     }
 
+    static clientFromId(clientId: number) {
+        const client = GameManager.clients[clientId];
+        if (!client) return null;
+        return client;
+    }
+
     // TODO: assign a worker thread to the room
     static createRoom(gameId: number, clientId: number) {
         const game = this.availableGames[gameId];
-        const client = Client.clientFromId(clientId);
+        const client = GameManager.clientFromId(clientId);
 
         // TODO: Build game definition from database if not in "availableGames"
         if (!game || !client) return null; 
@@ -41,13 +47,25 @@ export default class GameManager {
     }
 
     static removeClient(clientId: number) {
-        const client = Client.clientFromId(clientId);
+        const client = GameManager.clientFromId(clientId);
         if (!client) return; // Already taken care of
 
         const room = client.room;
         if (room) delete GameManager.rooms[room.name];
 
         delete GameManager.clients[clientId];
+    }
+
+    static registerGameDefinition(game: GameDefinition, id: number) {
+        GameManager.availableGames[id] = game;
+    }
+
+    static getAvailableGameNames() {
+        const names: Record<string, string> = {};
+        for (const game in GameManager.availableGames) {
+            names[game] = 'Pickup';//GameManager.availableGames[game].name; // TODO: add other information like author, description. Probably will be connected to DB
+        }
+        return names;
     }
 
     static get nextRoom() {

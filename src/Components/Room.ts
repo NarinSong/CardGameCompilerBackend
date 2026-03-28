@@ -2,9 +2,9 @@
 // There will be many of these, and each one will have a dedicated worker thread
 // Each room can hold one game
 
-import Client from "./Client/Client";
-import Game from "./Game/Game";
-import { PlayerType } from "./schemas/types";
+import Game from "../Game/Game";
+import GameManager from "../GameManager";
+import { PlayerType } from "../schemas/types";
 
 export default class Room {
     game: Game;
@@ -28,7 +28,7 @@ export default class Room {
             for (let c of this.clients) {
                 if (!this.game.players[0]) continue;
                 
-                const client = Client.clientFromId(c);
+                const client = GameManager.clientFromId(c);
                 if (!client) continue;
 
                 client.updateGamestate(this.game, this.game.players[0]); // TODO: switch to player number instead of always 0

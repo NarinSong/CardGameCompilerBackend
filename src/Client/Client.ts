@@ -7,8 +7,7 @@
 
 import Game from "../Game/Game";
 import Player from "../Game/Player";
-import GameManager from "../GameManager";
-import Room from "../Room";
+import Room from "../Components/Room";
 import GameDefinition from "../Rules/GameDefinition";
 import ClientView from "./ClientView";
 import { buildGameFromJSON } from "./GameBuilder";
@@ -32,12 +31,6 @@ export default class Client {
         } catch (error) {
             console.debug(error);
         }
-    }
-
-    static clientFromId(clientId: number) {
-        const client = GameManager.clients[clientId];
-        if (!client) return null;
-        return client;
     }
 
     // TODO: I expect a reference to "Player" or at least "PlayerID" will be stored in the client class eventually
