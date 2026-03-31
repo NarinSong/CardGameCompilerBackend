@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { RankSchema, SuitSchema } from "./types";
+import { RankSchema, SuitSchema } from "./types.js";
 
 export const CardArgsSchema = z.object({
     rank: RankSchema,

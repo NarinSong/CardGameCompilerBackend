@@ -1,20 +1,19 @@
 // This is what holds the board and players
 // It also has the interactions that actions' results are allowed to use
 
-import Card from "../Components/Card";
-import Logger from "../Components/Logger";
-import BoardDefinition from "../Rules/BoardDefinition";
-import CounterDefinition from "../Rules/CounterDefinition";
-import GameDefinition from "../Rules/GameDefinition";
-import { Label, StepLabel } from "../Rules/LabelManager";
-import PileDefinition from "../Rules/PileDefinition";
-import StepDefinition from "../Rules/StepDefinition";
-import { BoardID, PileState, PlayerID, PlayerType, Visibility } from "../schemas/types";
-import Board from "./Board";
-import Counter from "./Counter";
-import GameLabels from "./GameLabels";
-import Pile from "./Pile";
-import Player from "./Player";
+import Card from "../Components/Card.js";
+import BoardDefinition from "../Rules/BoardDefinition.js";
+import CounterDefinition from "../Rules/CounterDefinition.js";
+import GameDefinition from "../Rules/GameDefinition.js";
+import { Label } from "../Rules/LabelManager.js";
+import PileDefinition from "../Rules/PileDefinition.js";
+import StepDefinition from "../Rules/StepDefinition.js";
+import { BoardID, PileState, PlayerID, Visibility } from "../schemas/types.js";
+import Board from "./Board.js";
+import Counter from "./Counter.js";
+import GameLabels from "./GameLabels.js";
+import Pile from "./Pile.js";
+import Player from "./Player.js";
 
 
 /**

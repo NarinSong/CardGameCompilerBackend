@@ -5,14 +5,14 @@
 //      A Player may be a robot / AI and have no associated client
 // Clients have a method of sending information to the user (sockets for prototype, whatever Unity uses for that)
 
-import Game from "../Game/Game";
-import Player from "../Game/Player";
-import Room from "../Components/Room";
-import GameDefinition from "../Rules/GameDefinition";
-import ClientView from "./ClientView";
-import { buildGameFromJSON } from "./GameBuilder";
-import { sendClientGamestate } from "..";
-import Auth from "../Components/Auth";
+import Game from "../Game/Game.js";
+import Player from "../Game/Player.js";
+import Room from "../Components/Room.js";
+import GameDefinition from "../Rules/GameDefinition.js";
+import ClientView from "./ClientView.js";
+import { buildGameFromJSON } from "./GameBuilder.js";
+import { sendClientGamestate } from "../index.js";
+import Auth from "../Components/Auth.js";
 
 type AuthState =
   | {

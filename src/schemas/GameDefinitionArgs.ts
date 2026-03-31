@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { ActionNodeSchema, ValueNodeSchema } from "./AST";
-import { CardArgsSchema } from "./GameComponentArgs";
-import { ActionRoleSchema, ActionRolesSchema, PileStateSchema, TriggerTypeSchema, VisibilitySchema } from "./types";
+import { ActionNodeSchema, ValueNodeSchema } from "./AST.js";
+import { ActionRoleSchema, ActionRolesSchema, PileStateSchema, TriggerTypeSchema, VisibilitySchema } from "./types.js";
 
 // Arguments to definitions
 export const GameMetaArgsSchema = z.object({

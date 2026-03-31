@@ -1,10 +1,9 @@
 // Game builder expects a payload from the client, which it will then turn into a game definition
 // It will also house the type checking (yay!) to ensure that there won't be any runtime errors
 
-import Action from "../Rules/ActionDefinition";
-import GameDefinition from "../Rules/GameDefinition";
-import GamePhaseDefinition from "../Rules/GamePhaseDefinition";
-import { verifyClientGameDefintion } from "../schemas/ClientGameDefinition";
+import Action from "../Rules/ActionDefinition.js";
+import GameDefinition from "../Rules/GameDefinition.js";
+import { verifyClientGameDefintion } from "../schemas/ClientGameDefinition.js";
 
 export function buildGameFromJSON(clientJson: unknown) {
     const data = verifyClientGameDefintion(clientJson);

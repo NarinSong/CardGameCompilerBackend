@@ -1,4 +1,4 @@
-import Database from "./Database";
+import Database from "./Database.js";
 import argon2 from 'argon2';
 import { randomBytes } from "node:crypto";
 

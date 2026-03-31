@@ -4,8 +4,8 @@
 // Also it can have layout (spread vs stack vs singles)
 // And type (52-card, dominoes, etc.)
 
-import LabelManager, { Label } from "./LabelManager";
-import { ActionRole, DisplayName, PileState, Visibility } from "../schemas/types";
+import LabelManager, { Label } from "./LabelManager.js";
+import { ActionRole, DisplayName, PileState, Visibility } from "../schemas/types.js";
 
 /**
  * Defines the properties that make up a pile in a game.

@@ -1,8 +1,8 @@
-import Card from "../Components/Card";
-import { Label } from "../Rules/LabelManager";
-import PileDefinition from "../Rules/PileDefinition";
-import { ActionRole, DisplayName, PileState, Visibility } from "../schemas/types";
-import GameLabels from "./GameLabels";
+import Card from "../Components/Card.js";
+import { Label } from "../Rules/LabelManager.js";
+import PileDefinition from "../Rules/PileDefinition.js";
+import { ActionRole, DisplayName, PileState, Visibility } from "../schemas/types.js";
+import GameLabels from "./GameLabels.js";
 
 /**
  * Defines a Pile of cards in the card.

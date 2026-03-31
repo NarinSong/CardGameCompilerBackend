@@ -1,12 +1,10 @@
-import Game from "../Game/Game";
-import Pile from "../Game/Pile";
-import { Label } from "../Rules/LabelManager";
-import Trigger from "../Rules/TriggerDefinition";
-import { BoardID, PileState, PlayerID, Visibility } from "../schemas/types";
-import Card from "./Card";
+import Game from "../Game/Game.js";
+import { Label } from "../Rules/LabelManager.js";
+import { PileState, Visibility } from "../schemas/types.js";
+import Card from "./Card.js";
 
 // Using Zod schemas
-import { ActionContext, ValueNode, ActionNode, AST, ValueReturn } from "../schemas/AST";
+import { ActionContext, ValueNode, ActionNode, AST, ValueReturn } from "../schemas/AST.js";
 
 // Helper functions
 /**

@@ -1,8 +1,8 @@
-import GamePhaseDefinition from "../Rules/GamePhaseDefinition";
-import LabelManager, { Label, StepLabel } from "../Rules/LabelManager";
-import StepDefinition from "../Rules/StepDefinition";
-import Counter from "./Counter";
-import Pile from "./Pile";
+import GamePhaseDefinition from "../Rules/GamePhaseDefinition.js";
+import LabelManager, { Label, StepLabel } from "../Rules/LabelManager.js";
+import StepDefinition from "../Rules/StepDefinition.js";
+import Counter from "./Counter.js";
+import Pile from "./Pile.js";
 
 /**
  * Runtime game objects that can be referenced by a label.

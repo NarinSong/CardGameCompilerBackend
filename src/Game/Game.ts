@@ -3,15 +3,15 @@
 // It's created from a GameDefinition
 // It's passed down to action results
 
-import GameDefinition from "../Rules/GameDefinition";
-import StepDefinition from "../Rules/StepDefinition";
-import { ActionRole, PlayerType, TriggerType } from "../schemas/types";
-import GameState from "./GameState";
-import Player from "./Player";
-import { GamePiece } from "./GameLabels";
-import Logger from "../Components/Logger";
-import { ActionContext } from "../schemas/AST";
-import { evaluate } from "../Components/TreeParser";
+import GameDefinition from "../Rules/GameDefinition.js";
+import StepDefinition from "../Rules/StepDefinition.js";
+import { ActionRole, PlayerType, TriggerType } from "../schemas/types.js";
+import GameState from "./GameState.js";
+import Player from "./Player.js";
+import { GamePiece } from "./GameLabels.js";
+import Logger from "../Components/Logger.js";
+import { ActionContext } from "../schemas/AST.js";
+import { evaluate } from "../Components/TreeParser.js";
 
 /**
  * Represents a running game instance and its current state.

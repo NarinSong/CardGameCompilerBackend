@@ -1,6 +1,6 @@
-import { buildGameFromJSON } from "../Client/GameBuilder"
-import GameDefinition from "../Rules/GameDefinition";
-import pickupJson from "./Pickup.json"
+import { buildGameFromJSON } from "../Client/GameBuilder.js"
+import GameDefinition from "../Rules/GameDefinition.js";
+import pickupJson from "./Pickup.json" with { type: "json" };
 
 const PickupGame = buildGameFromJSON(pickupJson);
 

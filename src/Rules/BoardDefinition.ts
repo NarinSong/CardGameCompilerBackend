@@ -2,8 +2,8 @@
 // It holds all of the data specific to the game that is not per-player
 // Piles, counters, etc.
 
-import CounterDefinition from "./CounterDefinition";
-import PileDefinition from "./PileDefinition";
+import CounterDefinition from "./CounterDefinition.js";
+import PileDefinition from "./PileDefinition.js";
 
 
 /**

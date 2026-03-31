@@ -1,7 +1,7 @@
-import CounterDefinition from "./CounterDefinition";
-import GamePhaseDefinition from "./GamePhaseDefinition";
-import PileDefinition from "./PileDefinition";
-import StepDefinition from "./StepDefinition";
+import CounterDefinition from "./CounterDefinition.js";
+import GamePhaseDefinition from "./GamePhaseDefinition.js";
+import PileDefinition from "./PileDefinition.js";
+import StepDefinition from "./StepDefinition.js";
 
 
 /**

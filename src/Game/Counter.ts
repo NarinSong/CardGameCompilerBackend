@@ -1,7 +1,7 @@
-import CounterDefinition from "../Rules/CounterDefinition";
-import { Label } from "../Rules/LabelManager";
-import { ActionRole, DisplayName, Visibility } from "../schemas/types";
-import GameLabels from "./GameLabels";
+import CounterDefinition from "../Rules/CounterDefinition.js";
+import { Label } from "../Rules/LabelManager.js";
+import { ActionRole, DisplayName, Visibility } from "../schemas/types.js";
+import GameLabels from "./GameLabels.js";
 
 /**
  * Represents a counter in the game.

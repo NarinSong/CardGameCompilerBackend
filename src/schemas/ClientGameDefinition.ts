@@ -1,7 +1,7 @@
 // This will be used for type-checking incoming game definitions from the client
 
 import { z } from "zod";
-import { BoardSchema, GameMetaArgsSchema, PhaseSchema, PlayerSchema } from "./GameDefinitionArgs";
+import { BoardSchema, GameMetaArgsSchema, PhaseSchema, PlayerSchema } from "./GameDefinitionArgs.js";
 
 // It will *not* be used for the back-end implementation
 const ClientGameDefinitionSchema = z.object({

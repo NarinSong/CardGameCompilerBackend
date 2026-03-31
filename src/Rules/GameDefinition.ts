@@ -2,18 +2,18 @@
 // All other definitions are held within one large GameDefinition object
 // When a player starts a game, they will pass in a GameDefinition object's Rules component
 
-import Action from "./ActionDefinition";
-import BoardDefinition from "./BoardDefinition";
-import CounterDefinition from "./CounterDefinition";
-import GameMeta from "./GameMeta";
-import GamePhaseDefinition from "./GamePhaseDefinition";
-import LabelManager, { PhaseLabel, StepLabel } from "./LabelManager";
-import PileDefinition from "./PileDefinition";
-import PlayerDefinition from "./PlayerDefinition";
-import StepDefinition from "./StepDefinition";
-import { PileState, Visibility } from "../schemas/types";
-import Game from "../Game/Game";
-import Logger from "../Components/Logger";
+import Action from "./ActionDefinition.js";
+import BoardDefinition from "./BoardDefinition.js";
+import CounterDefinition from "./CounterDefinition.js";
+import GameMeta from "./GameMeta.js";
+import GamePhaseDefinition from "./GamePhaseDefinition.js";
+import LabelManager, { PhaseLabel, StepLabel } from "./LabelManager.js";
+import PileDefinition from "./PileDefinition.js";
+import PlayerDefinition from "./PlayerDefinition.js";
+import StepDefinition from "./StepDefinition.js";
+import { PileState, Visibility } from "../schemas/types.js";
+import Game from "../Game/Game.js";
+import Logger from "../Components/Logger.js";
 
 
 /**

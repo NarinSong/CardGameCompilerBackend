@@ -3,8 +3,8 @@
 // Each phase and step can have associated actions which the players may take
 // One game can have any number of phases associated with it
 
-import LabelManager, { PhaseLabel } from "./LabelManager";
-import StepDefinition from "./StepDefinition";
+import LabelManager, { PhaseLabel } from "./LabelManager.js";
+import StepDefinition from "./StepDefinition.js";
 
 /**
  * Defines the properties for a phase in the game.

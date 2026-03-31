@@ -1,8 +1,8 @@
 // Specific to each game, the PlayerDefintion determines what properties
 //      each player can have. Piles of cards, counters, etc.
 
-import CounterDefinition from "./CounterDefinition";
-import PileDefinition from "./PileDefinition";
+import CounterDefinition from "./CounterDefinition.js";
+import PileDefinition from "./PileDefinition.js";
 
 /**
  * Defines the piles and counters associated with a player.

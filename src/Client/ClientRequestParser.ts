@@ -1,7 +1,6 @@
 import { z } from "zod";
-import GameManager from "../GameManager";
-import Client from "./Client";
-import CodeBlocks from "./CodeBlocks.json";
+import GameManager from "../GameManager.js";
+import CodeBlocks from "./CodeBlocks.json" with { type: "json" };
 
 // This file is for handling incoming socket requests from the client
 // All incoming requests come through here

@@ -1,8 +1,8 @@
 import { Server, Socket } from 'socket.io';
-import GameManager from './GameManager';
-import ClientView from './Client/ClientView';
-import Logger from './Components/Logger';
-import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestPing, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser';
+import GameManager from './GameManager.js';
+import ClientView from './Client/ClientView.js';
+import Logger from './Components/Logger.js';
+import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestPing, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 
 // Execution begins here
 // All socket connections come through here. Incoming AND outgoing.

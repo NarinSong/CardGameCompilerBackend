@@ -1,6 +1,6 @@
-import mariadb from 'mariadb';
+import * as mariadb from 'mariadb';
 import { config } from 'dotenv';
-import Logger from './Logger';
+import Logger from './Logger.js';
 
 config(); // Set up environment variables
 
@@ -13,7 +13,7 @@ const pool = mariadb.createPool({
      port: 3306,
      user:'cardgamecompiler',
      database: 'cardgamecompiler',
-     password: process.env.PASSWORD, // From the .env file
+     password: process.env.PASSWORD as string, // From the .env file
      connectionLimit: 15
 });
 

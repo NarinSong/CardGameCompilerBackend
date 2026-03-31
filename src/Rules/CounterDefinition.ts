@@ -1,5 +1,5 @@
-import { ActionRole, DisplayName, Visibility } from "../schemas/types";
-import LabelManager, { Label } from "./LabelManager";
+import { ActionRole, DisplayName, Visibility } from "../schemas/types.js";
+import LabelManager, { Label } from "./LabelManager.js";
 
 
 /**

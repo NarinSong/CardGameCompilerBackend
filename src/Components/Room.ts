@@ -2,9 +2,9 @@
 // There will be many of these, and each one will have a dedicated worker thread
 // Each room can hold one game
 
-import Game from "../Game/Game";
-import GameManager from "../GameManager";
-import { PlayerType } from "../schemas/types";
+import Game from "../Game/Game.js";
+import GameManager from "../GameManager.js";
+import { PlayerType } from "../schemas/types.js";
 
 export default class Room {
     game: Game;

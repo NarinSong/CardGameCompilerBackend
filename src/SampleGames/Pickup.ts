@@ -1,10 +1,8 @@
-import { ValueNode } from "../schemas/AST";
-import GameState from "../Game/GameState";
-import Action from "../Rules/ActionDefinition";
-import GameDefinition from "../Rules/GameDefinition";
-import { Label } from "../Rules/LabelManager";
-import Trigger from "../Rules/TriggerDefinition";
-import { PileState, TriggerType, Visibility } from "../schemas/types";
+import { ValueNode } from "../schemas/AST.js";
+import Action from "../Rules/ActionDefinition.js";
+import GameDefinition from "../Rules/GameDefinition.js";
+import Trigger from "../Rules/TriggerDefinition.js";
+import { PileState, TriggerType, Visibility } from "../schemas/types.js";
 
 const Pickup = new GameDefinition();
 

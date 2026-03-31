@@ -1,7 +1,7 @@
-import Game from "../Game/Game";
-import Card from "./Card";
-import { ActionContext, ValueNode } from "../schemas/AST";
-import { evaluate } from "./TreeParser";
+import Game from "../Game/Game.js";
+import Card from "./Card.js";
+import { ActionContext, ValueNode } from "../schemas/AST.js";
+import { evaluate } from "./TreeParser.js";
 
 
 /**

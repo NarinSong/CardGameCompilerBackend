@@ -1,7 +1,7 @@
-import Pile from "../Game/Pile";
-import { CardArgs } from "../schemas/GameComponentArgs";
-import { PileState, RANK, rank, SUIT, suit } from "../schemas/types";
-import Logger from "./Logger";
+import Pile from "../Game/Pile.js";
+import { CardArgs } from "../schemas/GameComponentArgs.js";
+import { PileState, RANK, rank, SUIT, suit } from "../schemas/types.js";
+import Logger from "./Logger.js";
 
 
 /**

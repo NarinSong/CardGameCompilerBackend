@@ -3,8 +3,8 @@
 // Each step has associated actions
 // A step must have at least one action
 
-import Action from "./ActionDefinition";
-import LabelManager, { StepLabel } from "./LabelManager";
+import Action from "./ActionDefinition.js";
+import LabelManager, { StepLabel } from "./LabelManager.js";
 
 /**
  * Defines the actions associated with the step and its name.

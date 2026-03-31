@@ -1,14 +1,13 @@
 // This is the JSON object that will be sent to the clients
 // Note: anything starting with # will not be sent
 
-import ValueMap, { CardValueMap } from "../Components/ValueMap";
-import { Label } from "../Rules/LabelManager";
-import { PlayerID, Visibility } from "../schemas/types";
-import Board from "../Game/Board";
-import Counter from "../Game/Counter";
-import Game from "../Game/Game";
-import Pile from "../Game/Pile";
-import Player from "../Game/Player";
+import ValueMap from "../Components/ValueMap.js";
+import { PlayerID, Visibility } from "../schemas/types.js";
+import Board from "../Game/Board.js";
+import Counter from "../Game/Counter.js";
+import Game from "../Game/Game.js";
+import Pile from "../Game/Pile.js";
+import Player from "../Game/Player.js";
 
 type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number}[], label: string, displayName: string, actionRoles: string[] };
 type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[] };
