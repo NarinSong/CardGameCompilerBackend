@@ -12,14 +12,79 @@ import GameDefinition from "../Rules/GameDefinition";
 import ClientView from "./ClientView";
 import { buildGameFromJSON } from "./GameBuilder";
 import { sendClientGamestate } from "..";
+import Auth from "../Components/Auth";
+
+type AuthState =
+  | {
+      isAuthenticated: true;
+      displayName: string;
+      username: string;
+      token: string;
+    }
+  | {
+      isAuthenticated: false;
+      displayName: null;
+      username: null;
+      token: null;
+    };
 
 export default class Client {
     static #nextId : number = 1000;
     identifier: number;
     room: Room | null = null;
+    private authState: AuthState = {
+        isAuthenticated: false,
+        displayName: null,
+        username: null,
+        token: null
+    };
 
     constructor()  {
         this.identifier = Client.nextId;
+    }
+
+    async signIn(username: string, password: string) {
+        const success = await Auth.authenticateUser(username, password);
+        if (!success) return null;
+
+
+        this.authState = {
+            username: username,
+            token: success.token,
+            displayName: success.displayName,
+            isAuthenticated: true,
+        };
+
+        return success.token;
+    }
+
+    async signUp(username: string, password: string, displayName: string) {
+        const success = await Auth.createNewUser(username, password, displayName);
+        if (!success) return null;
+
+        this.authState = {
+            username: username,
+            token: success,
+            displayName: displayName,
+            isAuthenticated: true,
+        };
+
+        return success;
+    }
+
+    async signOut() {
+        if (!this.isAuthenticated || !this.authState.token) return false;
+
+        const success = await Auth.signOut(this.authState.token);
+
+        this.authState = {
+            isAuthenticated: false,
+            displayName: null,
+            username: null,
+            token: null
+        };
+
+        return success;
     }
 
     submitRulesFromEditor(rules: unknown) {
@@ -40,5 +105,21 @@ export default class Client {
 
     static get nextId() {
         return Client.#nextId++;
+    }
+
+    get rateLimitAllowed() {
+        return true; // TODO: Potentially add sign in / sign up rate limiting
+    }
+
+    get isAuthenticated() {
+        return this.authState.isAuthenticated;
+    }
+
+    get displayName() {
+        return this.authState.displayName;
+    }
+
+    get username() {
+        return this.authState.username;
     }
 }

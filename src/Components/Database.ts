@@ -18,13 +18,13 @@ const pool = mariadb.createPool({
 });
 
 export default class Database {
-    static async getHashByUsername(username: string): Promise<{ password: string; }[] | null> {
+    static async getHashByUsername(username: string): Promise<{ password: string; displayName: string }[] | null> {
         let conn;
         let password;
 
         try {
             conn = await pool.getConnection();
-            password = await conn.query("SELECT password FROM users WHERE username = ?", username);
+            password = await conn.query("SELECT password, displayName FROM users WHERE username = ?", username);
         } catch (error) {
             console.error(error);
         } finally {
@@ -32,5 +32,21 @@ export default class Database {
         }
 
         return password;
+    }
+
+    static async saveUserCredentials(username: string, passwordHash: string, displayName: string): Promise<boolean> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            await conn.query("INSERT INTO auth (username, passwordHash, displayName) VALUES (?, ?, ?)", [username, passwordHash, displayName]);
+        } catch (error) {
+            console.error(error);
+            return false;
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return true;
     }
 }

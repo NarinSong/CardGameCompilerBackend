@@ -7,28 +7,125 @@ import CodeBlocks from "./CodeBlocks.json";
 // All incoming requests come through here
 // This file *just* type-checks and forwards the requests to the appropriate place
 // There should not be any kind of game logic in here
-// All of the functions have a callback. Anything that doesn't return data will indicate either success or failure
+// All of the export functions have a callback. Anything that doesn't return data will indicate either success or failure
 // Note: callback returns void, so return callback(arg); is the same as callback(arg); return;
 function noop() {}
+function fCheck(callback: unknown) {return typeof callback === 'function';}
 
-function clientRequestPing(clientId: number, callback: (msg: string) => void = noop) {
+export function clientRequestPing(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return; // callback: (msg: string) => void
     callback(`Hello there ${clientId}`);
 }
 
-function clientRequestGetAvailableGames(clientId: number, callback: (games: string) => void = noop) {
+export async function clientRequestSignUp(clientId: number, username: unknown, password: unknown, displayName: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return; // callback: (token: string | null) => void
+    
+    // Verify client input
+    const usernameCheck = z
+        .string()
+        .min(3)
+        .max(16)
+        .regex(/^[a-z0-9_]+$/)
+        .safeParse(username);
+
+    const passwordCheck = z
+        .string()
+        .regex(/^[a-zA-Z0-9!@#$%^&*(),.?]+$/)
+        .min(4)
+        .safeParse(password);
+
+    const displayNameCheck = z
+        .string()
+        .min(3)
+        .max(16)
+        .regex(/^[a-zA-Z0-9 ]+$/)
+        .safeParse(displayName);
+
+    if (!usernameCheck.success || !passwordCheck.success || !displayNameCheck.success) return callback(null);
+
+    // Verify that the user isn't already signed in
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(null);
+    if (client.isAuthenticated) return callback(null);
+
+    // Verify rate limiting
+    if (!client.rateLimitAllowed) return callback(null);
+
+    // Attempt sign up
+    const success = await client.signUp(usernameCheck.data, passwordCheck.data, displayNameCheck.data);
+    if (!success) return callback(null);
+
+    return callback(success);
+}
+
+export async function clientRequestSignIn(clientId: number, username: unknown, password: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;// (token: string | null, displayName?: string) => void
+
+    // Verify client input
+    const usernameCheck = z
+        .string()
+        .min(3)
+        .max(16)
+        .regex(/^[a-z0-9_]+$/)
+        .safeParse(username);
+
+    const passwordCheck = z
+        .string()
+        .regex(/^[a-zA-Z0-9!@#$%^&*(),.?]+$/)
+        .min(4)
+        .safeParse(password);
+
+    if (!usernameCheck.success || !passwordCheck.success) return callback(null);
+
+    // Verify that the user isn't already signed in
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(null);
+    if (client.isAuthenticated) return callback(null);
+
+    // Verify rate limiting
+    if (!client.rateLimitAllowed) return callback(null);
+
+    // Attempt sign up
+    const success = await client.signIn(usernameCheck.data, passwordCheck.data);
+    if (!success || !client.displayName) return callback(null);
+
+    return callback(success, client.displayName);
+}
+
+export async function clientRequestSignOut(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean) => void
+
+    // Verify that the user is signed in
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(false);
+    if (!client.isAuthenticated) return callback(false);
+
+    // Attempt sign out
+    const success = await client.signOut();
+    if (!success) return callback(false);
+
+    return callback(true);
+}
+
+export function clientRequestGetAvailableGames(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(games: string) => void
+
     // Get the available games from the database and send those to the client
     const games: Record<string,number> = {'Pickup': 0, 'War': 1}; //TODO: replace with database call
 
     callback(JSON.stringify(games));
 }
 
-function clientRequestGetAvailableBlocks(clientId: number, callback: (games: string) => void = noop) {
-    // Send the available code blocks to the client
+export function clientRequestGetAvailableBlocks(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(games: string) => void
 
+    // Send the available code blocks to the client
     callback(JSON.stringify(CodeBlocks));
 }
 
-function clientRequestStartNewGame(clientId: number, game: unknown, callback: (succeeded: string | null) => void = noop) {
+export function clientRequestStartNewGame(clientId: number, game: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(succeeded: string | null) => void
+
     const result = z.number().safeParse(game)
     if (!result.success)
         return callback(null);
@@ -40,7 +137,9 @@ function clientRequestStartNewGame(clientId: number, game: unknown, callback: (s
     callback(room ? room.name: null);
 }
 
-function clientRequestClickLabel(clientId: number, label: unknown, callback: (succeeded: boolean) => void = noop) {
+export function clientRequestClickLabel(clientId: number, label: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(succeeded: boolean) => void 
+
     const result = z.string().safeParse(label)
     if (!result.success)
         return callback(false);
@@ -54,13 +153,4 @@ function clientRequestClickLabel(clientId: number, label: unknown, callback: (su
     room.handlePlayerClick(result.data);
 
     callback(true);
-}
-
-
-export {
-    clientRequestPing,
-    clientRequestGetAvailableGames,
-    clientRequestGetAvailableBlocks,
-    clientRequestStartNewGame,
-    clientRequestClickLabel,
 }

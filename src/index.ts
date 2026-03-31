@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager';
 import ClientView from './Client/ClientView';
 import Logger from './Components/Logger';
-import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestPing, clientRequestStartNewGame } from './Client/ClientRequestParser';
+import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestPing, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser';
 
 // Execution begins here
 // All socket connections come through here. Incoming AND outgoing.
@@ -20,7 +20,7 @@ const SOCKETS : Record<number, Socket> = {};
 io.on('connection', (socket: Socket) => {
     console.log('New socket connected');
 
-    // TODO: client authentication - potentially map to an already existing client id
+    // TODO: potentially map to an already existing client id
 
     // Create client
     const client = GameManager.createClient();
@@ -31,6 +31,10 @@ io.on('connection', (socket: Socket) => {
 
     // Listeners
     socket.on('ping', (callback) => {clientRequestPing(id, callback);});
+
+    socket.on('signUp', (username, password, displayName, callback) => {clientRequestSignUp(id, username, password, displayName, callback);});
+    socket.on('signIn', (username, password, callback) => {clientRequestSignIn(id, username, password, callback);});
+    socket.on('signOut', (callback) => {clientRequestSignOut(id, callback);});
 
     socket.on('getAvailableGames', (callback) => {clientRequestGetAvailableGames(id, callback);});
 
