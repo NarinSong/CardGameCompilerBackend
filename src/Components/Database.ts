@@ -4,6 +4,10 @@ import Logger from './Logger';
 
 config(); // Set up environment variables
 
+if (!process.env.PASSWORD) {
+    Logger.log('No password loaded in from .env - running without a database!');
+}
+
 const pool = mariadb.createPool({
      host: '127.0.0.1',
      port: 3306,

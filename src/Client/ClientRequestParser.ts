@@ -9,25 +9,26 @@ import CodeBlocks from "./CodeBlocks.json";
 // There should not be any kind of game logic in here
 // All of the functions have a callback. Anything that doesn't return data will indicate either success or failure
 // Note: callback returns void, so return callback(arg); is the same as callback(arg); return;
+function noop() {}
 
-function clientRequestPing(clientId: number, callback: (msg: string) => void) {
+function clientRequestPing(clientId: number, callback: (msg: string) => void = noop) {
     callback(`Hello there ${clientId}`);
 }
 
-function clientRequestGetAvailableGames(clientId: number, callback: (games: string) => void) {
+function clientRequestGetAvailableGames(clientId: number, callback: (games: string) => void = noop) {
     // Get the available games from the database and send those to the client
     const games: Record<string,number> = {'Pickup': 0, 'War': 1}; //TODO: replace with database call
 
     callback(JSON.stringify(games));
 }
 
-function clientRequestGetAvailableBlocks(clientId: number, callback: (games: string) => void) {
+function clientRequestGetAvailableBlocks(clientId: number, callback: (games: string) => void = noop) {
     // Send the available code blocks to the client
 
     callback(JSON.stringify(CodeBlocks));
 }
 
-function clientRequestStartNewGame(clientId: number, game: unknown, callback: (succeeded: string | null) => void) {
+function clientRequestStartNewGame(clientId: number, game: unknown, callback: (succeeded: string | null) => void = noop) {
     const result = z.number().safeParse(game)
     if (!result.success)
         return callback(null);
@@ -39,7 +40,7 @@ function clientRequestStartNewGame(clientId: number, game: unknown, callback: (s
     callback(room ? room.name: null);
 }
 
-function clientRequestClickLabel(clientId: number, label: unknown, callback: (succeeded: boolean) => void) {
+function clientRequestClickLabel(clientId: number, label: unknown, callback: (succeeded: boolean) => void = noop) {
     const result = z.string().safeParse(label)
     if (!result.success)
         return callback(false);
