@@ -107,19 +107,19 @@ export async function clientRequestSignOut(clientId: number, callback: unknown =
 }
 
 export function clientRequestGetAvailableGames(clientId: number, callback: unknown = noop) {
-    if (!fCheck(callback)) return;//(games: string) => void
+    if (!fCheck(callback)) return;//(games: { [name: string]: number }) => void
 
     // Get the available games from the database and send those to the client
     const games: Record<string,number> = {'Pickup': 0, 'War': 1}; //TODO: replace with database call
 
-    callback(JSON.stringify(games));
+    callback(games);
 }
 
 export function clientRequestGetAvailableBlocks(clientId: number, callback: unknown = noop) {
-    if (!fCheck(callback)) return;//(games: string) => void
+    if (!fCheck(callback)) return;//(blocks: typeof CodeBlocks) => void
 
     // Send the available code blocks to the client
-    callback(JSON.stringify(CodeBlocks));
+    callback(CodeBlocks);
 }
 
 export function clientRequestStartNewGame(clientId: number, game: unknown, callback: unknown = noop) {

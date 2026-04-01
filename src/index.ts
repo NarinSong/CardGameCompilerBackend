@@ -65,7 +65,7 @@ function sendClientGamestate(clientId: number, gamestate: ClientView) {
         return;
     }
 
-    socket.emit('gamestate', JSON.stringify(gamestate));
+    socket.emit('gamestate', gamestate);
 }
 
 // Exports. Note: socket is not exported
