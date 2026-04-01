@@ -110,7 +110,7 @@ export function clientRequestGetAvailableGames(clientId: number, callback: unkno
     if (!fCheck(callback)) return;//(games: { [name: string]: number }) => void
 
     // Get the available games from the database and send those to the client
-    const games: Record<string,number> = {'Pickup': 0, 'War': 1}; //TODO: replace with database call
+    const games: {name: string, id: number}[] = [{ name: 'Pickup', id: 0},{ name: 'War', id: 1 }]; //TODO: replace with database call
 
     callback(games);
 }
