@@ -6,7 +6,7 @@ import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequest
 
 // Execution begins here
 // All socket connections come through here. Incoming AND outgoing.
-const VERSION = '0.1.4';
+const VERSION = '0.1.5';
 
 Logger.LOG_LEVEL = 5;
 Logger.log('The server is open for business.');
