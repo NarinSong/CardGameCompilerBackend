@@ -4,13 +4,14 @@
 import Client from './Client/Client.js'
 import Room from './Components/Room.js';
 import GameDefinition from './Rules/GameDefinition.js';
+import PickupGame from './SampleGames/JsonReader.js';
 
 export default class GameManager {
     // No constructor, since everything here is static. There is only one.
 
     static clients: Record<number,Client> = {};
     static rooms: Record<string,Room> = {};
-    static availableGames: Record<number, GameDefinition> = {};
+    static availableGames: Record<number, GameDefinition> = {0: PickupGame};
     static roomName: number = 1;
 
 
@@ -40,6 +41,8 @@ export default class GameManager {
 
         const room = new Room(game.createGame(), clientId, name);
         client.room = room;
+
+        room.emitGameState();
 
         GameManager.rooms[name] = room;
 

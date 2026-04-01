@@ -20,19 +20,23 @@ export default class Room {
         this.game.startGame();
     }
 
+    emitGameState() {
+        for (let c of this.clients) {
+            if (!this.game.players[0]) continue;
+            
+            const client = GameManager.clientFromId(c);
+            if (!client) continue;
+
+            client.updateGamestate(this.game, this.game.players[0]); // TODO: switch to player number instead of always 0
+        }
+    }
+
     handlePlayerClick(label: string) {
         let actionTaken = this.game.clickAction(label); // TODO: player number?
 
         if (actionTaken) {
             // Update clients with new gamestate
-            for (let c of this.clients) {
-                if (!this.game.players[0]) continue;
-                
-                const client = GameManager.clientFromId(c);
-                if (!client) continue;
-
-                client.updateGamestate(this.game, this.game.players[0]); // TODO: switch to player number instead of always 0
-            }
+            this.emitGameState();
         }
     }
 }
