@@ -112,14 +112,14 @@ export function clientRequestGetAvailableGames(clientId: number, callback: unkno
     // Get the available games from the database and send those to the client
     const games: Record<string,number> = {'Pickup': 0, 'War': 1}; //TODO: replace with database call
 
-    callback(JSON.stringify(games));
+    callback(games);
 }
 
 export function clientRequestGetAvailableBlocks(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(games: string) => void
 
     // Send the available code blocks to the client
-    callback(JSON.stringify(CodeBlocks));
+    callback(CodeBlocks);
 }
 
 export function clientRequestStartNewGame(clientId: number, game: unknown, callback: unknown = noop) {
