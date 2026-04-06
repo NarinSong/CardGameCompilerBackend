@@ -36,7 +36,7 @@ export default class Auth {
         
         if (!passwordHashArray || !passwordHashArray[0]) return null;
 
-        const passwordHash = passwordHashArray[0].password; // Grab the first result from the database
+        const passwordHash = passwordHashArray[0].passwordHash; // Grab the first result from the database
         const matched = await argon2.verify(passwordHash, password);
 
         if (!matched) return null;

@@ -18,13 +18,13 @@ const pool = mariadb.createPool({
 });
 
 export default class Database {
-    static async getHashByUsername(username: string): Promise<{ password: string; displayName: string }[] | null> {
+    static async getHashByUsername(username: string): Promise<{ passwordHash: string; displayName: string }[] | null> {
         let conn;
-        let password;
+        let password = null;
 
         try {
             conn = await pool.getConnection();
-            password = await conn.query("SELECT passwordHash, displayName FROM users WHERE username = ?", username);
+            password = await conn.query("SELECT passwordHash, displayName FROM users WHERE username = ?", [username]);
         } catch (error) {
             console.error(error);
         } finally {
