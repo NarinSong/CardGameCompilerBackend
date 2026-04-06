@@ -59,7 +59,7 @@ export default class Auth {
     static async createNewUser(username: string, password: string, displayName: string): Promise<string | null> {
         const passwordHashArray = await Database.getHashByUsername(username);
         
-        if (passwordHashArray) return failureReason('createNewUser() failed: account already exists'); // User account already exists
+        if (passwordHashArray && passwordHashArray[0]) return failureReason('createNewUser() failed: account already exists'); // User account already exists
 
         const passwordHash = await argon2.hash(password, {
             type: argon2.argon2id,
