@@ -31,6 +31,7 @@ export async function clientRequestSignUp(clientId: number, username: unknown, p
         .string()
         .regex(/^[a-zA-Z0-9!@#$%^&*(),.?]+$/)
         .min(4)
+        .max(64)
         .safeParse(password);
 
     const displayNameCheck = z
