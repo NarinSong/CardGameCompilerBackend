@@ -1,8 +1,14 @@
 import Database from "./Database.js";
 import argon2 from 'argon2';
 import { randomBytes } from "node:crypto";
+import Logger from "./Logger.js";
 
 const ACTIVE_USERS: Record<string, string> = {}; // token, username
+
+function failureReason(reason: string): null {
+    Logger.log(reason);
+    return null;
+}
 
 export default class Auth {
     // all usernames are in lowercase before arriving here. Those are sanitized in the ClientRequestParser
@@ -11,7 +17,7 @@ export default class Auth {
         const account = ACTIVE_USERS[token];
 
         if (!account)
-            return null;
+            return failureReason('verifyUser() failed: invalid token');
 
         return account == username;
     }
@@ -23,7 +29,7 @@ export default class Auth {
             randomBytes(128, (err, buf) => {
                 if (err) {
                     console.error(err);
-                    return resolve(null);
+                    return resolve(failureReason('randomBytes() failed'));
                 }
                 
                 resolve(buf);
@@ -34,15 +40,15 @@ export default class Auth {
     static async authenticateUser(username: string, password: string): Promise<{token: string, displayName: string} | null> {
         const passwordHashArray = await Database.getHashByUsername(username);
         
-        if (!passwordHashArray || !passwordHashArray[0]) return null;
+        if (!passwordHashArray || !passwordHashArray[0]) return failureReason('authenticateUser() failed: no such user');
 
         const passwordHash = passwordHashArray[0].passwordHash; // Grab the first result from the database
         const matched = await argon2.verify(passwordHash, password);
 
-        if (!matched) return null;
+        if (!matched) return failureReason('authenticateUser() failed: passwordHash mismatch');
 
         const buf = await Auth.randomBytes();
-        if (!buf) return null;
+        if (!buf) return failureReason('authenticateUser() failed: randomBytes failed');
 
         const sessionId = buf.toString('hex');
         ACTIVE_USERS[sessionId] = username;
@@ -53,7 +59,7 @@ export default class Auth {
     static async createNewUser(username: string, password: string, displayName: string): Promise<string | null> {
         const passwordHashArray = await Database.getHashByUsername(username);
         
-        if (passwordHashArray) return null; // User account already exists
+        if (passwordHashArray) return failureReason('createNewUser() failed: account already exists'); // User account already exists
 
         const passwordHash = await argon2.hash(password, {
             type: argon2.argon2id,
@@ -65,10 +71,10 @@ export default class Auth {
 
         const saveSuccess = await Database.saveUserCredentials(username, passwordHash, displayName);
 
-        if (!saveSuccess) return null;
+        if (!saveSuccess) return failureReason('createNewUser() failed: database query failed');
 
         const buf = await Auth.randomBytes();
-        if (!buf) return null;
+        if (!buf) return failureReason('createNewUser() failed: randomBytes failed');
 
         const sessionId = buf.toString('hex');
         ACTIVE_USERS[sessionId] = username;
@@ -83,16 +89,15 @@ export default class Auth {
     }
 
     static async signOutEverywhere(username: string): Promise<boolean> {
-    let found = false;
+        let found = false;
 
-    for (const [token, user] of Object.entries(ACTIVE_USERS)) {
-        if (user === username) {
-            delete ACTIVE_USERS[token];
-            found = true;
+        for (const [token, user] of Object.entries(ACTIVE_USERS)) {
+            if (user === username) {
+                delete ACTIVE_USERS[token];
+                found = true;
+            }
         }
+
+        return found;
     }
-
-    return found;
-}
-
 }
