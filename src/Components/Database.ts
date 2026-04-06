@@ -24,7 +24,7 @@ export default class Database {
 
         try {
             conn = await pool.getConnection();
-            password = await conn.query("SELECT password, displayName FROM users WHERE username = ?", username);
+            password = await conn.query("SELECT passwordHash, displayName FROM users WHERE username = ?", username);
         } catch (error) {
             console.error(error);
         } finally {
@@ -39,7 +39,7 @@ export default class Database {
 
         try {
             conn = await pool.getConnection();
-            await conn.query("INSERT INTO auth (username, passwordHash, displayName) VALUES (?, ?, ?)", [username, passwordHash, displayName]);
+            await conn.query("INSERT INTO users (username, passwordHash, displayName) VALUES (?, ?, ?)", [username, passwordHash, displayName]);
         } catch (error) {
             console.error(error);
             return false;
