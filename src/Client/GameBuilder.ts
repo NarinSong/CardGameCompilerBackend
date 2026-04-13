@@ -1,6 +1,7 @@
 // Game builder expects a payload from the client, which it will then turn into a game definition
 // It will also house the type checking (yay!) to ensure that there won't be any runtime errors
 
+import Database from "../Components/Database.js";
 import Action from "../Rules/ActionDefinition.js";
 import GameDefinition from "../Rules/GameDefinition.js";
 import { verifyClientGameDefintion } from "../schemas/ClientGameDefinition.js";
@@ -76,4 +77,12 @@ export function buildGameFromJSON(clientJson: unknown) {
     }
 
     return game;
+}
+
+export async function buildGameFromDatabase(id: number) {
+    const g = await Database.getGameFromId(id);
+
+    if (!g || !g[0]) return null;
+
+    return buildGameFromJSON(JSON.parse(g[0].gameRules));
 }

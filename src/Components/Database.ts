@@ -51,4 +51,53 @@ export default class Database {
 
         return true;
     }
+
+    static async saveGameJson(game: string, name: string, owner: string, parent: number | null, description: string | null, isPrivate: boolean) {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            await conn.query("INSERT INTO savedrules (gameRules, gameName, creator, parent, gameDescription, privateGame) VALUES (?, ?, ?, ?, ?, ?)", 
+                [game, name, owner, parent, description, isPrivate]);
+        } catch (error) {
+            console.error(error);
+            return false;
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return true;
+    }
+
+    static async getGameFromId(gameId: number): Promise<{ gameRules: string }[] | null> {
+        let conn;
+        let game = null;
+
+        try {
+            conn = await pool.getConnection();
+            game = await conn.query("SELECT gameRules FROM savedrules WHERE id = ?", [gameId]);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return game;
+    }
+
+    static async getGamesList(): Promise<{ name: string; id: number }[] | null> {
+        let conn;
+        let games = null;
+
+        try {
+            conn = await pool.getConnection();
+            games = await conn.query("SELECT gameName AS name, id FROM savedrules");
+        } catch (error) {
+            console.error(error);
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return games;
+    }
 }

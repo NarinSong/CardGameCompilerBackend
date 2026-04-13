@@ -122,6 +122,8 @@ export function clientRequestGetAvailableGames(clientId: number, callback: unkno
         { name: 'gPickup', id: 14},{ name: 'Chess', id: 15 },
     ]; //TODO: replace with database call
 
+    //const games = GameManager.availableGames();
+
     callback(games);
 }
 

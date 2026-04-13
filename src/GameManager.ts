@@ -2,6 +2,8 @@
 // The room list, client list, etc. will be in here
 // This is so that the distinct parts of the server can all grab information that is important to them
 import Client from './Client/Client.js'
+import { buildGameFromDatabase } from './Client/GameBuilder.js';
+import Database from './Components/Database.js';
 import Room from './Components/Room.js';
 import GameDefinition from './Rules/GameDefinition.js';
 import PickupGame from './SampleGames/JsonReader.js';
@@ -63,12 +65,15 @@ export default class GameManager {
         GameManager.availableGames[id] = game;
     }
 
-    static getAvailableGameNames() {
-        const names: Record<string, string> = {};
-        for (const game in GameManager.availableGames) {
-            names[game] = 'Pickup';//GameManager.availableGames[game].name; // TODO: add other information like author, description. Probably will be connected to DB
-        }
-        return names;
+    static async getAvailableGameNames() {
+        // Potential: caching
+        return await Database.getGamesList();
+    }
+
+    static async getGameDefinition(id: number): Promise<GameDefinition | null> {
+        if (GameManager.availableGames[id]) return GameManager.availableGames[id];
+        
+        return await buildGameFromDatabase(id);
     }
 
     static get nextRoom() {
