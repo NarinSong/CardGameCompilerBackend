@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
-import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestPing, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestPing, clientRequestSaveGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 
 // Execution begins here
 // All socket connections come through here. Incoming AND outgoing.
@@ -34,14 +34,18 @@ io.on('connection', (socket: Socket) => {
     // Listeners
     socket.on('ping', (callback) => {clientRequestPing(id, callback);});
 
+    // Auth
     socket.on('signUp', (username, password, displayName, callback) => {clientRequestSignUp(id, username, password, displayName, callback);});
     socket.on('signIn', (username, password, callback) => {clientRequestSignIn(id, username, password, callback);});
     socket.on('signOut', (callback) => {clientRequestSignOut(id, callback);});
 
     socket.on('getAvailableGames', (callback) => {clientRequestGetAvailableGames(id, callback);});
 
+    // Game Builder
     socket.on('getAvailableBlocks', (callback) => {clientRequestGetAvailableBlocks(id, callback);});
+    socket.on('saveGame', (json, gameName, parentGameId, gameDescription, isPrivate, callback) => {clientRequestSaveGame(id, json, gameName, parentGameId, gameDescription, isPrivate, callback);});
 
+    // Game play
     socket.on('startNewGame', (gameId, callback) => {clientRequestStartNewGame(id, gameId, callback);});
     socket.on('playerClickEvent', (label, callback) => {clientRequestClickLabel(id, label, callback);});
 

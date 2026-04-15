@@ -4,7 +4,7 @@ import { z } from "zod";
 import { BoardSchema, GameMetaArgsSchema, PhaseSchema, PlayerSchema } from "./GameDefinitionArgs.js";
 
 // It will *not* be used for the back-end implementation
-const ClientGameDefinitionSchema = z.object({
+export const ClientGameDefinitionSchema = z.object({
   gameMeta: GameMetaArgsSchema,
   playerDefinition: PlayerSchema,
   boardDefinition: BoardSchema,

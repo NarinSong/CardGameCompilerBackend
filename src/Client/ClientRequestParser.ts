@@ -1,6 +1,9 @@
 import { z } from "zod";
 import GameManager from "../GameManager.js";
 import CodeBlocks from "./CodeBlocks.json" with { type: "json" };
+import { buildGameFromJSON } from "./GameBuilder.js";
+import Database from "../Components/Database.js";
+import { ClientGameDefinitionSchema } from "../schemas/ClientGameDefinition.js";
 
 // This file is for handling incoming socket requests from the client
 // All incoming requests come through here
@@ -73,6 +76,7 @@ export async function clientRequestSignIn(clientId: number, username: unknown, p
         .string()
         .regex(/^[a-zA-Z0-9!@#$%^&*(),.?]+$/)
         .min(4)
+        .max(128)
         .safeParse(password);
 
     if (!usernameCheck.success || !passwordCheck.success) return callback(null);
@@ -125,6 +129,59 @@ export function clientRequestGetAvailableGames(clientId: number, callback: unkno
     //const games = GameManager.availableGames();
 
     callback(games);
+}
+
+export async function clientRequestSaveGame(clientId: number, json: unknown, gameName: unknown, parentGameId: unknown, gameDescription: unknown, isPrivate: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean, id?: number) => void
+
+    // Auth check
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(false);
+    const username = client.username;
+    if (!username) return callback(false);
+
+    // Verify client input
+    const jsonCheck = 
+        ClientGameDefinitionSchema
+        .safeParse(json);
+
+    const gameNameCheck = z
+        .string()
+        .min(3)
+        .max(16)
+        .regex(/^[a-z0-9_]+$/)
+        .safeParse(gameName);
+    
+    const parentIdCheck = z
+        .number()
+        .optional()
+        .safeParse(parentGameId);
+
+    const gameDescriptionCheck = z
+        .string()
+        .regex(/^[a-zA-Z0-9!@#$%^&*(),.?]+$/)
+        .max(10000)
+        .safeParse(gameDescription); // can be blank ''
+
+    const isPrivateCheck = z
+        .boolean()
+        .safeParse(isPrivate);
+
+    if (!jsonCheck.success || !gameNameCheck.success || !parentIdCheck.success || !gameDescriptionCheck.success || !isPrivateCheck.success) return callback(false);
+
+    const def = buildGameFromJSON(jsonCheck.data);
+    if (!def) return callback(false);
+
+    //TODO: connect actual id
+    const id = 1;
+
+    // Save game in database and available games
+    await Database.saveGameJson(JSON.stringify(jsonCheck.data), gameNameCheck.data, username, parentIdCheck.data ?? null, gameDescriptionCheck.data, isPrivateCheck.data);
+    
+    // todo: get save id from database
+    GameManager.registerGameDefinition(def, id); 
+
+    callback(true, id);
 }
 
 export function clientRequestGetAvailableBlocks(clientId: number, callback: unknown = noop) {
