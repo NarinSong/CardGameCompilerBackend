@@ -120,7 +120,7 @@ export default class Database {
 
     /**
      * Gets the list of available games.
-     * @returns Promise for the list of game names if successful, else null.
+     * @returns Promise for the list of game names and ids if successful, else null.
      */
     static async getGamesList(): Promise<{ name: string; id: number }[] | null> {
         let conn;
