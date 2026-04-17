@@ -12,6 +12,11 @@ import Player from "../Game/Player.js";
 type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number}[], label: string, displayName: string, actionRoles: string[] };
 type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[] };
 
+/**
+ * The current gamestate from the perspective of the client.
+ * 
+ * The ClientView contains the piles, counters, players, and board information.
+ */
 export default class ClientView {
     // These are readonly so that they can be linked to the actual gamestate without having to worry about side-effects
     readonly piles: ClientPileType[];
@@ -19,6 +24,13 @@ export default class ClientView {
     readonly players: Record<PlayerID, Player>;
     readonly board: Board;
 
+    /**
+     * Creates the ClientView.
+     * @param piles - Piles in the game.
+     * @param counters - Counters in the game.
+     * @param players - The players in the game.
+     * @param board - The game board.
+     */
     private constructor(
         piles: ClientPileType[],
         counters: ClientCounterType[],
@@ -31,6 +43,15 @@ export default class ClientView {
         this.board = board;
     }
 
+    /**
+     * The view of the pile from the perspective of the client.
+     * @param pile - the pile to generate a view for. 
+     * @param owner - id of the owner of the pile. 
+     * @param player - Player object of the client.
+     * @param suitMap - Map between the suit and its value.
+     * @param rankMap - Map between the rank and its value.
+     * @returns Created pileView object, else null if the pile is supposed to be invisible.
+     */
     static pileView(pile: Pile, owner: number, player: Player, suitMap: ValueMap<string, number>, rankMap: ValueMap<string, number>) {
         // Do *not* mutate pile, since it's from the gamestate
         if (pile.visibility == Visibility.INVISIBLE) return null;
@@ -57,6 +78,13 @@ export default class ClientView {
         return pileView;
     }
 
+    /**
+     * The view of the counter from the perspective of the client.
+     * @param counter - the counter to generate a view for.
+     * @param owner - id of the owner of the counter.
+     * @param player - Player object of the client.
+     * @returns Created counterView object, else null if the counter is supposed to be invisible.
+     */
     static counterView(counter: Counter, owner: number, player: Player) {
         if (counter.visibility == Visibility.INVISIBLE) return null;
 
@@ -74,6 +102,12 @@ export default class ClientView {
         return counterView;
     }
 
+    /**
+     * Creates the view that the client will see from the game state
+     * @param g - running game instance.
+     * @param p - Player object of the client.
+     * @returns ClientView object.
+     */
     static fromGamestate(g: Game, p: Player) {
         const piles: ClientPileType[] = [];
         const counters: ClientCounterType[] = [];
