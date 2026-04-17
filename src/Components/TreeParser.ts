@@ -5,6 +5,7 @@ import Card from "./Card.js";
 
 // Using Zod schemas
 import { ActionContext, ValueNode, ActionNode, AST, ValueReturn } from "../schemas/AST.js";
+import Player from "../Game/Player.js";
 
 // Helper functions
 /**
@@ -78,6 +79,80 @@ function executeRemovePile(g: Game, c: ActionContext, node: ActionNode) {
     )
 }
 
+function evaluateIdFromRole(g: Game, c: ActionContext, node: ActionNode) {
+    if (node.type !== 'GET_ID_FROM_ROLE') throw new Error("Called evaluateIdFromRole with an invalid node");
+
+    return g.gameState.roles[ evaluate(g, c, node.role ) ]?.at( evaluate(g, c, node.index ) ?? 0 );
+}
+function evaluatePileOf(g: Game, c: ActionContext, node: ActionNode) {
+    if (node.type !== 'PILE_OF') throw new Error("Called evaluatePileOf with an invalid node");
+
+    const playerId = evaluate(g, c, node.id) as number;
+    const actionRole = evaluate(g, c, node.actionRole) as string;
+
+    for (let p in g.gameState.piles) {
+        const pile = g.gameState.piles[p];
+        if (pile?.owner === playerId
+            && pile.pile.actionRoles.includes(actionRole)
+        ) return p;
+    }
+
+    return null;
+}
+function evaluateIdHasRole(g: Game, c: ActionContext, node: ActionNode) {
+    if (node.type !== 'HAS_ROLE') throw new Error("Called evaluateIdHasRole with an invalid node");
+
+    const role = evaluate(g, c, node.role) as string;
+    const playerId = evaluate(g, c, node.id) as number;
+
+    return g.gameState.roles[role]?.includes(playerId) ?? false;
+}
+
+function evaluateAssignRole(g: Game, c: ActionContext, node: ActionNode) {
+    if (node.type !== 'ASSIGN_ROLE') throw new Error("Called evaluateAssignRole with an invalid node");
+
+    const role = evaluate(g, c, node.role) as string;
+    const playerId = evaluate(g, c, node.id) as number;
+
+    if (g.gameState.roles[role] && !g.gameState.roles[role].includes(playerId)) {
+        g.gameState.roles[role].push(playerId);
+        return true;
+    }
+
+    return false;
+}
+
+function evaluateUnassignRole(g: Game, c: ActionContext, node: ActionNode) {
+    if (node.type !== 'UNASSIGN_ROLE') throw new Error("Called evaluateUnassignRole with an invalid node");
+
+    const role = evaluate(g, c, node.role) as string;
+    const playerId = evaluate(g, c, node.id) as number;
+
+    if (g.gameState.roles[role]) {
+        const idx = g.gameState.roles[role].indexOf(playerId);
+        if (idx == -1) return false;
+
+        delete g.gameState.roles[role][idx];
+        return true;
+    }
+
+    return false;
+}
+
+function evaluateAssignRoleSingular(g: Game, c: ActionContext, node: ActionNode) {
+    if (node.type !== 'ASSIGN_ROLE_SINGULAR') throw new Error("Called evaluateAssignRoleSingular with an invalid node");
+
+    const role = evaluate(g, c, node.role) as string;
+    const playerId = evaluate(g, c, node.id) as number;
+
+    if (g.gameState.roles[role] && !g.gameState.roles[role].includes(playerId)) {
+        g.gameState.roles[role] = [playerId];
+        return true;
+    }
+
+    return false;
+}
+
 // Note: calls to evaluate should *always* be wrapped in a try-catch :)
 /**
  * Evaluates an AST node within the current game and action context.
@@ -119,7 +194,16 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | un
         case 'CREATE_PILE': return executeCreatePile(g, c, node);
         case 'REMOVE_PILE': executeRemovePile(g, c, node); return;
         case 'CLICKED_LABEL': return c.label;
+        // Action context
         case 'CTX_CARD': return c.card;
+        case 'CTX_ID': return c.id;
+        // Users and roles
+        case 'GET_ID_FROM_ROLE': return evaluateIdFromRole(g, c, node);
+        case 'PILE_OF': return evaluatePileOf(g, c, node);
+        case 'HAS_ROLE': return evaluateIdHasRole(g, c, node);
+        case 'ASSIGN_ROLE': return evaluateAssignRole(g, c, node);
+        case 'UNASSIGN_ROLE': return evaluateUnassignRole(g, c, node);
+        case 'ASSIGN_ROLE_SINGULAR': return evaluateAssignRoleSingular(g, c, node);
         // Game info extraction
         case 'RANK': return (evaluate(g, c, node.primary) as Card).rank;
         case 'SUIT': return (evaluate(g, c, node.primary) as Card).suit;

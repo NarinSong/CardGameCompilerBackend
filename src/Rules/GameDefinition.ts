@@ -27,6 +27,7 @@ export default class GameDefinition {
     board: BoardDefinition;
     labelManger: LabelManager;
     gameMeta: GameMeta;
+    roles: string[];
 
     /**
      * Creates a new game definition.
@@ -37,6 +38,7 @@ export default class GameDefinition {
         this.board = new BoardDefinition();
         this.labelManger = new LabelManager();
         this.gameMeta = new GameMeta();
+        this.roles = [];
     }
 
     /**
@@ -170,6 +172,14 @@ export default class GameDefinition {
         Logger.debug(`Steps: ${this.phases[0] ? this.phases[0].steps.reduce((prev, curr, idx, arr) => `${prev} ${curr.label}`, '') : ' N/A'}`);
 
         return null;
+    }
+
+    addRole(role: string) {
+        if (this.roles.includes(role)) return null;
+
+        this.roles.push(role);
+        
+        return role;
     }
 
     /**

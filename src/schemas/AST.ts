@@ -1,6 +1,6 @@
 // Schemas are used to verify client input (using zod)
 
-import { z } from "zod";
+import { number, z } from "zod";
 
 const Literal = z.literal("LITERAL");
 const Structures = z.literal("ARRAY");
@@ -109,7 +109,47 @@ export const ValueNodeSchema: z.ZodType<any> = z.lazy(() =>
 
     z.object({
       type: z.literal("CTX_CARD")
-    })
+    }),
+
+    z.object({
+      type: z.literal("CTX_ID")
+    }),
+
+    z.object({
+      type: z.literal("GET_ID_FROM_ROLE"),
+      role: ValueNodeSchema,
+      index: ValueNodeSchema
+    }),
+
+    z.object({
+      type: z.literal("PILE_OF"),
+      id: ValueNodeSchema,
+      actionRole: ValueNodeSchema
+    }),
+
+    z.object({
+      type: z.literal("HAS_ROLE"),
+      id: ValueNodeSchema,
+      role: ValueNodeSchema
+    }),
+
+    z.object({
+      type: z.literal("ASSIGN_ROLE"),
+      id: ValueNodeSchema,
+      role: ValueNodeSchema
+    }),
+
+    z.object({
+      type: z.literal("UNASSIGN_ROLE"),
+      id: ValueNodeSchema,
+      role: ValueNodeSchema
+    }),
+
+    z.object({
+      type: z.literal("ASSIGN_ROLE_SINGULAR"),
+      id: ValueNodeSchema,
+      role: ValueNodeSchema
+    }),
   ])
 );
 
@@ -150,6 +190,7 @@ export const ActionNodeSchema: z.ZodType<any> = z.lazy(() =>
 
 export const ActionContextSchema = z.object({
   trigger: TriggerSchema,
+  id: z.number(),
   label: LabelSchema.optional(),
   card: CardSchema.optional()
 });
