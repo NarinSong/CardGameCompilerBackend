@@ -24,6 +24,7 @@ import Player from "./Player.js";
 export default class GameState {
     gameLabels: GameLabels;
     players: Record<PlayerID, Player>;
+    roles: Record<string, PlayerID[]>; 
     numPlayers: number = 0;
     board: Board;
     currentStep: StepDefinition | null;
@@ -38,6 +39,7 @@ export default class GameState {
         this.gameLabels = new GameLabels(definition.labelManger);
         this.board = new Board(definition.board, this.gameLabels);
         this.players = {};
+        this.roles = {}; // Assigned with a 'time' Trigger
         this.currentStep = null;
         this.piles = {};
         this.counters = {};
