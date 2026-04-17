@@ -16,7 +16,14 @@ const io = new Server(8020);
 
 Logger.log('Listening for socket.io connections on port 8020');
 
+/**
+ * Maps socket.io socket ids to internal client ids.
+ */
 const SOCKET_ID_TO_CLIENT_ID : Record<string, number> = {};
+
+/**
+ * Maps client ids to their socket ids
+ */
 const SOCKETS : Record<number, Socket> = {};
 
 io.on('connection', (socket: Socket) => {
@@ -57,11 +64,22 @@ io.on('connection', (socket: Socket) => {
     })
 })
 
+/**
+ * log the failed send.
+ * @param clientId - Client id that was supposed to receive.
+ * @param functionName - Function name that it failed on.
+ */
 function failedSend(clientId: number, functionName: string) {
     Logger.log(`Failed emit: ${clientId} attempted ${functionName}`);
 }
 
 // Emitters
+/**
+ * Send the gamestate to the client
+ * @param clientId - Client id to send gamestate to.
+ * @param gamestate - Game state to send to client.
+ * @returns void
+ */
 function sendClientGamestate(clientId: number, gamestate: ClientView) {
     const socket = SOCKETS[clientId];
     if (!socket) {
