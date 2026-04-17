@@ -6,6 +6,13 @@ import Action from "../Rules/ActionDefinition.js";
 import GameDefinition from "../Rules/GameDefinition.js";
 import { verifyClientGameDefintion } from "../schemas/ClientGameDefinition.js";
 
+/**
+ * Create a new game definition from the JSON the client sends.
+ * @param clientJson - The JSON containg game meta and rules.
+ * @returns The created game definition or null if the JSON is invalid.
+ * @todo the remaining game meta :)
+ * @todo verify labels, actionRoles, etc.
+ */
 export function buildGameFromJSON(clientJson: unknown) {
     const data = verifyClientGameDefintion(clientJson);
     if (!data) return null;
@@ -79,6 +86,11 @@ export function buildGameFromJSON(clientJson: unknown) {
     return game;
 }
 
+/**
+ * Build the game definition from the JSON stored in the database
+ * @param id - The id of the game.
+ * @returns The created game definition or null if the JSON is invalid.
+ */
 export async function buildGameFromDatabase(id: number) {
     const g = await Database.getGameFromId(id);
 
