@@ -1,7 +1,6 @@
 import { ValueNode } from "../schemas/AST.js";
 import Action from "../Rules/ActionDefinition.js";
 import GameDefinition from "../Rules/GameDefinition.js";
-import Trigger from "../Rules/TriggerDefinition.js";
 import { ButtonType, PileState, TriggerType, Visibility } from "../schemas/types.js";
 
 const Between = new GameDefinition();
@@ -44,7 +43,9 @@ function L(v: any): ValueNode {
 }
 
 const start = new Action(
-    new Trigger(TriggerType.AUTO),
+    {
+        type: TriggerType.AUTO
+    },
     null,
     {
         type: 'SEQUENCE',
@@ -71,7 +72,10 @@ const start = new Action(
 );
 
 const playCard = new Action(
-    new Trigger(TriggerType.CLICK, 'Bet'),
+    {
+        type: TriggerType.CLICK,
+        target: 'Bet'
+    },
     {
         type: 'HAS_ROLE',
         id: {

@@ -10,17 +10,12 @@ import { ActionRole, TriggerType } from "../schemas/types.js";
  * 
  * A Trigger specifies the type of player interaction and the target action role that the interaction applies to.
  */
-export default class Trigger {
-    type: TriggerType;
-    target?: ActionRole | undefined;
-
-    /**
-     * Creates a Trigger.
-     * @param type - The type of trigger. Eg. "CLICK".
-     * @param target - The action role that the trigger applies to.
-     */
-    constructor(type: TriggerType, target?: ActionRole) {
-        this.type = type;
-        this.target = target;
+export type Trigger =
+    {
+      type: typeof TriggerType.CLICK;
+      target: ActionRole;
     }
-}
+  | {
+      type: typeof TriggerType.AUTO;
+      target?: undefined;
+    };

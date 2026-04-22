@@ -1,7 +1,6 @@
 import { ValueNode } from "../schemas/AST.js";
 import Action from "../Rules/ActionDefinition.js";
 import GameDefinition from "../Rules/GameDefinition.js";
-import Trigger from "../Rules/TriggerDefinition.js";
 import { PileState, TriggerType, Visibility } from "../schemas/types.js";
 
 const Pickup = new GameDefinition();
@@ -33,7 +32,10 @@ function L(v: any): ValueNode {
 }
 
 const playCard = new Action(
-    new Trigger(TriggerType.CLICK, 'Deck'),
+    {
+        type: TriggerType.CLICK,
+        target: 'Deck'
+    },
     null,
     {
         type: 'SEQUENCE',
@@ -64,7 +66,10 @@ const playCard = new Action(
 Pickup.addActionToStep(step1, playCard);
 
 const restoreCard = new Action(
-    new Trigger(TriggerType.CLICK, 'Card'),
+    {
+        type: TriggerType.CLICK,
+        target: 'Card'
+    },
     null,
     {
         type: 'REMOVE_PILE',
