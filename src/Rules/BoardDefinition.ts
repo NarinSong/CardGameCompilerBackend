@@ -2,6 +2,7 @@
 // It holds all of the data specific to the game that is not per-player
 // Piles, counters, etc.
 
+import ButtonDefinition from "./ButtonDefinition.js";
 import CounterDefinition from "./CounterDefinition.js";
 import PileDefinition from "./PileDefinition.js";
 
@@ -14,6 +15,7 @@ import PileDefinition from "./PileDefinition.js";
 export default class BoardDefinition {
     piles: PileDefinition[];
     counters: CounterDefinition[];
+    buttons: ButtonDefinition[];
 
     /**
      * Creates a new board definition.
@@ -21,5 +23,6 @@ export default class BoardDefinition {
     constructor() {
         this.piles = [];
         this.counters = [];
+        this.buttons = [];
     }
 }

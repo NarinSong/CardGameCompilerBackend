@@ -11,9 +11,10 @@ import LabelManager, { PhaseLabel, StepLabel } from "./LabelManager.js";
 import PileDefinition from "./PileDefinition.js";
 import PlayerDefinition from "./PlayerDefinition.js";
 import StepDefinition from "./StepDefinition.js";
-import { PileState, Visibility } from "../schemas/types.js";
+import { ButtonType, PileState, Visibility } from "../schemas/types.js";
 import Game from "../Game/Game.js";
 import Logger from "../Components/Logger.js";
+import ButtonDefinition from "./ButtonDefinition.js";
 
 
 /**
@@ -110,6 +111,17 @@ export default class GameDefinition {
         this.board.counters.push(counter);
     }
 
+    addBoardButton(definition: {
+        label?: string | undefined,
+        displayName?: string | undefined,
+        actionRoles?: string[] | undefined,
+        type?: ButtonType | undefined,
+        range: { min?: number | undefined, max?: number | undefined, increment?: number | undefined } | undefined,
+    }) {
+        const button = new ButtonDefinition({ labelManager: this.labelManger, ... definition });
+        this.board.buttons.push(button);
+    }
+
     /**
      * Adds a phase to the game definition.
      * 
@@ -178,7 +190,7 @@ export default class GameDefinition {
         if (this.roles.includes(role)) return null;
 
         this.roles.push(role);
-        
+
         return role;
     }
 

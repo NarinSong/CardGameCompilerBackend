@@ -18,6 +18,11 @@ export const PileStateSchema = z.enum([
   "SHUFFLED"
 ]);
 
+export const ButtonTypeSchema = z.enum([
+  "CLICK",
+  "NUMBER"
+]);
+
 /**
  * Possible states of visibility for piles or cards.
  */
@@ -31,7 +36,8 @@ export const VisibilitySchema = z.enum([
  * Types of triggers that can execute actions.
  */
 export const TriggerTypeSchema = z.enum([
-  "CLICK"
+  "CLICK",
+  "AUTO"
 ]);
 
 
@@ -74,12 +80,14 @@ export const BoardIDSchema = z.literal(-1);
 // Enums
 export const Visibility = VisibilitySchema.enum;
 export const PileState = PileStateSchema.enum;
+export const ButtonType = ButtonTypeSchema.enum;
 export const TriggerType = TriggerTypeSchema.enum;
 export const PlayerType = PlayerTypeSchema.enum;
 
 // Types
 export type PlayerType = z.infer<typeof PlayerTypeSchema>;
 export type PileState = z.infer<typeof PileStateSchema>;
+export type ButtonType = z.infer<typeof ButtonTypeSchema>;
 export type Visibility = z.infer<typeof VisibilitySchema>;
 export type TriggerType = z.infer<typeof TriggerTypeSchema>;
 export type DisplayName = z.infer<typeof DisplayNameSchema>;

@@ -1,3 +1,4 @@
+import ButtonDefinition from "./ButtonDefinition.js";
 import CounterDefinition from "./CounterDefinition.js";
 import GamePhaseDefinition from "./GamePhaseDefinition.js";
 import PileDefinition from "./PileDefinition.js";
@@ -19,7 +20,7 @@ export type StepLabel = string;
 /**
  * Game objects that can be associated with a label.
  */
-export type GameObject = PileDefinition | CounterDefinition;
+export type GameObject = PileDefinition | CounterDefinition | ButtonDefinition;
 
 
 /**

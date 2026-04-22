@@ -12,14 +12,14 @@ import { ActionRole, TriggerType } from "../schemas/types.js";
  */
 export default class Trigger {
     type: TriggerType;
-    target: ActionRole;
+    target?: ActionRole | undefined;
 
     /**
      * Creates a Trigger.
      * @param type - The type of trigger. Eg. "CLICK".
      * @param target - The action role that the trigger applies to.
      */
-    constructor(type: TriggerType, target: ActionRole) {
+    constructor(type: TriggerType, target?: ActionRole) {
         this.type = type;
         this.target = target;
     }

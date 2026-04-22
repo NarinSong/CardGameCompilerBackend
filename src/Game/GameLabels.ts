@@ -1,13 +1,14 @@
 import GamePhaseDefinition from "../Rules/GamePhaseDefinition.js";
 import LabelManager, { Label, StepLabel } from "../Rules/LabelManager.js";
 import StepDefinition from "../Rules/StepDefinition.js";
+import Button from "./Button.js";
 import Counter from "./Counter.js";
 import Pile from "./Pile.js";
 
 /**
  * Runtime game objects that can be referenced by a label.
  */
-export type GamePiece = Pile | Counter;
+export type GamePiece = Pile | Counter | Button;
 
 /**
  * Manages labels for objects, phases, and steps in the game.
@@ -47,6 +48,10 @@ export default class GameLabels {
      */
     registerCounter(counter: Counter, label: Label) {
         this.gameObjectLabels[label] = counter;
+    }
+
+    registerButton(button: Button, label: Label) {
+        this.gameObjectLabels[label] = button;
     }
 
     /**
