@@ -6,13 +6,19 @@ import {
     clientRequestSignOut,
     clientRequestSignUp,
     clientRequestSignIn,
+    clientRequestClickLabel,
+    clientRequestStartNewGame,
+    clientRequestSaveGame,
 } from "./ClientRequestParser.js";
 import GameManager from "../GameManager.js";
+import { buildGameFromJSON } from "./GameBuilder.js";
 import { execPath } from "node:process";
+import GameMeta from "../Rules/GameMeta.js";
 
 vi.mock("../GameManager.js", () => ({
     default: {
         clientFromId: vi.fn(),
+        registerGameDefinition: vi.fn(),
     }
 }));
 
@@ -228,31 +234,216 @@ describe("clientRequestSignIn", () => {
 
         const callback = vi.fn();
         await clientRequestSignIn(1, "dadawdawasdwadaw", "dadawdawasdwadaw",  callback);
-
+        
         expect(callback).toHaveBeenCalledWith(null);
     });
     
     it("calls callback(null) if client.displayName is null", async () => {
         const fakeClient = makeFakeClient({isAuthenticated: false, displayName: null});
         vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
-
-
+        
+        
         const callback = vi.fn();
         await clientRequestSignIn(1, "dadawdawasdwadaw", "dadawdawasdwadaw", callback);
-
+        
         expect(callback).toHaveBeenCalledWith(null);
     });
-
+    
     it("calls callback(success) when sign in succeeds", async () => {
         const fakeClient = makeFakeClient({isAuthenticated: false, signIn: vi.fn().mockResolvedValue("success")});
         vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
-
-
+        
+        
         const callback = vi.fn();
         await clientRequestSignIn(1, "dadawdawasdwadaw", "dadawdawasdwadaw", callback);
-
+        
         expect(callback).toHaveBeenCalledWith("success", "TestUser");
     });
 });
 
 // Didnt continue after signout
+
+describe("clientRequestGetAvailableGames", () => {
+    it("does nothing if callback is not a function", async () => {
+        expect(() => clientRequestGetAvailableGames(1,"ddwadaw")).not.toThrow();
+    });
+
+    it("calls callback with an array", () => {
+        const callback = vi.fn();
+        clientRequestGetAvailableGames(1, callback);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalledWith(expect.any(Array));
+    });
+});
+
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+const validGame = {
+    gameMeta: {},
+    playerDefinition: {},
+    boardDefinition: {},
+    phases: [],
+}
+
+const invalidGame = {
+    gameMeta: {},
+
+}
+
+vi.mock("./GameBuilder.js", () => ({
+    buildGameFromJSON: vi.fn().mockReturnValue({ some: "gamedef" } as any),
+}));
+
+vi.mock("../Components/Database.js", () => ({
+    default: {
+        saveGameJson: vi.fn().mockResolvedValue(undefined),
+    }
+}));
+
+
+describe("clientRequestSaveGame", () => {
+    it("does nothing if callback is not a function", async () => {
+        expect(() => clientRequestSaveGame(1, validGame,"dawwad", 1, "dwadwad", true,"ddwadaw")).not.toThrow();
+    });
+
+    it("calls callback(false) if client is not found", async () => {
+
+        vi.mocked(GameManager.clientFromId).mockReturnValue(null);
+
+        const callback = vi.fn();
+        await clientRequestSaveGame(1, validGame, "dawwad", 1, "dwadwad", true, callback);
+
+        expect(callback).toHaveBeenCalledWith(false);
+    });
+
+    
+
+    it("calls callback(false) if client is not authenticated", async () => {
+        const fakeClient = makeFakeClient({username: null});
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+
+        const callback = vi.fn();
+        await clientRequestSaveGame(1, validGame, "dawwad", 1, "dwadwad", true, callback);
+
+        expect(callback).toHaveBeenCalledWith(false);
+    });
+
+    it("calls callback(false) if jsonCheck fails", async () => {
+        const fakeClient = makeFakeClient();
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+
+        const callback = vi.fn();
+        await clientRequestSaveGame(1, invalidGame, "dawwad", 1, "dwadwad", true, callback);
+
+        expect(callback).toHaveBeenCalledWith(false);
+    });
+
+    it("calls callback(false) if gameNameCheck fails", async () => {
+        const fakeClient = makeFakeClient();
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+
+        const callback = vi.fn();
+        await clientRequestSaveGame(1, validGame, "dawwad@@@@@@", 1, "dwadwad", true, callback);
+
+        expect(callback).toHaveBeenCalledWith(false);
+    });
+    
+    it("calls callback(false) if parentIdCheck fails", async () => {
+        const fakeClient = makeFakeClient();
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+
+        const callback = vi.fn();
+        await clientRequestSaveGame(1, validGame, "dawwad", "skjwhks", "dwadwad", true, callback);
+
+        expect(callback).toHaveBeenCalledWith(false);
+    });
+
+    it("calls callback(false) if gameDescriptionCheck fails", async () => {
+        const fakeClient = makeFakeClient();
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+
+        const callback = vi.fn();
+        await clientRequestSaveGame(1, validGame, "dawwad", 1, "dwad wad", true, callback);
+
+        expect(callback).toHaveBeenCalledWith(false);
+    });
+    
+    it("calls callback(false) if isPrivateCheck fails", async () => {
+        const fakeClient = makeFakeClient();
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+
+        const callback = vi.fn();
+        await clientRequestSaveGame(1, validGame, "dawwad", 1, "dwadwad", "true", callback);
+
+        expect(callback).toHaveBeenCalledWith(false);
+    });
+
+    it("calls callback(false) if buildGameFromJSON fails", async () => {
+        const fakeClient = makeFakeClient();
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+        vi.mocked(buildGameFromJSON).mockReturnValue(null)
+
+        const callback = vi.fn();
+        await clientRequestSaveGame(1, validGame, "dawwad", 1, "dwadwad", true, callback);
+
+        expect(callback).toHaveBeenCalledWith(false);
+    });
+    
+    it("calls callback(true) if successful", async () => {
+        const fakeClient = makeFakeClient();
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+        vi.mocked(buildGameFromJSON).mockReturnValue({ some: "gamedef" } as any)
+        
+        const callback = vi.fn();
+        await clientRequestSaveGame(1, validGame, "dawwad", 1, "dwadwad", true, callback);
+
+        expect(callback).toHaveBeenCalledWith(true, expect.any(Number));
+    });
+    
+});
+
+
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+describe("clientRequestGetAvailableBlocks", () => {
+    it("does nothing if callback is not a function", async () => {
+        expect(() => clientRequestGetAvailableBlocks(1,"ddwadaw")).not.toThrow();
+    });
+
+
+});
+
+describe("clientRequestClickLabel", () => {
+    it("does nothing if callback is not a function", async () => {
+        expect(() => clientRequestClickLabel(1,"ddwadaw")).not.toThrow();
+    });
+
+
+});
+describe("clientRequestStartNewGame", () => {
+    it("does nothing if callback is not a function", async () => {
+        expect(() => clientRequestStartNewGame(1,"ddwadaw")).not.toThrow();
+    });
+
+
+});
+
