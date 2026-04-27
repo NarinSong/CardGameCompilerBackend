@@ -8,7 +8,9 @@
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec 'ts-node src/index.ts'",
     "prod": "tsc && node dist/index.js",
-    "compile-only": "tsc"
+    "compile-only": "tsc",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "argon2": "^0.44.0",
