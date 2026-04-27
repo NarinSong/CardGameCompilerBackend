@@ -19,7 +19,7 @@ import Player from "./Player.js";
 /**
  * Represents the game state during runtime.
  * 
- * A GameState tracks the labels in the game, number of players, players, board, current step, piles, and counters.
+ * A GameState tracks the labels in the game, number of players, players, roles, board, current step, piles, and counters.
  */
 export default class GameState {
     gameLabels: GameLabels;

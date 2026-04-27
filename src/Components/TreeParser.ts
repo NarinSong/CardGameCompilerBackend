@@ -79,11 +79,28 @@ function executeRemovePile(g: Game, c: ActionContext, node: ActionNode) {
     )
 }
 
+/**
+ *  Executes a "GET_ID_FROM_ROLE" action node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - GET_ID_FROM_ROLE action node to execute.
+ * @throws Error if the node is not a GET_ID_FROM_ROLE node.
+ * @returns Id of first player with that role in that index.
+ */
 function evaluateIdFromRole(g: Game, c: ActionContext, node: ActionNode) {
     if (node.type !== 'GET_ID_FROM_ROLE') throw new Error("Called evaluateIdFromRole with an invalid node");
 
     return g.gameState.roles[ evaluate(g, c, node.role ) ]?.at( evaluate(g, c, node.index ) ?? 0 );
 }
+
+/**
+ * Executes a "PILE_OF" action node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - PILE_OF action node to execute.
+ * @throws Error if the node is not a PILE_OF node.
+ * @returns The label of the matching pile, or null if none is found.
+ */
 function evaluatePileOf(g: Game, c: ActionContext, node: ActionNode) {
     if (node.type !== 'PILE_OF') throw new Error("Called evaluatePileOf with an invalid node");
 
@@ -99,6 +116,15 @@ function evaluatePileOf(g: Game, c: ActionContext, node: ActionNode) {
 
     return null;
 }
+
+/**
+ * Executes a "HAS_ROLE" action node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - HAS_ROLE action node to execute.
+ * @throws Error if the node is not a HAS_ROLE node.
+ * @returns True if user has a certain role, else false.
+ */
 function evaluateIdHasRole(g: Game, c: ActionContext, node: ActionNode) {
     if (node.type !== 'HAS_ROLE') throw new Error("Called evaluateIdHasRole with an invalid node");
 
@@ -108,6 +134,14 @@ function evaluateIdHasRole(g: Game, c: ActionContext, node: ActionNode) {
     return g.gameState.roles[role]?.includes(playerId) ?? false;
 }
 
+/**
+ * Executes a "ASSIGN_ROLE" action node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - ASSIGN_ROLE action node to execute.
+ * @throws Error if the node is not a ASSIGN_ROLE node.
+ * @returns True if the player was successfully added to the role, false if the role doesn't exist or the player already has it.
+ */
 function evaluateAssignRole(g: Game, c: ActionContext, node: ActionNode) {
     if (node.type !== 'ASSIGN_ROLE') throw new Error("Called evaluateAssignRole with an invalid node");
 
@@ -122,6 +156,14 @@ function evaluateAssignRole(g: Game, c: ActionContext, node: ActionNode) {
     return false;
 }
 
+/**
+ * Executes a "UNASSIGN_ROLE" action node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - UNASSIGN_ROLE action node to execute.
+ * @throws Error if the node is not a UNASSIGN_ROLE node.
+ * @returns true if unassigning the role was successful, else false.
+ */
 function evaluateUnassignRole(g: Game, c: ActionContext, node: ActionNode) {
     if (node.type !== 'UNASSIGN_ROLE') throw new Error("Called evaluateUnassignRole with an invalid node");
 
@@ -139,6 +181,14 @@ function evaluateUnassignRole(g: Game, c: ActionContext, node: ActionNode) {
     return false;
 }
 
+/**
+ * Executes a "ASSIGN_ROLE_SINGULAR" action node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - ASSIGN_ROLE_SINGULAR action node to execute.
+ * @throws Error if the node is not a ASSIGN_ROLE_SINGULAR node.
+ * @returns True if successfully assigned, false if the role doesn't exist or the player already holds it.
+ */
 function evaluateAssignRoleSingular(g: Game, c: ActionContext, node: ActionNode) {
     if (node.type !== 'ASSIGN_ROLE_SINGULAR') throw new Error("Called evaluateAssignRoleSingular with an invalid node");
 

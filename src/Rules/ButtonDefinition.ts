@@ -1,6 +1,11 @@
 import LabelManager, { Label } from "./LabelManager.js";
 import { ActionRole, DisplayName, ButtonType, Visibility } from "../schemas/types.js";
 
+/**
+ * Defines the properties that make up a button in a game.
+ * 
+ * A ButtonDefinition describes the label, display name, action roles, type, and range (if applicable) used when creating a button.
+ */
 export default class ButtonDefinition {
     label: Label;
     displayName: DisplayName;
@@ -8,6 +13,10 @@ export default class ButtonDefinition {
     type: ButtonType;
     range: { min: number | undefined, max: number | undefined, increment: number } | undefined;
     
+    /**
+     * Creates a new button.
+     * @param definition - Configuration for the Button, including its label, display name, action roles, button type, and range if necessary.
+     */
     constructor(definition: {
         labelManager: LabelManager,
         label?: string | undefined,

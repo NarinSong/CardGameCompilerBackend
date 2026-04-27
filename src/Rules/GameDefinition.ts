@@ -20,7 +20,7 @@ import ButtonDefinition from "./ButtonDefinition.js";
 /**
  *   Defines the static rules, structure, and metadata for a game.
  * 
- *  A GameDefinition contains the phases, steps, board/player definitions, and action rules needed to create a runtime Game instance.
+ *  A GameDefinition contains the phases, steps, board/player definitions, roles, and action rules needed to create a runtime Game instance.
  */
 export default class GameDefinition {
     phases: GamePhaseDefinition[];
@@ -111,6 +111,10 @@ export default class GameDefinition {
         this.board.counters.push(counter);
     }
 
+    /**
+     * Adds a button to the game definition.
+     * @param definition - Configuration for the Button, including its label, display name, action roles, button type, and range if necessary.
+     */
     addBoardButton(definition: {
         label?: string | undefined,
         displayName?: string | undefined,
@@ -186,6 +190,11 @@ export default class GameDefinition {
         return null;
     }
 
+    /**
+     * Adds a new role to the roles.
+     * @param role - Name of the role.
+     * @returns The role name if successfully added, or null if the role already exists.
+     */
     addRole(role: string) {
         if (this.roles.includes(role)) return null;
 
