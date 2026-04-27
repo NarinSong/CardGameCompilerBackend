@@ -203,6 +203,48 @@ function evaluateAssignRoleSingular(g: Game, c: ActionContext, node: ActionNode)
     return false;
 }
 
+/**
+ * Executes a "ADD_VARIABLE" value node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - ADD_VARIABLE value node to execute.
+ * @throws Error if the node is not a ADD_VARIABLE node.
+ * @returns The value if successfully assigned.
+ */
+function executeAddVariable(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== 'ADD_VARIABLE') throw new Error("Called executeAddVariable with invalid node");
+
+    const name = evaluate(g, c, node.name) as string;
+    const value = evaluate(g, c, node.value) as number;
+
+    if (name in g.definition.gameMeta.variables) return null;
+
+    g.definition.gameMeta.variables[name] = value;
+
+    return value;
+}
+
+/**
+ * Executes a "UPDATE_VARIABLE" value node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - UPDATE_VARIABLE value node to execute.
+ * @throws Error if the node is not a UPDATE_VARIABLE node.
+ * @returns The value if successfully assigned.
+ */
+function executeUpdateVariable(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== 'UPDATE_VARIABLE') throw new Error("Called executeUpdateVariable with invalid node");
+
+    const name = evaluate(g, c, node.name) as string;
+    const value = evaluate(g, c, node.value) as number;
+
+    if (!(name in g.definition.gameMeta.variables)) return null;
+
+    g.definition.gameMeta.variables[name] = value;
+
+    return value;
+}
+
 // Note: calls to evaluate should *always* be wrapped in a try-catch :)
 /**
  * Evaluates an AST node within the current game and action context.
@@ -259,6 +301,9 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | un
         case 'SUIT': return (evaluate(g, c, node.primary) as Card).suit;
         // Map usage
         case 'MAP': return (g.definition.gameMeta.maps[ evaluate(g, c, node.secondary) as string ]?.get( evaluate(g, c, node.primary) ));
+        case 'ADD_VARIABLE': return executeAddVariable(g, c, node);
+        case 'UPDATE_VARIABLE': return executeUpdateVariable(g, c, node);
+        case 'GET_VARIABLE': return g.definition.gameMeta.variables[evaluate(g, c, node.name) as string];
     }
 
     //throw new Error(`Unsupported type ${node.type}`);

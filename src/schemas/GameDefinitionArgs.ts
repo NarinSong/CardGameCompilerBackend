@@ -8,7 +8,9 @@ export const GameMetaArgsSchema = z.object({
     maxPlayers: z.number().optional(),
     cardValueMap: ValueNodeSchema.optional(),
     clientSuitMap: z.record(z.string(), z.number()).optional(),
-    clientRankMap: z.record(z.string(), z.number()).optional()
+    clientRankMap: z.record(z.string(), z.number()).optional(),
+    variables: z.record(z.string(), z.number()).optional(),
+
 })
 
 export const PileSchema = z.object({

@@ -150,6 +150,23 @@ export const ValueNodeSchema: z.ZodType<any> = z.lazy(() =>
       id: ValueNodeSchema,
       role: ValueNodeSchema
     }),
+
+    z.object({
+      type: z.literal("ADD_VARIABLE"),
+      name: ValueNodeSchema,
+      value: ValueNodeSchema,
+    }),
+
+    z.object({
+      type: z.literal("UPDATE_VARIABLE"),
+      name: ValueNodeSchema,
+      value: ValueNodeSchema,
+    }),
+
+    z.object({
+    type: z.literal("GET_VARIABLE"),
+    name: ValueNodeSchema,
+    }),
   ])
 );
 

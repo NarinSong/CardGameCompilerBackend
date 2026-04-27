@@ -14,6 +14,7 @@ export default class GameMeta {
     cardValueMap: CardValueMap;
     clientSuitMap: ValueMap<string, number>;
     clientRankMap: ValueMap<string, number>;
+    variables: Record<string, number>;
 
     /**
      * Creates a new GameMeta configuration.
@@ -26,6 +27,7 @@ export default class GameMeta {
         this.maps = { 'CARD_RANK_MAP': DEFAULT_CARD_RANK_MAP }
         this.clientSuitMap = obj.clientSuitMap ? new ValueMap<string, number>(obj.clientSuitMap) : DEFAULT_CLIENT_VIEW_SUIT_MAP;
         this.clientRankMap = obj.clientRankMap ? new ValueMap<string, number>(obj.clientRankMap) : DEFAULT_CLIENT_VIEW_RANK_MAP;
+        this.variables = obj.variables ?? {};
     }
 
     // Prevent the minimum number of players from being larger than the maximum
