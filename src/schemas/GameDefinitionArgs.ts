@@ -42,10 +42,17 @@ export const BoardSchema = z.object({
 // Building up to phase definition
 
 // Start with actions
-export const TriggerSchema = z.object({
-    type: TriggerTypeSchema,
+export const TriggerSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal(TriggerTypeSchema.enum.CLICK),
     target: ActionRoleSchema,
-});
+  }),
+
+  z.object({
+    type: z.literal(TriggerTypeSchema.enum.AUTO),
+    target: z.undefined().optional(),
+  }),
+]);
 
 export const ActionSchema = z.object({
     trigger: TriggerSchema,

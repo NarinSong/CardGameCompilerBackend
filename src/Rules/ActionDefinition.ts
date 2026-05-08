@@ -4,7 +4,7 @@
 //      and a result (what happens when the action is taken)
 
 import { ActionNode, ValueNode } from "../schemas/AST.js";
-import Trigger from "./TriggerDefinition.js";
+import { Trigger } from "./TriggerDefinition.js";
 
 /**
  *   Defines the trigger, filter, and result that make up a game action.
