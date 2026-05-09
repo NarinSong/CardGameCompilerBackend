@@ -3,6 +3,7 @@ import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
 import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { LobbyView } from './Components/Lobby.js';
 
 // Execution begins here
 // All socket connections come through here. Incoming AND outgoing.
@@ -96,5 +97,15 @@ function sendClientGamestate(clientId: number, gamestate: ClientView) {
     socket.emit('gamestate', gamestate);
 }
 
+function sendLobbyStatus(clientId: number, lobbyStatus: LobbyView) {
+    const socket = SOCKETS[clientId];
+    if (!socket) {
+        failedSend(clientId, 'sendClientGamestate()');
+        return;
+    }
+
+    socket.emit('lobbyStatus', lobbyStatus);
+}
+
 // Exports. Note: socket is not exported
-export { sendClientGamestate };
+export { sendClientGamestate, sendLobbyStatus };

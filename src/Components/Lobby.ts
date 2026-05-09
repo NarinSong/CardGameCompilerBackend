@@ -2,8 +2,21 @@
 
 import Client from "../Client/Client";
 import GameManager from "../GameManager";
+import { sendLobbyStatus } from "..";
 
 const A = "A".charCodeAt(0);
+
+export class LobbyView {
+    readonly host: string;
+    readonly players: string[];
+    readonly code: string;
+
+    constructor(lobby: Lobby) {
+        this.host = lobby.host;
+        this.players = lobby.playerNames;
+        this.code = lobby.joinCode;
+    }
+}
 
 export default class Lobby {
     #host: string;
@@ -24,6 +37,17 @@ export default class Lobby {
         this.#joinCode = joinCode;
     }
 
+    update() {
+        const view = new LobbyView(this);
+
+        for (let p in this.#players) {
+            const client = this.#players[p];
+            if (!client) continue;
+
+            sendLobbyStatus(client.identifier, view);
+        }
+    }
+
     joinGame(client: Client) {
         if (this.#players.length >= this.#maxPlayers) return false;
 
@@ -31,6 +55,8 @@ export default class Lobby {
 
         client.inLobby = true;
         client.lobby = this.#joinCode;
+
+        this.update();
 
         return true;
     }
@@ -41,12 +67,14 @@ export default class Lobby {
         // Add available players until maxPlayers is reached
         // Mark those players as "in game"
         // Send "game started" signals to those players
+        this.update();
     }
 
     isHost(username: string) {
         return this.#host == username;
     }
 
+    // NEEDS TESTING
     assignNewHost() {
         if (this.#players.length == 0) {
             GameManager.deleteLobby(this.#joinCode);
@@ -60,9 +88,10 @@ export default class Lobby {
         }
 
         this.#host = host.username;
-        //TODO let new host know
+        this.update();
     }
 
+    // NEEDS TESTING
     removeFromLobby(username: string) {
         for (let p in this.#players) {
             const client = this.#players[p];
@@ -81,6 +110,8 @@ export default class Lobby {
 
         if (this.isHost(username))
             this.assignNewHost();
+        
+        this.update();
     }
 
     static randomAlphaNumeric() {
@@ -110,5 +141,20 @@ export default class Lobby {
             //if (!this.#players[p].inGame) s++; // todo add "inGame" flag
         }
         return s;
+    }
+
+    get host() {
+        return this.#host;
+    }
+
+    get playerNames() {
+        const list = [];
+        for (let p in this.#players) {
+            const client = this.#players[p];
+            if (!client || !client.username) continue;
+
+            list.push(client.username);
+        }
+        return list;
     }
 }
