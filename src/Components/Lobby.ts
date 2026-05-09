@@ -15,6 +15,9 @@ export default class Lobby {
     constructor(host: Client, joinCode: string) {
         if (!host.isAuthenticated || !host.username) throw new Error("Unauthenticated host created lobby");
 
+        host.inLobby = true;
+        host.lobby = joinCode;
+
         this.#host = host.username;
         this.#players = [host];
         this.#game = null;
@@ -26,7 +29,9 @@ export default class Lobby {
 
         this.#players.push(client);
 
-        // todo: set client.lobby to this lobby's id
+        client.inLobby = true;
+        client.lobby = this.#joinCode;
+
         return true;
     }
 
@@ -60,7 +65,11 @@ export default class Lobby {
 
     removeFromLobby(username: string) {
         for (let p in this.#players) {
-            if (this.#players[p]?.username == username) {
+            const client = this.#players[p];
+            if (!client) continue;
+            if (client.username == username) {
+                client.inLobby = false;
+                client.lobby = undefined;
                 delete this.#players[p];
             }
         }
