@@ -1,8 +1,10 @@
-// Lobby holds players who aren't yet in a game, but might be soon
+// Lobby holds players and child rooms
 
 import Client from "../Client/Client";
 import GameManager from "../GameManager";
 import { sendLobbyStatus } from "..";
+import Room from "./Room";
+import GameDefinition from "../Rules/GameDefinition";
 
 const A = "A".charCodeAt(0);
 
@@ -21,9 +23,10 @@ export class LobbyView {
 export default class Lobby {
     #host: string;
     #players: Client[];
-    #game: string | null;
+    #game: GameDefinition | null;
     #maxPlayers: number = 32;
     #joinCode: string;
+    #rooms: Room[];
 
     constructor(host: Client, joinCode: string) {
         if (!host.isAuthenticated || !host.username) throw new Error("Unauthenticated host created lobby");
@@ -35,6 +38,7 @@ export default class Lobby {
         this.#players = [host];
         this.#game = null;
         this.#joinCode = joinCode;
+        this.#rooms = [];
     }
 
     update() {
@@ -63,10 +67,26 @@ export default class Lobby {
 
     startGame() {
         if (!this.#game) return false;
-        // Create the room if at least minPlayers (available, e.g. not in game) are in the lobby
-        // Add available players until maxPlayers is reached
-        // Mark those players as "in game"
-        // Send "game started" signals to those players
+        const numMinPlayers = this.#game.gameMeta.minPlayers;
+        const numAvailablePlayers = this.numAvailablePlayers;
+        if (numAvailablePlayers < numMinPlayers) return false; // TODO: robots :)
+
+        const game = this.#game.createGame();
+        const room = new Room(game, GameManager.nextRoom, this.#joinCode);
+        GameManager.registerRoom(room);
+        
+        const numMaxPlayers = this.#game.gameMeta.maxPlayers;
+        for (let i=0; i<numMaxPlayers; i++) {
+            const client = this.firstAvailablePlayer;
+            if (!client) continue;
+
+            const success = room.handleJoinRoom(client); // marks the client as "inGame" so shouldn't be listed as "available"
+            if (!success)
+                this.removeFromLobbyById(client.identifier);
+        }
+
+        room.startGame();
+
         this.update();
     }
 
@@ -91,14 +111,15 @@ export default class Lobby {
         this.update();
     }
 
-    // NEEDS TESTING
-    removeFromLobby(username: string) {
+    removeFromLobbyById(clientId: number) {
         for (let p in this.#players) {
             const client = this.#players[p];
             if (!client) continue;
-            if (client.username == username) {
+            if (client.identifier == clientId) {
                 client.inLobby = false;
                 client.lobby = undefined;
+                if (client.username && this.isHost(client.username))
+                    this.assignNewHost();
                 delete this.#players[p];
             }
         }
@@ -108,10 +129,20 @@ export default class Lobby {
             return;
         }
 
-        if (this.isHost(username))
-            this.assignNewHost();
         
         this.update();
+    }
+
+    // NEEDS TESTING
+    removeFromLobby(username: string) {
+        for (let p in this.#players) {
+            const client = this.#players[p];
+            if (!client) continue;
+            if (client.username == username) {
+                this.removeFromLobbyById(client.identifier);
+                return;
+            }
+        }
     }
 
     static randomAlphaNumeric() {
@@ -156,5 +187,26 @@ export default class Lobby {
             list.push(client.username);
         }
         return list;
+    }
+
+    get numAvailablePlayers() {
+        let a = 0;
+        for (let p in this.#players) {
+            const client = this.#players[p];
+            if (!client || client.inGame) continue;
+
+            a++;
+        }
+        return a;
+    }
+
+    get firstAvailablePlayer() {
+        for (let p in this.#players) {
+            const client = this.#players[p];
+            if (!client || client.inGame) continue;
+
+            return client;
+        }
+        return null;
     }
 }

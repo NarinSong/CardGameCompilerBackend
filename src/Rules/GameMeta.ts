@@ -10,6 +10,7 @@ import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
 export default class GameMeta {
     #minPlayers: number;
     #maxPlayers: number;
+    #name: string;
     maps: Record<string, ValueMap<any,any>>;
     cardValueMap: CardValueMap;
     clientSuitMap: ValueMap<string, number>;
@@ -20,7 +21,8 @@ export default class GameMeta {
      * Creates a new GameMeta configuration.
      * @param obj - Configuration for the game, including the minimum and maximum number of players allowed, available value maps, the card value map, and the client suit and rank maps.
      */
-    constructor(obj: GameMetaArgs = {}) {
+    constructor(obj: GameMetaArgs = { name: 'Game' }) {
+        this.#name = obj.name;
         this.#minPlayers = obj.minPlayers || 1;
         this.#maxPlayers = obj.maxPlayers || 4;
         this.cardValueMap = obj.cardValueMap ?? DEFAULT_VALUE_MAP;

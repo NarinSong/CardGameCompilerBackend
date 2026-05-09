@@ -44,6 +44,7 @@ export default class Client {
     lobby: string | undefined;
     inLobby: boolean = false;
     inGame: boolean = false;
+    player: Player | null = null;
 
     private authState: AuthState = {
         isAuthenticated: false,
@@ -142,11 +143,10 @@ export default class Client {
     /**
      * Send the updated game state to the client.
      * @param game - Current game instance.
-     * @param player - The player associated with the client.
-     * @todo I expect a reference to "Player" or at least "PlayerID" will be stored in the client class eventually
      */
-    updateGamestate(game: Game, player: Player) {
-        sendClientGamestate(this.identifier, ClientView.fromGamestate(game, player));
+    updateGamestate(game: Game) {
+        if (!this.player) return;
+        sendClientGamestate(this.identifier, ClientView.fromGamestate(game, this.player));
     }
 
     static get nextId() {

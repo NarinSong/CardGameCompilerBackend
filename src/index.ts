@@ -60,7 +60,7 @@ io.on('connection', (socket: Socket) => {
     socket.on('removeFromLobby', (username, callback) => {clientRequestRemoveFromLobby(id, username, callback);});
 
     // Game play
-    socket.on('startNewGame', (gameId, callback) => {clientRequestStartNewGame(id, gameId, callback);});
+    socket.on('startNewGame', (callback) => {clientRequestStartNewGame(id, callback);});
     socket.on('playerClickEvent', (label, callback) => {clientRequestClickLabel(id, label, callback);});
 
     // Disconnect

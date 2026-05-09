@@ -55,23 +55,8 @@ export default class GameManager {
         delete GameManager.lobbies[code];
     }
 
-    // TODO: assign a worker thread to the room
-    static createRoom(gameId: number, clientId: number) {
-        const game = this.availableGames[gameId];
-        const client = GameManager.clientFromId(clientId);
-
-        // TODO: Build game definition from database if not in "availableGames"
-        if (!game || !client) return null; 
-
-        const name = GameManager.nextRoom;
-
-        const room = new Room(game.createGame(), clientId, name);
-        client.room = room;
-
-        room.emitGameState();
-
-        GameManager.rooms[name] = room;
-
+    static registerRoom(room: Room) {
+        GameManager.rooms[room.name] = room;
         return room;
     }
 

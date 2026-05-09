@@ -6,6 +6,7 @@ import { ActionRoleSchema, ActionRolesSchema, PileStateSchema, TriggerTypeSchema
 export const GameMetaArgsSchema = z.object({
     minPlayers: z.number().optional(),
     maxPlayers: z.number().optional(),
+    name: z.string().min(3).max(16).regex(/^[a-zA-Z0-9]+$/),
     cardValueMap: ValueNodeSchema.optional(),
     clientSuitMap: z.record(z.string(), z.number()).optional(),
     clientRankMap: z.record(z.string(), z.number()).optional(),

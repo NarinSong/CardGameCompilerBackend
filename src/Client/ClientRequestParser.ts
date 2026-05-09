@@ -331,23 +331,24 @@ export function clientRequestLeaveLobby(clientId: number, callback: unknown = no
  * Handles client request to start a new game.
  * 
  * @param clientId - The id of the client initiating the request. 
- * @param game - The id of the game to start.
  * @param callback - Response handler. Called with the name of room.
- * @returns void if callback is not a function, returns callback(room.name) if successful, else callback(null).
- * @todo check if the client is already in a game.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
  */
-export function clientRequestStartNewGame(clientId: number, game: unknown, callback: unknown = noop) {
-    if (!fCheck(callback)) return;//(succeeded: string | null) => void
+export function clientRequestStartNewGame(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(succeess: boolean) => void
 
-    const result = z.number().safeParse(game)
-    if (!result.success)
-        return callback(null);
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.isAuthenticated || !client.username || !client.inLobby || !client.lobby || client.inGame) 
+        return callback(false);
 
-    // TODO: Check if the client is already in a game
+    const lobby = GameManager.lobbyFromCode(client.lobby);
+    if (!lobby) return callback(false);
 
-    const room = GameManager.createRoom(result.data, clientId);
+    if (!lobby.isHost(client.username)) return callback(false);
 
-    callback(room ? room.name: null);
+    const success = lobby.startGame();
+
+    callback(success);
 }
 
 /**
