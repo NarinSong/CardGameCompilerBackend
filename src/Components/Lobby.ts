@@ -115,7 +115,7 @@ export default class Lobby {
     }
 
     static randomAlphaNumeric() {
-        const number = Math.random() * 36;
+        const number = Math.floor(Math.random() * 36);
         
         if (number < 10) return ''+number; //0-9
 
