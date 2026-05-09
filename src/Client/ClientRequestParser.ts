@@ -251,6 +251,82 @@ export function clientRequestGetAvailableBlocks(clientId: number, callback: unkn
     callback(CodeBlocks);
 }
 
+export function clientRequestHostLobby(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(code: string | null) => void
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.isAuthenticated || client.inLobby || client.inGame) 
+        return callback(null);
+
+    const code = GameManager.hostLobby(client);
+
+    callback(code);
+}
+
+export function clientRequestJoinLobby(clientId: number, code: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean) => void
+
+    const codeCheck = z
+        .string()
+        .min(6)
+        .max(6)
+        .regex(/^[a-z0-9]+$/)
+        .safeParse(code);
+
+    if (!codeCheck.success) return callback(false);
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.isAuthenticated || client.inLobby || client.inGame) 
+        return callback(false);
+
+    const lobby = GameManager.lobbyFromCode(codeCheck.data);
+    if (!lobby) return callback(false);
+
+    const success = lobby.joinGame(client);
+
+    callback(success);
+}
+
+export function clientRequestRemoveFromLobby(clientId: number, username: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean) => void
+
+    const usernameCheck = z
+        .string()
+        .min(3)
+        .max(16)
+        .regex(/^[a-z0-9_]+$/)
+        .safeParse(username);
+
+    if (!usernameCheck.success) return callback(false);
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.isAuthenticated || !client.username || !client.inLobby || !client.lobby || client.inGame) 
+        return callback(false);
+
+    const lobby = GameManager.lobbyFromCode(client.lobby);
+    if (!lobby) return callback(false);
+    if (!lobby.isHost(client.username)) return callback(false);
+
+    const success = lobby.removeFromLobby(usernameCheck.data);
+
+    callback(success);
+}
+
+export function clientRequestLeaveLobby(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean) => void
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.isAuthenticated || !client.username || !client.inLobby || !client.lobby || client.inGame) 
+        return callback(false);
+
+    const lobby = GameManager.lobbyFromCode(client.lobby);
+    if (!lobby) return callback(false);
+
+    const success = lobby.removeFromLobby(client.username);
+
+    callback(success);
+}
+
 /**
  * Handles client request to start a new game.
  * 

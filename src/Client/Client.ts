@@ -41,6 +41,10 @@ export default class Client {
     static #nextId : number = 1000;
     identifier: number;
     room: Room | null = null;
+    lobby: string | undefined;
+    inLobby: boolean = false;
+    inGame: boolean = false;
+
     private authState: AuthState = {
         isAuthenticated: false,
         displayName: null,
