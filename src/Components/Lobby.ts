@@ -1,10 +1,10 @@
 // Lobby holds players and child rooms
 
-import Client from "../Client/Client";
-import GameManager from "../GameManager";
-import { sendLobbyStatus } from "..";
-import Room from "./Room";
-import GameDefinition from "../Rules/GameDefinition";
+import Client from "../Client/Client.js";
+import GameManager from "../GameManager.js";
+import { sendLobbyStatus } from "../index.js";
+import Room from "./Room.js";
+import GameDefinition from "../Rules/GameDefinition.js";
 
 const A = "A".charCodeAt(0);
 

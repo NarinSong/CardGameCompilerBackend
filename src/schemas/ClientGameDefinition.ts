@@ -13,13 +13,12 @@ export const ClientGameDefinitionSchema = z.object({
 
 type ClientGameDefinition = z.infer<typeof ClientGameDefinitionSchema>;
 
-// Throws if invalid
-export function verifyClientGameDefintion(payload: unknown): ClientGameDefinition {
+export function verifyClientGameDefintion(payload: unknown): ClientGameDefinition | null {
   const result = ClientGameDefinitionSchema.safeParse(payload);
 
   if (!result.success) {
     console.dir(z.treeifyError(result.error), { depth: null });
-    throw new Error("Failed to parse client data");
+    return null;
   }
   return result.data;
 }

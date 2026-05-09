@@ -1,7 +1,8 @@
 {
     "gameMeta": {
         "minPlayers": 1,
-        "maxPlayers": 1
+        "maxPlayers": 1,
+        "name": "Pickup"
     },
     "playerDefinition": {
         "piles": []
