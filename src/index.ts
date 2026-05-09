@@ -66,7 +66,7 @@ io.on('connection', (socket: Socket) => {
 
     // Disconnect
     socket.on('disconnect', () => {
-        // TODO: set up auto-reonnect or recovery
+        // TODO: set up auto-reconnect or recovery
         GameManager.removeClient(id);
         delete SOCKETS[id];
     })

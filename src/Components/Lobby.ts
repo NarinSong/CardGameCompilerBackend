@@ -12,11 +12,13 @@ export class LobbyView {
     readonly host: string;
     readonly players: string[];
     readonly code: string;
+    readonly game: string;
 
     constructor(lobby: Lobby) {
         this.host = lobby.host;
         this.players = lobby.playerNames;
         this.code = lobby.joinCode;
+        this.game = lobby.gameName; // defaults to "No Game Name"
     }
 }
 
@@ -91,6 +93,8 @@ export default class Lobby {
         }
 
         room.startGame();
+
+        this.#rooms.push(room); //should we use the id? Mayhaps
 
         this.update();
     }
@@ -192,6 +196,10 @@ export default class Lobby {
             list.push(client.username);
         }
         return list;
+    }
+
+    get gameName() {
+        return this.#game ? this.#game.gameMeta.name : 'No Game Selected';
     }
 
     get numAvailablePlayers() {

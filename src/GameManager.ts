@@ -67,6 +67,12 @@ export default class GameManager {
         const room = client.room;
         if (room) delete GameManager.rooms[room.name];
 
+        const lobbyId = client.lobby;
+        if (lobbyId) {
+            const lobby = GameManager.lobbyFromCode(lobbyId);
+            if (lobby) lobby.removeFromLobbyById(client.identifier); // potentially deletes the lobby too, if empty
+        }
+
         delete GameManager.clients[clientId];
     }
 

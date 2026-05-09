@@ -74,4 +74,8 @@ export default class GameMeta {
     get maxPlayers() {
         return this.#maxPlayers;
     }
+
+    get name() {
+        return this.#name;
+    }
 }
