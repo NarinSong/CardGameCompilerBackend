@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
-import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 import { LobbyView } from './Components/Lobby.js';
 
 // Execution begins here
@@ -58,6 +58,7 @@ io.on('connection', (socket: Socket) => {
     socket.on('joinLobby', (code, callback) => {clientRequestJoinLobby(id, code, callback);});
     socket.on('leaveLobby', (callback) => {clientRequestLeaveLobby(id, callback);});
     socket.on('removeFromLobby', (username, callback) => {clientRequestRemoveFromLobby(id, username, callback);});
+    socket.on('selectGame', (gameId, callback) => {clientRequestSelectGame(id, gameId, callback);});
 
     // Game play
     socket.on('startNewGame', (callback) => {clientRequestStartNewGame(id, callback);});

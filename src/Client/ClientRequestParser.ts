@@ -327,6 +327,32 @@ export function clientRequestLeaveLobby(clientId: number, callback: unknown = no
     callback(success);
 }
 
+export async function clientRequestSelectGame(clientId: number, gameId: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(succeess: boolean) => void
+
+    const gameIdCheck = z
+        .number()
+        .safeParse(gameId);
+
+    if (!gameIdCheck.success) return callback(false);
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.isAuthenticated || !client.username || !client.inLobby || !client.lobby || client.inGame) 
+        return callback(false);
+
+    const lobby = GameManager.lobbyFromCode(client.lobby);
+    if (!lobby) return callback(false);
+
+    if (!lobby.isHost(client.username)) return callback(false);
+
+    const game = await GameManager.getGameDefinition(gameIdCheck.data);
+    if (!game) return callback(false);
+
+    lobby.selectGame(game);
+
+    callback(true);
+}
+
 /**
  * Handles client request to start a new game.
  * 

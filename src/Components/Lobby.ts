@@ -65,6 +65,11 @@ export default class Lobby {
         return true;
     }
 
+    selectGame(gameDefinition: GameDefinition) {
+        this.#game = gameDefinition;
+        this.update();
+    }
+
     startGame() {
         if (!this.#game) return false;
         const numMinPlayers = this.#game.gameMeta.minPlayers;
