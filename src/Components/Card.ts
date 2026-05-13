@@ -12,6 +12,8 @@ import Logger from "./Logger.js";
 export default class Card {
     rank: rank;
     suit: suit;
+    id: number;
+    private static nextId: number = 0;
 
     /**
      * Creates a card.
@@ -20,6 +22,7 @@ export default class Card {
     constructor(args: CardArgs) {
         this.rank = args.rank;
         this.suit = args.suit;
+        this.id = Card.nextId++;
     }
 
     /**

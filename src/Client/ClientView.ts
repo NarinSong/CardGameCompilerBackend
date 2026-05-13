@@ -9,7 +9,7 @@ import Game from "../Game/Game.js";
 import Pile from "../Game/Pile.js";
 import Player from "../Game/Player.js";
 
-type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number}[], label: string, displayName: string, actionRoles: string[] };
+type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number, id: number}[], label: string, displayName: string, actionRoles: string[] };
 type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[] };
 
 /**
@@ -58,12 +58,12 @@ export default class ClientView {
         
         let hide = pile.visibility == Visibility.FACE_DOWN;
         
-        const cards: {suit: number, rank: number}[] = [];
+        const cards: {suit: number, rank: number, id: number}[] = [];
 
         for (let card of pile.cards) {
             if (!card) continue;
-            if (hide) cards.push({suit: 0, rank: 0});
-            else cards.push({suit: suitMap.get(card.suit) ?? 0, rank: rankMap.get(card.rank) ?? 0});
+            if (hide) cards.push({suit: 0, rank: 0, id: card.id});
+            else cards.push({suit: suitMap.get(card.suit) ?? 0, rank: rankMap.get(card.rank) ?? 0, id: card.id ?? 0});
         }
 
         const pileView: ClientPileType = {
