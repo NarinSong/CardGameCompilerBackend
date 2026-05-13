@@ -62,8 +62,8 @@ export default class ClientView {
 
         for (let card of pile.cards) {
             if (!card) continue;
-            if (hide) cards.push({suit: 0, rank: 0, id: card.id});
-            else cards.push({suit: suitMap.get(card.suit) ?? 0, rank: rankMap.get(card.rank) ?? 0, id: card.id ?? 0});
+            if (hide) cards.push({suit: 0, rank: 0, id: 0});
+            else cards.push({suit: suitMap.get(card.suit) ?? 0, rank: rankMap.get(card.rank) ?? 0, id: card.id});
         }
 
         const pileView: ClientPileType = {
