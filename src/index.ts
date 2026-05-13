@@ -47,7 +47,6 @@ io.on('connection', (socket: Socket) => {
     socket.on('signIn', (username, password, callback) => {clientRequestSignIn(id, username, password, callback);});
     socket.on('signOut', (callback) => {clientRequestSignOut(id, callback);});
 
-    socket.on('getAvailableGames', (callback) => {clientRequestGetAvailableGames(id, callback);});
 
     // Game Builder
     socket.on('getAvailableBlocks', (callback) => {clientRequestGetAvailableBlocks(id, callback);});
@@ -58,10 +57,12 @@ io.on('connection', (socket: Socket) => {
     socket.on('joinLobby', (code, callback) => {clientRequestJoinLobby(id, code, callback);});
     socket.on('leaveLobby', (callback) => {clientRequestLeaveLobby(id, callback);});
     socket.on('removeFromLobby', (username, callback) => {clientRequestRemoveFromLobby(id, username, callback);});
+    socket.on('getAvailableGames', (callback) => {clientRequestGetAvailableGames(id, callback);});
+    // TODO get game info getGameInfo (gameId, callback)
     socket.on('selectGame', (gameId, callback) => {clientRequestSelectGame(id, gameId, callback);});
+    socket.on('startNewGame', (callback) => {clientRequestStartNewGame(id, callback);});
 
     // Game play
-    socket.on('startNewGame', (callback) => {clientRequestStartNewGame(id, callback);});
     socket.on('playerClickEvent', (label, callback) => {clientRequestClickLabel(id, label, callback);});
 
     // Disconnect
