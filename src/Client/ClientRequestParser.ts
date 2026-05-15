@@ -171,6 +171,28 @@ export function clientRequestGetAvailableGames(clientId: number, callback: unkno
     callback(games);
 }
 
+export async function clientRequestGetGameInfo(clientId: number, gameId: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(game: null | { name: string; description: string }) => void
+
+    const gameIdCheck = z
+        .number()
+        .safeParse(gameId);
+
+    if (!gameIdCheck.success) 
+        return callback(null);
+
+    const game = await GameManager.getGameDefinition(gameIdCheck.data);
+    if (!game)
+        return callback(null);
+
+    callback(
+        {
+            name: game.gameMeta.name,
+            description: 'A game'
+        }
+    );
+}
+
 /**
  * Handles the request of saving a game and verifies the inputs.
  * 
