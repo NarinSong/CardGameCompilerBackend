@@ -270,7 +270,7 @@ export function clientRequestJoinLobby(clientId: number, code: unknown, callback
         .string()
         .min(6)
         .max(6)
-        .regex(/^[a-z0-9]+$/)
+        .regex(/^[A-Z0-9]+$/)
         .safeParse(code);
 
     if (!codeCheck.success) return callback(false);
