@@ -50,6 +50,8 @@ export default class Lobby {
         this.#game = null;
         this.#joinCode = joinCode;
         this.#rooms = [];
+
+        this.update();
     }
 
     update() {
