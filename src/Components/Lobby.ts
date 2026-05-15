@@ -138,10 +138,10 @@ export default class Lobby {
             if (client.identifier == clientId) {
                 client.inLobby = false;
                 client.lobby = undefined;
+                delete this.#players[p];
                 if (client.username && this.isHost(client.username))
                     this.assignNewHost();
                 sendLobbyClosed(client.identifier);
-                delete this.#players[p];
             }
         }
 
