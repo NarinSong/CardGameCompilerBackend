@@ -131,6 +131,15 @@ export default class Lobby {
         this.update();
     }
 
+    checkForHost() {
+        for (let i in this.#players) {
+            if (this.#players[i] && this.#players[i].username && this.isHost(this.#players[i].username))
+                return true;
+        }
+
+        return false;
+    }
+
     removeFromLobbyById(clientId: number) {
         for (let p in this.#players) {
             const client = this.#players[p];
@@ -149,6 +158,10 @@ export default class Lobby {
             GameManager.deleteLobby(this.#joinCode);
             return;
         }
+
+        // Double-check the host status
+        if (!this.checkForHost())
+            this.assignNewHost();
 
         
         this.update();
