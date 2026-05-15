@@ -1,6 +1,6 @@
 import { z } from "zod";
 import GameManager from "../GameManager.js";
-import CodeBlocks from "./CodeBlocks.json" with { type: "json" };
+import { BLOCKS } from "../schemas/Blocks.js";
 import { buildGameFromJSON } from "./GameBuilder.js";
 import Database from "../Components/Database.js";
 import { ClientGameDefinitionSchema } from "../schemas/ClientGameDefinition.js";
@@ -242,13 +242,13 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, gam
  * Send the client the available code blocks.
  * @param clientId - The id of the client initiating the request.
  * @param callback - Response handler. Called with the available code blocks.
- * @returns void if callback is not a function, else returns callback(CodeBlocks).
+ * @returns void if callback is not a function, else returns callback(BLOCKS).
  */
 export function clientRequestGetAvailableBlocks(clientId: number, callback: unknown = noop) {
-    if (!fCheck(callback)) return;//(blocks: typeof CodeBlocks) => void
+    if (!fCheck(callback)) return;//(blocks: typeof BLOCKS) => void
 
     // Send the available code blocks to the client
-    callback(CodeBlocks);
+    callback(BLOCKS);
 }
 
 export function clientRequestHostLobby(clientId: number, callback: unknown = noop) {
