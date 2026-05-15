@@ -9,13 +9,22 @@ import GameDefinition from "../Rules/GameDefinition.js";
 const A = "A".charCodeAt(0);
 
 export class LobbyView {
-    readonly host: string;
-    readonly players: string[];
+    readonly host: {
+        username: string;
+        displayName: string;
+    };
+    readonly players: {
+        username: string;
+        displayName: string;
+    }[];
     readonly code: string;
     readonly game: string;
 
     constructor(lobby: Lobby) {
-        this.host = lobby.host;
+        this.host = {
+            username: lobby.host,
+            displayName: lobby.hostDisplayName
+        };
         this.players = lobby.playerNames;
         this.code = lobby.joinCode;
         this.game = lobby.gameName; // defaults to "No Game Name"
@@ -189,13 +198,24 @@ export default class Lobby {
         return this.#host;
     }
 
+    get hostDisplayName() {
+        for (let i in this.#players) {
+            if (this.#players[i] && this.#players[i].username == this.#host)
+                return this.#players[i]?.displayName ?? this.#host;
+        }
+        return this.#host; // default to the host's username
+    }
+
     get playerNames() {
         const list = [];
         for (let p in this.#players) {
             const client = this.#players[p];
-            if (!client || !client.username) continue;
+            if (!client || !client.username || !client.displayName) continue;
 
-            list.push(client.username);
+            list.push({
+                username: client.username,
+                displayName: client.displayName
+            });
         }
         return list;
     }
