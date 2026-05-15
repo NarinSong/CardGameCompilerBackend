@@ -149,9 +149,10 @@ export default class Lobby {
             if (!client) continue;
             if (client.username == username) {
                 this.removeFromLobbyById(client.identifier);
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     static randomAlphaNumeric() {
