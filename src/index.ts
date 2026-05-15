@@ -109,5 +109,15 @@ function sendLobbyStatus(clientId: number, lobbyStatus: LobbyView) {
     socket.emit('lobbyStatus', lobbyStatus);
 }
 
+function sendLobbyClosed(clientId: number) {
+    const socket = SOCKETS[clientId];
+    if (!socket) {
+        failedSend(clientId, 'sendLobbyClosed()');
+        return;
+    }
+
+    socket.emit('lobbyClosed');
+}
+
 // Exports. Note: socket is not exported
-export { sendClientGamestate, sendLobbyStatus };
+export { sendClientGamestate, sendLobbyStatus, sendLobbyClosed };

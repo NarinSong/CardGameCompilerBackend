@@ -2,7 +2,7 @@
 
 import Client from "../Client/Client.js";
 import GameManager from "../GameManager.js";
-import { sendLobbyStatus } from "../index.js";
+import { sendLobbyClosed, sendLobbyStatus } from "../index.js";
 import Room from "./Room.js";
 import GameDefinition from "../Rules/GameDefinition.js";
 
@@ -129,6 +129,7 @@ export default class Lobby {
                 client.lobby = undefined;
                 if (client.username && this.isHost(client.username))
                     this.assignNewHost();
+                sendLobbyClosed(client.identifier);
                 delete this.#players[p];
             }
         }
