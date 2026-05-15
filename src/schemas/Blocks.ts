@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { PileStateSchema, VisibilitySchema } from "./types";
+import { PileStateSchema, VisibilitySchema } from "./types.js";
 
 // These are the values that can be used inside the blocks and their corresponding JS types
 export const ValueTypes = {
