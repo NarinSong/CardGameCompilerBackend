@@ -37,7 +37,7 @@ export default class GameManager {
         const code = GameManager.uniqueLobbyJoinCode;
         const lobby = new Lobby(client, code);
         GameManager.lobbies[code] = lobby;
-        return lobby;
+        return code;
     }
 
     static lobbyFromCode(code: string) {
