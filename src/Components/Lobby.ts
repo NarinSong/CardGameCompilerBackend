@@ -27,7 +27,7 @@ export class LobbyView {
         };
         this.players = lobby.playerNames;
         this.code = lobby.joinCode;
-        this.game = lobby.gameName; // defaults to "No Game Name"
+        this.game = lobby.gameName; // defaults to "No Game Selected"
     }
 }
 
