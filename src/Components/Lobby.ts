@@ -19,6 +19,7 @@ export class LobbyView {
     }[];
     readonly code: string;
     readonly game: string;
+    readonly gameDescription: string;
 
     constructor(lobby: Lobby) {
         this.host = {
@@ -28,6 +29,7 @@ export class LobbyView {
         this.players = lobby.playerNames;
         this.code = lobby.joinCode;
         this.game = lobby.gameName; // defaults to "No Game Selected"
+        this.gameDescription = 'Game description';
     }
 }
 
