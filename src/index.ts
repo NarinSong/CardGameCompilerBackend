@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
-import { clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetGameInfo, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { clientRequestChangeColor, clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetGameInfo, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 import { LobbyView } from './Components/Lobby.js';
 
 // Execution begins here
@@ -46,6 +46,9 @@ io.on('connection', (socket: Socket) => {
     socket.on('signUp', (username, password, displayName, callback) => {clientRequestSignUp(id, username, password, displayName, callback);});
     socket.on('signIn', (username, password, callback) => {clientRequestSignIn(id, username, password, callback);});
     socket.on('signOut', (callback) => {clientRequestSignOut(id, callback);});
+
+    // Account management
+    socket.on('setColor', (color, callback) => {clientRequestChangeColor(id, color, callback);});
 
 
     // Game Builder
