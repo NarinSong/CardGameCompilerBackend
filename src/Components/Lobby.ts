@@ -16,6 +16,7 @@ export class LobbyView {
     readonly players: {
         username: string;
         displayName: string;
+        color: string;
     }[];
     readonly code: string;
     readonly game: string;
@@ -26,7 +27,7 @@ export class LobbyView {
             username: lobby.host,
             displayName: lobby.hostDisplayName
         };
-        this.players = lobby.playerNames;
+        this.players = lobby.playerDetails;
         this.code = lobby.joinCode;
         this.game = lobby.gameName; // defaults to "No Game Selected"
         this.gameDescription = 'Game description';
@@ -223,7 +224,7 @@ export default class Lobby {
         return this.#host; // default to the host's username
     }
 
-    get playerNames() {
+    get playerDetails() {
         const list = [];
         for (let p in this.#players) {
             const client = this.#players[p];
@@ -231,7 +232,8 @@ export default class Lobby {
 
             list.push({
                 username: client.username,
-                displayName: client.displayName
+                displayName: client.displayName,
+                color: client.color
             });
         }
         return list;

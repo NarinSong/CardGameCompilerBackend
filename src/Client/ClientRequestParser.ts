@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { check, z } from "zod";
 import GameManager from "../GameManager.js";
 import { BLOCKS } from "../schemas/Blocks.js";
 import { buildGameFromJSON } from "./GameBuilder.js";
@@ -141,6 +141,30 @@ export async function clientRequestSignOut(clientId: number, callback: unknown =
     if (!success) return callback(false);
 
     return callback(true);
+}
+
+export function clientRequestChangeColor(clientId: number, color: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean) => void
+
+    const checkColor = z
+        .string()
+        .regex(/^#[0-9a-fA-F]{6}$/)
+        .min(7)
+        .max(7)
+        .safeParse(color);
+
+    if (!checkColor.success)
+        return callback(false);
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(false);
+    if (!client.isAuthenticated) return callback(false);
+
+    client.color = checkColor.data;
+    
+    // TODO: store color in database
+
+    callback(true);
 }
 
 /**

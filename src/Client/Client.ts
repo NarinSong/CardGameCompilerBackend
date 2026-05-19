@@ -45,6 +45,7 @@ export default class Client {
     inLobby: boolean = false;
     inGame: boolean = false;
     player: Player | null = null;
+    color: string = "#000000";
 
     private authState: AuthState = {
         isAuthenticated: false,
