@@ -2,11 +2,14 @@
 // There will be many of these, and each one will have a dedicated worker thread
 // Each room can hold one game
 
+import { Worker } from "node:worker_threads";
+
 import Client from "../Client/Client.js";
 import Game from "../Game/Game.js";
 import Player from "../Game/Player.js";
 import GameManager from "../GameManager.js";
 import { PlayerType } from "../schemas/types.js";
+import GameDefinition from "../Rules/GameDefinition.js";
 
 /**
  * Defines the properties for a room.
@@ -14,6 +17,7 @@ import { PlayerType } from "../schemas/types.js";
  * A Room consists of the running game instance, the list of clients, and the name of the room.
  */
 export default class Room {
+    worker: Worker;
     game: Game;
     clients: Record<number, number>; // ClientId: playerId
     name: string;
@@ -32,6 +36,24 @@ export default class Room {
         this.name = name;
         this.lobby = lobby;
         this.started = false;
+
+
+        this.worker = new Worker(new URL("./RoomWorker.js", import.meta.url), {
+            workerData: {gameDefinition: game.definition}
+        });
+
+        this.worker.on("message", (msg) => {
+            switch (msg.type){
+                case "GAME_STATE":
+                    this.emitGameState(msg.state);
+                    break;
+        
+            }
+        });
+
+        this.worker.on("error", (err) => {
+            console.error(`Room ${this.name} worker error:`, err);
+        });
     }
 
     /**
@@ -39,14 +61,14 @@ export default class Room {
      * Send the updated game state to all clients.
      * 
      */
-    emitGameState() {
+    emitGameState(state: unknown) {
         for (let c in this.clients) {
             if (!this.game.players[0]) continue;
             
             const client = GameManager.clientFromId(+c);
             if (!client) continue;
 
-            client.updateGamestate(this.game);
+            client.updateGamestate(state);
         }
     }
 
@@ -56,13 +78,13 @@ export default class Room {
      */
     handlePlayerClick(label: string) {
         if (!this.started) return;
-        
-        let actionTaken = this.game.clickAction(label); // TODO: player number?
+        this.worker.postMessage({type: "PLAYER_CLICK", label})
+        // let actionTaken = this.game.clickAction(label); // TODO: player number?
 
-        if (actionTaken) {
-            // Update clients with new gamestate
-            this.emitGameState();
-        }
+        // if (actionTaken) {
+        //     // Update clients with new gamestate
+        //     this.emitGameState();
+        // }
     }
 
     // This function should *only* be called by the parent lobby, and *only* during room creation, before the game begins
@@ -84,12 +106,14 @@ export default class Room {
 
     startGame() {
         if (this.started) return false;
-
-        this.game.startGame();
         this.started = true;
-
-        this.emitGameState();
-
+        this.worker.postMessage({type: "START_GAME"});
         return true;
+    }
+
+
+    //Terminate the thread after the room is done
+    destroy(){
+        this.worker.terminate();
     }
 }
