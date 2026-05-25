@@ -62,7 +62,7 @@ export default class Auth {
      * @param password - password that user inputs.
      * @returns an object with a token and display name of the user.
      */
-    static async authenticateUser(username: string, password: string): Promise<{token: string, displayName: string} | null> {
+    static async authenticateUser(username: string, password: string): Promise<{token: string, displayName: string, color: string} | null> {
         const passwordHashArray = await Database.getHashByUsername(username);
         
         if (!passwordHashArray || !passwordHashArray[0]) return failureReason('authenticateUser() failed: no such user');
@@ -78,7 +78,7 @@ export default class Auth {
         const sessionId = buf.toString('hex');
         ACTIVE_USERS[sessionId] = username;
 
-        return {token: sessionId, displayName: passwordHashArray[0].displayName};
+        return { token: sessionId, displayName: passwordHashArray[0].displayName, color: passwordHashArray[0].color };
     }
 
     /**
@@ -88,7 +88,7 @@ export default class Auth {
      * @param displayName - display name for the new user.
      * @returns a session id if successful else null if fails.
      */
-    static async createNewUser(username: string, password: string, displayName: string): Promise<string | null> {
+    static async createNewUser(username: string, password: string, displayName: string, color: string): Promise<string | null> {
         const passwordHashArray = await Database.getHashByUsername(username);
         
         if (passwordHashArray && passwordHashArray[0]) return failureReason('createNewUser() failed: account already exists'); // User account already exists
@@ -101,7 +101,7 @@ export default class Auth {
             parallelism: 1
         });
 
-        const saveSuccess = await Database.saveUserCredentials(username, passwordHash, displayName);
+        const saveSuccess = await Database.saveUserCredentials(username, passwordHash, displayName, color);
 
         if (!saveSuccess) return failureReason('createNewUser() failed: database query failed');
 

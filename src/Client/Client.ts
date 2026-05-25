@@ -13,6 +13,7 @@ import ClientView from "./ClientView.js";
 import { buildGameFromJSON } from "./GameBuilder.js";
 import { sendClientGamestate } from "../index.js";
 import Auth from "../Components/Auth.js";
+import Database from "../Components/Database.js";
 
 /**
  * Client's state of authentication 
@@ -61,6 +62,25 @@ export default class Client {
         this.identifier = Client.nextId;
     }
 
+    randomColor() {
+        let colors = [
+            '#ffcccc',
+            '#ffd9cc',
+            '#ffe5cc',
+            '#fff2cc',
+            '#e6ffcc',
+            '#d9ffcc',
+            '#ccfff2',
+            '#ccf2ff',
+            '#cce5ff',
+            '#d9ccff',
+            '#e6ccff',
+            '#ffccf2'
+        ];
+
+        return colors[Math.floor(Math.random() * colors.length)] ?? '#ffcccc';
+    }
+
     /**
      * 
      * Signs a client into his/her account.
@@ -81,6 +101,8 @@ export default class Client {
             isAuthenticated: true,
         };
 
+        this.color = success.color;
+
         return success.token;
     }
 
@@ -92,7 +114,8 @@ export default class Client {
      * @returns If successful it returns a sessionId, otherwise null.
      */
     async signUp(username: string, password: string, displayName: string) {
-        const success = await Auth.createNewUser(username, password, displayName);
+        let color = this.randomColor();
+        const success = await Auth.createNewUser(username, password, displayName, color);
         if (!success) return null;
 
         this.authState = {
@@ -101,6 +124,8 @@ export default class Client {
             displayName: displayName,
             isAuthenticated: true,
         };
+
+        this.color = color;
 
         return success;
     }

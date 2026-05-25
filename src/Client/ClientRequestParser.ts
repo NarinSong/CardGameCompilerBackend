@@ -159,10 +159,11 @@ export function clientRequestChangeColor(clientId: number, color: unknown, callb
     const client = GameManager.clientFromId(clientId);
     if (!client) return callback(false);
     if (!client.isAuthenticated) return callback(false);
+    if (!client.username) return callback(false);
 
     client.color = checkColor.data;
     
-    // TODO: store color in database
+    Database.saveUserColor(client.username, checkColor.data);
 
     callback(true);
 }
