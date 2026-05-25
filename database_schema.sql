@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     profileUrl TEXT, -- a url to a png file. Can be null
     profileDescription VARCHAR(500), -- user-inputted text. Can be null. Max 500 characters
     passwordHash TEXT NOT NULL, -- created by argon2ID
+    color CHAR(7), -- a hex code color, starting with # and followed by 6 0-f values
     createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- should be automatic based on date of creation
 );
 
