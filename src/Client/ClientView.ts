@@ -2,7 +2,7 @@
 // Note: anything starting with # will not be sent
 
 import ValueMap from "../Components/ValueMap.js";
-import { PlayerID, Visibility } from "../schemas/types.js";
+import { PlayerID, PlayerType, Visibility } from "../schemas/types.js";
 import Board from "../Game/Board.js";
 import Counter from "../Game/Counter.js";
 import Game from "../Game/Game.js";
@@ -11,6 +11,7 @@ import Player from "../Game/Player.js";
 
 type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number, id: number}[], label: string, displayName: string, actionRoles: string[] };
 type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[] };
+type ClientPlayerType = { playerId: PlayerID, type: PlayerType }
 
 /**
  * The current gamestate from the perspective of the client.
@@ -21,26 +22,22 @@ export default class ClientView {
     // These are readonly so that they can be linked to the actual gamestate without having to worry about side-effects
     readonly piles: ClientPileType[];
     readonly counters: ClientCounterType[];
-    readonly players: Record<PlayerID, Player>;
-    readonly board: Board;
+    readonly players: ClientPlayerType[];
 
     /**
      * Creates the ClientView.
      * @param piles - Piles in the game.
      * @param counters - Counters in the game.
      * @param players - The players in the game.
-     * @param board - The game board.
      */
     private constructor(
         piles: ClientPileType[],
         counters: ClientCounterType[],
-        players: Record<PlayerID, Player>,
-        board: Board
+        players: ClientPlayerType[]
     ) {
         this.piles = piles;
         this.counters = counters;
         this.players = players;
-        this.board = board;
     }
 
     /**
@@ -111,6 +108,7 @@ export default class ClientView {
     static fromGamestate(g: Game, p: Player) {
         const piles: ClientPileType[] = [];
         const counters: ClientCounterType[] = [];
+        const players: ClientPlayerType[] = [];
 
         for (let key of Object.keys(g.gameState.piles)) {
             let item = g.gameState.piles[key];
@@ -128,8 +126,17 @@ export default class ClientView {
             if (counterView) counters.push(counterView);
         }
 
+        const gamePlayers = Object.entries(g.gameState.players);
+
+        for (let player of gamePlayers) {
+            players.push({
+                playerId: player[1].id,
+                type: player[1].type
+            })
+        }
+
         return new ClientView(
-            piles, counters, g.gameState.players, g.gameState.board
+            piles, counters, players
         );
     }
 }
