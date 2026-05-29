@@ -13,7 +13,6 @@ import ClientView from "./ClientView.js";
 import { buildGameFromJSON } from "./GameBuilder.js";
 import { sendClientGamestate } from "../index.js";
 import Auth from "../Components/Auth.js";
-import Database from "../Components/Database.js";
 
 /**
  * Client's state of authentication 
@@ -46,7 +45,7 @@ export default class Client {
     inLobby: boolean = false;
     inGame: boolean = false;
     player: Player | null = null;
-    color: string = "#000000";
+    color: string = "#ffffff";
 
     private authState: AuthState = {
         isAuthenticated: false,
