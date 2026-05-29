@@ -68,19 +68,19 @@ export type CardValueMap = CalculationMap<Card, number>;
  * Default mapping from card rank names to numeric rank values.
  */
 export const DEFAULT_CARD_RANK_MAP = new ValueMap<string, number>({
-    'ace': 0,
-    'two': 1,
-    'three': 2,
-    'four': 3,
-    'five': 4,
-    'six': 5,
-    'seven': 6,
-    'eight': 7,
-    'nine': 8,
-    'ten': 9,
-    'jack': 10,
-    'queen': 11,
-    'king': 12,
+    'Ace': 0,
+    'Two': 1,
+    'Three': 2,
+    'Four': 3,
+    'Five': 4,
+    'Six': 5,
+    'Seven': 6,
+    'Eight': 7,
+    'Nine': 8,
+    'Ten': 9,
+    'Jack': 10,
+    'Queen': 11,
+    'King': 12,
 })
 
 /**
