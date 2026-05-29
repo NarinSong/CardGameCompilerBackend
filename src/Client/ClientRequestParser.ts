@@ -431,11 +431,21 @@ export function clientRequestStartNewGame(clientId: number, callback: unknown = 
  * @param callback - Response handler. Called with the boolean true.
  * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
  */
-export function clientRequestClickLabel(clientId: number, label: unknown, callback: unknown = noop) {
+export function clientRequestClickLabel(clientId: number, label: unknown, cardId: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(succeeded: boolean) => void 
 
-    const result = z.string().safeParse(label)
-    if (!result.success)
+    const labelCheck = z
+        .string()
+        .safeParse(label);
+
+    if (!labelCheck.success)
+        return callback(false);
+
+    const cardIdCheck = z
+        .number()
+        .safeParse(cardId);
+
+    if (!cardIdCheck.success)
         return callback(false);
 
     const client = GameManager.clientFromId(clientId);
@@ -444,7 +454,7 @@ export function clientRequestClickLabel(clientId: number, label: unknown, callba
     const room = client.room;
     if (!room) return callback(false);
 
-    room.handlePlayerClick(result.data);
+    room.handlePlayerClick(labelCheck.data, cardIdCheck.data);
 
     callback(true);
 }

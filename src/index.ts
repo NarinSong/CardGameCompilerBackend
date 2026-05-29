@@ -66,7 +66,7 @@ io.on('connection', (socket: Socket) => {
     socket.on('startNewGame', (callback) => {clientRequestStartNewGame(id, callback);});
 
     // Game play
-    socket.on('playerClickEvent', (label, callback) => {clientRequestClickLabel(id, label, callback);});
+    socket.on('playerClickEvent', (label, cardId, callback) => {clientRequestClickLabel(id, label, cardId, callback);});
 
     // Disconnect
     socket.on('disconnect', () => {

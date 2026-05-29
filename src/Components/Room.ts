@@ -53,8 +53,9 @@ export default class Room {
     /**
      * Handles the action whenever a player clicks an object (Pile, Card, etc.).
      * @param label - The object that the user clicked.
+     * @todo use cardId and player number to build action context
      */
-    handlePlayerClick(label: string) {
+    handlePlayerClick(label: string, cardId: number) {
         if (!this.started) return;
         
         let actionTaken = this.game.clickAction(label); // TODO: player number?
