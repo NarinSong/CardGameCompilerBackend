@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
-import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetGameInfo, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 import { LobbyView } from './Components/Lobby.js';
 
 // Execution begins here
@@ -48,6 +48,7 @@ io.on('connection', (socket: Socket) => {
     socket.on('signOut', (callback) => {clientRequestSignOut(id, callback);});
 
     // Account management
+    socket.on('getColor', (callback) => {clientRequestGetColor(id, callback);});
     socket.on('setColor', (color, callback) => {clientRequestChangeColor(id, color, callback);});
     socket.on('setDisplayName', (displayName, callback) => {clientRequestChangeDisplayName(id, displayName, callback);});
 

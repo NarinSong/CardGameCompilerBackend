@@ -143,6 +143,17 @@ export async function clientRequestSignOut(clientId: number, callback: unknown =
     return callback(true);
 }
 
+export async function clientRequestGetColor(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(color: hex string, defaults to '#ffffff' on failure) => void
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback('#ffffff');
+    if (!client.isAuthenticated) return callback('#ffffff');
+    if (!client.color) return callback('#ffffff');
+
+    callback(client.color);
+}
+
 export async function clientRequestChangeColor(clientId: number, color: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean) => void
 
