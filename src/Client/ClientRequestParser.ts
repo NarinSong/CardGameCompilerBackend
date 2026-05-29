@@ -458,3 +458,35 @@ export function clientRequestClickLabel(clientId: number, label: unknown, cardId
 
     callback(true);
 }
+
+export function clientRequestLeaveGame(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(succeess: boolean) => void
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.isAuthenticated || !client.username || !client.inLobby || !client.lobby || !client.inGame) 
+        return callback(false);
+
+    const lobby = GameManager.lobbyFromCode(client.lobby);
+    if (!lobby) return callback(false);
+
+    // TODO: leave the game
+
+    callback(true);
+}
+
+export function clientRequestEndGame(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(succeess: boolean) => void
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.isAuthenticated || !client.username || !client.inLobby || !client.lobby || !client.inGame) 
+        return callback(false);
+
+    const lobby = GameManager.lobbyFromCode(client.lobby);
+    if (!lobby) return callback(false);
+
+    if (!lobby.isHost(client.username)) return callback(false);
+
+    // TODO: End the game
+
+    callback(true);
+}
