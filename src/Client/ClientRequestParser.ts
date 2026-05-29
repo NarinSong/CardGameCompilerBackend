@@ -212,24 +212,12 @@ export async function clientRequestChangeDisplayName(clientId: number, displayNa
  * @param clientId - The id of the client requesting the available games.
  * @param callback - Response handler. Called with the list of game names and its id.
  * @returns void if callback is not a function, returns callback(games) for the games found in the database.
- * @todo replace placeholder with database call.
  */
-export function clientRequestGetAvailableGames(clientId: number, callback: unknown = noop) {
+export async function clientRequestGetAvailableGames(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(games: { [name: string]: number }) => void
 
     // Get the available games from the database and send those to the client
-    const games: {name: string, id: number}[] = [
-        { name: 'Pickup', id: 0},{ name: 'War', id: 1 },
-        { name: 'aPickup', id: 2},{ name: 'Attack', id: 3 },
-        { name: 'bPickup', id: 4},{ name: 'Send', id: 5 },
-        { name: 'cPickup', id: 6},{ name: 'Mahjong', id: 7 },
-        { name: 'rePickup', id: 8},{ name: 'Next', id: 9 },
-        { name: 'rePickup', id: 10},{ name: 'Skipbo', id: 11 },
-        { name: 'dPickup', id: 12},{ name: 'Go', id: 13 },
-        { name: 'gPickup', id: 14},{ name: 'Chess', id: 15 },
-    ]; //TODO: replace with database call
-
-    //const games = GameManager.availableGames();
+    const games = await GameManager.getAvailableGameNames();
 
     callback(games);
 }

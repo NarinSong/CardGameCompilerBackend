@@ -82,7 +82,8 @@ export default class GameManager {
 
     static async getAvailableGameNames() {
         // Potential: caching
-        return await Database.getGamesList();
+        const list = await Database.getGamesList();
+        return list?.concat({name: 'Pickup', id: 0});
     }
 
     static async getGameDefinition(id: number): Promise<GameDefinition | null> {
