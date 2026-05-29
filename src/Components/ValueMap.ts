@@ -2,6 +2,7 @@ import Game from "../Game/Game.js";
 import Card from "./Card.js";
 import { ActionContext, ValueNode } from "../schemas/AST.js";
 import { evaluate } from "./TreeParser.js";
+import { rank, suit } from "../schemas/types.js";
 
 
 /**
@@ -67,7 +68,7 @@ export type CardValueMap = CalculationMap<Card, number>;
 /**
  * Default mapping from card rank names to numeric rank values.
  */
-export const DEFAULT_CARD_RANK_MAP = new ValueMap<string, number>({
+export const DEFAULT_CARD_RANK_MAP = new ValueMap<rank, number>({
     'Ace': 0,
     'Two': 1,
     'Three': 2,
@@ -91,7 +92,7 @@ export const DEFAULT_CLIENT_VIEW_RANK_MAP = DEFAULT_CARD_RANK_MAP;
 /**
  * Default mapping used by the client to display suit values.
  */
-export const DEFAULT_CLIENT_VIEW_SUIT_MAP = new ValueMap<string, number>({
+export const DEFAULT_CLIENT_VIEW_SUIT_MAP = new ValueMap<suit | 'Jokers', number>({
     'Clubs': 0,
     'Diamonds': 1,
     'Spades': 2,
