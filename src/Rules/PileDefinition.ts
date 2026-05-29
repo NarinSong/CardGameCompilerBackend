@@ -27,10 +27,10 @@ export default class PileDefinition {
         label?: string | undefined,
         displayName?: string | undefined,
         actionRoles?: string[] | undefined,
-        initialValue?: PileState | undefined,
+        initialState?: PileState | undefined,
         visibility?: Visibility | undefined,
     }) {
-        this.initialState = definition.initialValue ?? PileState.EMPTY;
+        this.initialState = definition.initialState ?? PileState.EMPTY;
         this.label = definition.labelManager.createLabel(this, definition.label);
         this.displayName = definition.displayName ?? this.label;
         this.actionRoles = definition.actionRoles ?? [this.label];
