@@ -86,6 +86,22 @@ export default class Database {
         return true;
     }
 
+    static async saveUserDisplayName(username: string, displayName: string): Promise<boolean> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            await conn.query("UPDATE users SET displayName = ? WHERE username = ?", [displayName, username]);
+        } catch (error) {
+            console.error(error);
+            return false;
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return true;
+    }
+
     /**
      * Save the game definition JSON.
      * @param game - The game JSON.

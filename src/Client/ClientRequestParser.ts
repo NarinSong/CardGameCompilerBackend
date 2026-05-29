@@ -143,7 +143,7 @@ export async function clientRequestSignOut(clientId: number, callback: unknown =
     return callback(true);
 }
 
-export function clientRequestChangeColor(clientId: number, color: unknown, callback: unknown = noop) {
+export async function clientRequestChangeColor(clientId: number, color: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean) => void
 
     const checkColor = z
@@ -161,11 +161,38 @@ export function clientRequestChangeColor(clientId: number, color: unknown, callb
     if (!client.isAuthenticated) return callback(false);
     if (!client.username) return callback(false);
 
-    client.color = checkColor.data;
-    
-    Database.saveUserColor(client.username, checkColor.data);
+    const success = await Database.saveUserColor(client.username, checkColor.data);
 
-    callback(true);
+    if (success)
+        client.color = checkColor.data;
+
+    callback(success);
+}
+
+export async function clientRequestChangeDisplayName(clientId: number, displayName: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean) => void
+
+    const displayNameCheck = z
+        .string()
+        .min(3)
+        .max(16)
+        .regex(/^[a-zA-Z0-9 ]+$/)
+        .safeParse(displayName);
+
+    if (!displayNameCheck.success)
+        return callback(false);
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(false);
+    if (!client.isAuthenticated) return callback(false);
+    if (!client.username) return callback(false);
+    
+    const success = await Database.saveUserDisplayName(client.username, displayNameCheck.data);
+
+    if (success)
+        client.updateDisplayName(displayNameCheck.data);
+
+    callback(success);
 }
 
 /**

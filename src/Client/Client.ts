@@ -175,6 +175,10 @@ export default class Client {
         sendClientGamestate(this.identifier, ClientView.fromGamestate(game, this.player));
     }
 
+    updateDisplayName(name: string) {
+        this.authState.displayName = name;
+    }
+
     static get nextId() {
         return Client.#nextId++;
     }
