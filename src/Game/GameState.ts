@@ -3,6 +3,7 @@
 
 import Card from "../Components/Card.js";
 import BoardDefinition from "../Rules/BoardDefinition.js";
+import ButtonDefinition from "../Rules/ButtonDefinition.js";
 import CounterDefinition from "../Rules/CounterDefinition.js";
 import GameDefinition from "../Rules/GameDefinition.js";
 import { Label } from "../Rules/LabelManager.js";
@@ -10,6 +11,7 @@ import PileDefinition from "../Rules/PileDefinition.js";
 import StepDefinition from "../Rules/StepDefinition.js";
 import { BoardID, PileState, PlayerID, Visibility } from "../schemas/types.js";
 import Board from "./Board.js";
+import Button from "./Button.js";
 import Counter from "./Counter.js";
 import GameLabels from "./GameLabels.js";
 import Pile from "./Pile.js";
@@ -30,6 +32,7 @@ export default class GameState {
     currentStep: StepDefinition | null;
     piles: Record<Label, {pile: Pile, owner: PlayerID | BoardID}>;
     counters: Record<Label, {counter: Counter, owner: PlayerID | BoardID}>;
+    buttons: Record<Label, {button: Button, owner: PlayerID | BoardID}>;
 
     /**
      * Creates a new GameState instance.
@@ -43,6 +46,7 @@ export default class GameState {
         this.currentStep = null;
         this.piles = {};
         this.counters = {};
+        this.buttons = {};
         this.initializeBoard(definition.board);
     }
 
@@ -57,6 +61,10 @@ export default class GameState {
 
         for (let cd of definition.counters) {
             this.createCounterFromDefinition(cd, -1);
+        }
+
+        for (let bd of definition.buttons) {
+            this.createButtonFromDefinition(bd, -1);
         }
     }
 
@@ -82,6 +90,12 @@ export default class GameState {
         const counter = Counter.fromDefinition(counterDefinition, this.gameLabels);
 
         this.counters[counter.label] = { counter: counter, owner: id };
+    }
+
+    createButtonFromDefinition(buttonDefinition: ButtonDefinition, id: number) {
+        const button = Button.fromDefinition(buttonDefinition, this.gameLabels);
+
+        this.buttons[button.label] = { button: button, owner: id };
     }
 
     /**
