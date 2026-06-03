@@ -71,4 +71,9 @@ export const PhaseSchema = z.object({
     steps: z.array(StepSchema),
 })
 
+const NodeSchema = ActionNodeSchema.or(ValueNodeSchema);
+
 export type GameMetaArgs = z.infer<typeof GameMetaArgsSchema>;
+export type GameDefinitionPhase = z.infer<typeof PhaseSchema>;
+export type GameDefinitionStep = z.infer<typeof StepSchema>;
+export type GameDefinitionNode = z.infer<typeof NodeSchema>;

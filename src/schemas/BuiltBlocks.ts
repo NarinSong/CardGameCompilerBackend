@@ -1,7 +1,8 @@
 // This file is for blocks that are put together on the client side and sent to the server
 
 import { z } from "zod";
-import { ArgDef, BlockName, BLOCKS, ValueTypeName, ValueTypes } from "./Blocks";
+import { ArgDef, BlockName, BlockNames, BLOCKS, ValueTypeName, ValueTypes } from "./Blocks";
+import { BoardSchema, GameMetaArgsSchema, PlayerSchema, TriggerSchema } from "./GameDefinitionArgs";
 
 type LiteralNode = {
   kind: "literal";
@@ -9,14 +10,14 @@ type LiteralNode = {
   value: unknown; // literals can be anything
 };
 
-type BlockNode = {
+export type BlockNode = {
   kind: "block";
-  block: string;
+  block: BlockName;
   args: Record<string, ClientNode>;
 };
 
 // ClientNode is any block or literal sent by the client
-type ClientNode = LiteralNode | BlockNode;
+export type ClientNode = LiteralNode | BlockNode;
 
 
 // These Zod schemas verify structure only. That they are blocks, rather than what blocks they are.
@@ -31,7 +32,7 @@ const ClientNodeSchema: z.ZodType<ClientNode> = z.lazy(() =>
     LiteralSchema,
     z.object({
       kind: z.literal("block"),
-      block: z.string(),
+      block: z.enum(BlockNames),
       args: z.record(z.string(), ClientNodeSchema),
     }),
   ])
@@ -90,3 +91,26 @@ export function validateNode(node: ClientNode): void {
     }
   }
 }
+
+const ClientActionSchema = z.object({
+  trigger: TriggerSchema,
+  filter: ClientNodeSchema.optional().or(z.null()),
+  result: ClientNodeSchema
+});
+
+const ClientStepSchema = z.object({
+  name: z.string(),
+  actions: z.array(ClientActionSchema),
+});
+
+const ClientPhaseSchema = z.object({
+  name: z.string(),
+  steps: z.array(ClientStepSchema)
+});
+
+export const ClientBuiltBlocksSchema = z.object({
+  gameMeta: GameMetaArgsSchema,
+  playerDefinition: PlayerSchema,
+  boardDefinition: BoardSchema,
+  phases: z.array(ClientPhaseSchema),
+});
