@@ -8,14 +8,15 @@ import Lobby from './Components/Lobby.js';
 import Room from './Components/Room.js';
 import GameDefinition from './Rules/GameDefinition.js';
 import PickupGame from './SampleGames/JsonReader.js';
+import { ClientID, GameID, LobbyID, RoomID } from './schemas/types.js';
 
 export default class GameManager {
     // No constructor, since everything here is static. There is only one.
 
-    static lobbies: Record<string,Lobby> = {};
-    static clients: Record<number,Client> = {};
-    static rooms: Record<string,Room> = {};
-    static availableGames: Record<number, GameDefinition> = {0: PickupGame};
+    static lobbies: Record<LobbyID,Lobby> = {};
+    static clients: Record<ClientID,Client> = {};
+    static rooms: Record<RoomID,Room> = {};
+    static availableGames: Record<GameID, GameDefinition> = {0: PickupGame};
     static roomName: number = 1;
 
 
@@ -27,7 +28,7 @@ export default class GameManager {
         return client;
     }
 
-    static clientFromId(clientId: number) {
+    static clientFromId(clientId: ClientID) {
         const client = GameManager.clients[clientId];
         if (!client) return null;
         return client;
@@ -40,13 +41,13 @@ export default class GameManager {
         return code;
     }
 
-    static lobbyFromCode(code: string) {
+    static lobbyFromCode(code: LobbyID) {
         const lobby = GameManager.lobbies[code];
         if (!lobby) return null;
         return lobby;
     }
 
-    static deleteLobby(code: string) {
+    static deleteLobby(code: LobbyID) {
         const lobby = GameManager.lobbyFromCode(code);
         if (!lobby) return null;
         
@@ -60,11 +61,17 @@ export default class GameManager {
         return room;
     }
 
-    static removeClient(clientId: number) {
-        const client = GameManager.clientFromId(clientId);
-        if (!client) return; // Already taken care of
+    static getRoomFromId(roomId: RoomID) {
+        const room = GameManager.rooms[roomId];
+        if (!room) return null;
+        return room;
+    }
 
-        const room = client.room;
+    static removeClient(clientId: ClientID) {
+        const client = GameManager.clientFromId(clientId);
+        if (!client || !client.roomId) return; // Already taken care of
+
+        const room = GameManager.getRoomFromId(client.roomId);
         if (room) delete GameManager.rooms[room.name];
 
         const lobbyId = client.lobby;
@@ -76,7 +83,7 @@ export default class GameManager {
         delete GameManager.clients[clientId];
     }
 
-    static registerGameDefinition(game: GameDefinition, id: number) {
+    static registerGameDefinition(game: GameDefinition, id: GameID) {
         GameManager.availableGames[id] = game;
     }
 
@@ -86,17 +93,21 @@ export default class GameManager {
         return list?.concat({name: 'Pickup', id: 0});
     }
 
-    static async getGameDefinition(id: number): Promise<GameDefinition | null> {
+    static async getGameDefinition(id: GameID): Promise<GameDefinition | null> {
         if (GameManager.availableGames[id]) return GameManager.availableGames[id];
         
         return await buildGameFromDatabase(id);
     }
 
-    static get nextRoom() {
+    static getRegisteredGameDefinition(id: GameID) {
+        return GameManager.availableGames[id] ?? null;
+    }
+
+    static get nextRoom(): RoomID {
         return `Room ${GameManager.roomName++}`;
     }
 
-    static get uniqueLobbyJoinCode() {
+    static get uniqueLobbyJoinCode(): LobbyID {
         let code = Lobby.createRandomJoinCode();
         while (GameManager.lobbies[code]) code = Lobby.createRandomJoinCode(); // ensure code is unique
         return code;

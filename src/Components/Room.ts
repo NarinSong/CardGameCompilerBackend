@@ -6,7 +6,7 @@ import Client from "../Client/Client.js";
 import Game from "../Game/Game.js";
 import Player from "../Game/Player.js";
 import GameManager from "../GameManager.js";
-import { PlayerType } from "../schemas/types.js";
+import { ClientID, PlayerType } from "../schemas/types.js";
 
 /**
  * Defines the properties for a room.
@@ -67,8 +67,10 @@ export default class Room {
     }
 
     // This function should *only* be called by the parent lobby, and *only* during room creation, before the game begins
-    handleJoinRoom(client: Client) {
+    handleJoinRoom(clientId: ClientID) {
         if (this.started) return false;
+        const client = GameManager.clientFromId(clientId);
+        if (!client) return false;
 
         const player = this.game.handlePlayerJoin(PlayerType.HUMAN);
         if (!player) return false;
@@ -77,8 +79,8 @@ export default class Room {
         this.clients[client.identifier] = pn;
 
         client.inGame = true;
-        client.room = this;
-        client.player = player;
+        client.roomId = this.name;
+        client.player = pn;
 
         return true;
     }

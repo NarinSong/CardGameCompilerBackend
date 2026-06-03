@@ -13,6 +13,7 @@ import ClientView from "./ClientView.js";
 import { buildGameFromJSON } from "./GameBuilder.js";
 import { sendClientGamestate } from "../index.js";
 import Auth from "../Components/Auth.js";
+import { PlayerID } from "../schemas/types.js";
 
 /**
  * Client's state of authentication 
@@ -40,11 +41,11 @@ type AuthState =
 export default class Client {
     static #nextId : number = 1000;
     identifier: number;
-    room: Room | null = null;
+    roomId: string | null = null;
     lobby: string | undefined;
     inLobby: boolean = false;
     inGame: boolean = false;
-    player: Player | null = null;
+    player: PlayerID | null = null;
     color: string = "#ffffff";
 
     private authState: AuthState = {
@@ -170,8 +171,10 @@ export default class Client {
      * @param game - Current game instance.
      */
     updateGamestate(game: Game) {
-        if (!this.player) return;
-        sendClientGamestate(this.identifier, ClientView.fromGamestate(game, this.player));
+        if (this.player === null) return;
+        const player = game.getPlayer(this.player);
+        if (!player) return;
+        sendClientGamestate(this.identifier, ClientView.fromGamestate(game, player));
     }
 
     updateDisplayName(name: string) {

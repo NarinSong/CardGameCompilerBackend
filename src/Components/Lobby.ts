@@ -5,6 +5,7 @@ import GameManager from "../GameManager.js";
 import { sendLobbyClosed, sendLobbyStatus } from "../index.js";
 import Room from "./Room.js";
 import GameDefinition from "../Rules/GameDefinition.js";
+import { ClientID, GameID, LobbyID, RoomID } from "../schemas/types.js";
 
 const A = "A".charCodeAt(0);
 
@@ -24,7 +25,7 @@ export class LobbyView {
 
     constructor(lobby: Lobby) {
         this.host = {
-            username: lobby.host,
+            username: lobby.hostName,
             displayName: lobby.hostDisplayName
         };
         this.players = lobby.playerDetails;
@@ -35,21 +36,23 @@ export class LobbyView {
 }
 
 export default class Lobby {
-    #host: string;
-    #players: Client[];
-    #game: GameDefinition | null;
+    #host: ClientID;
+    #hostName: string;
+    #players: ClientID[];
+    #game: GameID | null;
     #maxPlayers: number = 32;
     #joinCode: string;
-    #rooms: Room[];
+    #rooms: RoomID[];
 
-    constructor(host: Client, joinCode: string) {
+    constructor(host: Client, joinCode: LobbyID) {
         if (!host.isAuthenticated || !host.username) throw new Error("Unauthenticated host created lobby");
 
         host.inLobby = true;
         host.lobby = joinCode;
 
-        this.#host = host.username;
-        this.#players = [host];
+        this.#host = host.identifier;
+        this.#hostName = host.username;
+        this.#players = [host.identifier];
         this.#game = null;
         this.#joinCode = joinCode;
         this.#rooms = [];
@@ -64,14 +67,14 @@ export default class Lobby {
             const client = this.#players[p];
             if (!client) continue;
 
-            sendLobbyStatus(client.identifier, view);
+            sendLobbyStatus(client, view);
         }
     }
 
     joinGame(client: Client) {
         if (this.#players.length >= this.#maxPlayers) return false;
 
-        this.#players.push(client);
+        this.#players.push(client.identifier);
 
         client.inLobby = true;
         client.lobby = this.#joinCode;
@@ -81,62 +84,67 @@ export default class Lobby {
         return true;
     }
 
-    selectGame(gameDefinition: GameDefinition) {
-        this.#game = gameDefinition;
+    selectGame(gameId: GameID) {
+        this.#game = gameId;
         this.update();
     }
 
     startGame() {
         if (!this.#game) return false;
-        const numMinPlayers = this.#game.gameMeta.minPlayers;
+        const gameDefinition = GameManager.getRegisteredGameDefinition(this.#game);
+        if (!gameDefinition) return false;
+
+        const numMinPlayers = gameDefinition.gameMeta.minPlayers;
         const numAvailablePlayers = this.numAvailablePlayers;
         if (numAvailablePlayers < numMinPlayers) return false; // TODO: robots :)
 
-        const game = this.#game.createGame();
+        const game = gameDefinition.createGame();
         const room = new Room(game, GameManager.nextRoom, this.#joinCode);
         GameManager.registerRoom(room);
         
-        const numMaxPlayers = this.#game.gameMeta.maxPlayers;
+        const numMaxPlayers = gameDefinition.gameMeta.maxPlayers;
         for (let i=0; i<numMaxPlayers; i++) {
             const client = this.firstAvailablePlayer;
             if (!client) continue;
 
             const success = room.handleJoinRoom(client); // marks the client as "inGame" so shouldn't be listed as "available"
             if (!success)
-                this.removeFromLobbyById(client.identifier);
+                this.removeFromLobbyById(client);
         }
 
         room.startGame();
 
-        this.#rooms.push(room); //should we use the id? Mayhaps
+        this.#rooms.push(room.name);
 
         this.update();
     }
 
-    isHost(username: string) {
-        return this.#host == username;
+    isHost(clientId: ClientID) {
+        return this.#host == clientId;
     }
 
     // NEEDS TESTING
     assignNewHost() {
-        if (this.#players.length == 0) {
+        const hostId = this.#players[0];
+        if (this.#players.length == 0 || !hostId) {
             GameManager.deleteLobby(this.#joinCode);
             return;
         }
 
-        const host = this.#players[0];
+        const host = GameManager.clientFromId(hostId);
         if (!host || !host.username)  {
             GameManager.deleteLobby(this.#joinCode);
             return;
         }
 
-        this.#host = host.username;
+        this.#host = hostId;
+        this.#hostName = host.username;
         this.update();
     }
 
     checkForHost() {
         for (let i in this.#players) {
-            if (this.#players[i] && this.#players[i].username && this.isHost(this.#players[i].username))
+            if (this.#players[i] && this.isHost(this.#players[i]))
                 return true;
         }
 
@@ -145,14 +153,19 @@ export default class Lobby {
 
     removeFromLobbyById(clientId: number) {
         for (let p in this.#players) {
-            const client = this.#players[p];
-            if (!client) continue;
-            if (client.identifier == clientId) {
+            const currentId = this.#players[p];
+            if (!currentId) continue;
+            if (currentId == clientId) {
+                const client = GameManager.clientFromId(currentId);
+                if (!client) continue;
+
                 client.inLobby = false;
                 client.lobby = undefined;
                 this.#players.splice(+p, 1);
-                if (client.username && this.isHost(client.username))
+
+                if (this.isHost(currentId))
                     this.assignNewHost();
+
                 sendLobbyClosed(client.identifier);
             }
         }
@@ -173,10 +186,13 @@ export default class Lobby {
     // NEEDS TESTING
     removeFromLobby(username: string) {
         for (let p in this.#players) {
-            const client = this.#players[p];
+            const clientId = this.#players[p];
+            if (!clientId) continue;
+            const client = GameManager.clientFromId(clientId);
             if (!client) continue;
+
             if (client.username == username) {
-                this.removeFromLobbyById(client.identifier);
+                this.removeFromLobbyById(clientId);
                 return true;
             }
         }
@@ -191,7 +207,7 @@ export default class Lobby {
         return String.fromCharCode( number - 10 + A ); //A-Z
     }
 
-    static createRandomJoinCode() {
+    static createRandomJoinCode(): LobbyID {
         const LENGTH = 6;
         let code = '';
         for (let i=0; i<LENGTH; i++) {
@@ -204,30 +220,30 @@ export default class Lobby {
         return this.#joinCode;
     }
 
-    get availablePlayers() {
-        let s=0;
-        for (let p in this.#players) {
-            //if (!this.#players[p].inGame) s++; // todo add "inGame" flag
-        }
-        return s;
-    }
-
     get host() {
         return this.#host;
     }
 
+    get hostName() {
+        return this.#hostName;
+    }
+
     get hostDisplayName() {
         for (let i in this.#players) {
-            if (this.#players[i] && this.#players[i].username == this.#host)
-                return this.#players[i]?.displayName ?? this.#host;
+            if (this.#players[i] == this.#host) {
+                const host = GameManager.clientFromId(this.#host);
+                return host && host.displayName ? host.displayName : this.#hostName;
+            }
         }
-        return this.#host; // default to the host's username
+        return this.#hostName; // default to the host's username
     }
 
     get playerDetails() {
         const list = [];
         for (let p in this.#players) {
-            const client = this.#players[p];
+            const clientId = this.#players[p];
+            if (!clientId) continue;
+            const client = GameManager.clientFromId(clientId);
             if (!client || !client.username || !client.displayName) continue;
 
             list.push({
@@ -240,13 +256,18 @@ export default class Lobby {
     }
 
     get gameName() {
-        return this.#game ? this.#game.gameMeta.name : 'No Game Selected';
+        if (!this.#game) return 'No Game Selected';
+        const game = GameManager.getRegisteredGameDefinition(this.#game);
+
+        return game ? game.gameMeta.name : 'No Game Selected';
     }
 
     get numAvailablePlayers() {
         let a = 0;
         for (let p in this.#players) {
-            const client = this.#players[p];
+            const clientId = this.#players[p];
+            if (!clientId) continue;
+            const client = GameManager.clientFromId(clientId);
             if (!client || client.inGame) continue;
 
             a++;
@@ -256,10 +277,12 @@ export default class Lobby {
 
     get firstAvailablePlayer() {
         for (let p in this.#players) {
-            const client = this.#players[p];
+            const clientId = this.#players[p];
+            if (!clientId) continue;
+            const client = GameManager.clientFromId(clientId);
             if (!client || client.inGame) continue;
 
-            return client;
+            return clientId;
         }
         return null;
     }

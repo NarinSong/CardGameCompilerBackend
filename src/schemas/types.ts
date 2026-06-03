@@ -96,3 +96,9 @@ export type PlayerID = z.infer<typeof PlayerIDSchema>;
 export type BoardID = z.infer<typeof BoardIDSchema>;
 export type rank = z.infer<typeof RankSchema>;
 export type suit = z.infer<typeof SuitSchema>;
+
+// IDs
+export type ClientID = number;
+export type GameID = number;
+export type RoomID = string;
+export type LobbyID = string;

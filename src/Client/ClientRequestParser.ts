@@ -378,7 +378,7 @@ export function clientRequestRemoveFromLobby(clientId: number, username: unknown
 
     const lobby = GameManager.lobbyFromCode(client.lobby);
     if (!lobby) return callback(false);
-    if (!lobby.isHost(client.username)) return callback(false);
+    if (!lobby.isHost(clientId)) return callback(false);
 
     const success = lobby.removeFromLobby(usernameCheck.data);
 
@@ -416,12 +416,12 @@ export async function clientRequestSelectGame(clientId: number, gameId: unknown,
     const lobby = GameManager.lobbyFromCode(client.lobby);
     if (!lobby) return callback(false);
 
-    if (!lobby.isHost(client.username)) return callback(false);
+    if (!lobby.isHost(clientId)) return callback(false);
 
     const game = await GameManager.getGameDefinition(gameIdCheck.data);
     if (!game) return callback(false);
 
-    lobby.selectGame(game);
+    lobby.selectGame(gameIdCheck.data);
 
     callback(true);
 }
@@ -443,7 +443,7 @@ export function clientRequestStartNewGame(clientId: number, callback: unknown = 
     const lobby = GameManager.lobbyFromCode(client.lobby);
     if (!lobby) return callback(false);
 
-    if (!lobby.isHost(client.username)) return callback(false);
+    if (!lobby.isHost(clientId)) return callback(false);
 
     const success = lobby.startGame();
 
@@ -475,9 +475,9 @@ export function clientRequestClickLabel(clientId: number, label: unknown, cardId
         return callback(false);
 
     const client = GameManager.clientFromId(clientId);
-    if (!client) return callback(false);
+    if (!client || !client.roomId) return callback(false);
 
-    const room = client.room;
+    const room = GameManager.getRoomFromId(client.roomId);
     if (!room) return callback(false);
 
     room.handlePlayerClick(labelCheck.data, cardIdCheck.data);
@@ -510,7 +510,7 @@ export function clientRequestEndGame(clientId: number, callback: unknown = noop)
     const lobby = GameManager.lobbyFromCode(client.lobby);
     if (!lobby) return callback(false);
 
-    if (!lobby.isHost(client.username)) return callback(false);
+    if (!lobby.isHost(clientId)) return callback(false);
 
     // TODO: End the game
 
