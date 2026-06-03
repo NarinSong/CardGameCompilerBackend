@@ -42,7 +42,7 @@ export default class Client {
     static #nextId : number = 1000;
     identifier: number;
     roomId: string | null = null;
-    lobby: string | undefined;
+    lobby: string | null = null;
     inLobby: boolean = false;
     inGame: boolean = false;
     player: PlayerID | null = null;

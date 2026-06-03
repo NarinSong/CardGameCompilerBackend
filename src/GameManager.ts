@@ -102,6 +102,8 @@ export default class GameManager {
             if (!client) continue;
 
             sendGameEnded(clientId);
+            client.inGame = false;
+            client.roomId = null;
         }
 
         room.clients = {};

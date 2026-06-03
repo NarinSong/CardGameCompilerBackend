@@ -159,8 +159,17 @@ export default class Lobby {
                 const client = GameManager.clientFromId(currentId);
                 if (!client) continue;
 
+                // Remove from room
+                if (client.roomId) {
+                    const room = GameManager.getRoomFromId(client.roomId);
+                    if (room) delete room.clients[currentId];
+                    client.inGame = false;
+                    client.roomId = null;
+                }
+
+                // Remove from lobby
                 client.inLobby = false;
-                client.lobby = undefined;
+                client.lobby = null;
                 this.#players.splice(+p, 1);
 
                 if (this.isHost(currentId))
