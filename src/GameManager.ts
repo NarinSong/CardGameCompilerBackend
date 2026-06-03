@@ -6,6 +6,7 @@ import { buildGameFromDatabase } from './Client/GameBuilder.js';
 import Database from './Components/Database.js';
 import Lobby from './Components/Lobby.js';
 import Room from './Components/Room.js';
+import { sendGameEnded } from './index.js';
 import GameDefinition from './Rules/GameDefinition.js';
 import PickupGame from './SampleGames/JsonReader.js';
 import { ClientID, GameID, LobbyID, RoomID } from './schemas/types.js';
@@ -72,7 +73,7 @@ export default class GameManager {
         if (!client || !client.roomId) return; // Already taken care of
 
         const room = GameManager.getRoomFromId(client.roomId);
-        if (room) delete GameManager.rooms[room.name];
+        if (room) GameManager.closeRoom(room);
 
         const lobbyId = client.lobby;
         if (lobbyId) {
@@ -81,6 +82,32 @@ export default class GameManager {
         }
 
         delete GameManager.clients[clientId];
+    }
+
+    static leaveGame(clientId: ClientID) {
+        const client = GameManager.clientFromId(clientId);
+        if (!client || !client.roomId) return false;
+
+        const room = GameManager.getRoomFromId(client.roomId);
+        if (room) GameManager.closeRoom(room);
+
+        return true;
+    }
+
+    static closeRoom(room: Room) {
+        const clients = room.clients;
+        for (const idx in clients) {
+            const clientId = +idx;
+            const client = GameManager.clientFromId(clientId);
+            if (!client) continue;
+
+            sendGameEnded(clientId);
+        }
+
+        room.clients = {};
+        room.clearTimeouts();
+
+        delete GameManager.rooms[room.name];
     }
 
     static registerGameDefinition(game: GameDefinition, id: GameID) {

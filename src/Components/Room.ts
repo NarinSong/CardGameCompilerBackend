@@ -6,7 +6,7 @@ import Client from "../Client/Client.js";
 import Game from "../Game/Game.js";
 import Player from "../Game/Player.js";
 import GameManager from "../GameManager.js";
-import { ClientID, PlayerType } from "../schemas/types.js";
+import { ClientID, LobbyID, PlayerID, PlayerType, RoomID } from "../schemas/types.js";
 
 /**
  * Defines the properties for a room.
@@ -15,9 +15,9 @@ import { ClientID, PlayerType } from "../schemas/types.js";
  */
 export default class Room {
     game: Game;
-    clients: Record<number, number>; // ClientId: playerId
-    name: string;
-    lobby: string;
+    clients: Record<ClientID, PlayerID>;
+    name: RoomID;
+    lobby: LobbyID;
     started: boolean;
 
     /**
@@ -94,5 +94,10 @@ export default class Room {
         this.emitGameState();
 
         return true;
+    }
+
+    clearTimeouts() {
+        // TODO: As timeouts are added, remove them here.
+        
     }
 }

@@ -495,9 +495,9 @@ export function clientRequestLeaveGame(clientId: number, callback: unknown = noo
     const lobby = GameManager.lobbyFromCode(client.lobby);
     if (!lobby) return callback(false);
 
-    // TODO: leave the game
+    const success = GameManager.leaveGame(clientId);
 
-    callback(true);
+    callback(success);
 }
 
 export function clientRequestEndGame(clientId: number, callback: unknown = noop) {
@@ -512,7 +512,8 @@ export function clientRequestEndGame(clientId: number, callback: unknown = noop)
 
     if (!lobby.isHost(clientId)) return callback(false);
 
-    // TODO: End the game
+    // Leave game does the same thing as end game at the moment :)
+    const success = GameManager.leaveGame(clientId);
 
-    callback(true);
+    callback(success);
 }
