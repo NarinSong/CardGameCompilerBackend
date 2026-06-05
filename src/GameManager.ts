@@ -17,7 +17,7 @@ export default class GameManager {
     static lobbies: Record<LobbyID,Lobby> = {};
     static clients: Record<ClientID,Client> = {};
     static rooms: Record<RoomID,Room> = {};
-    static availableGames: Record<GameID, GameDefinition> = {0: PickupGame};
+    static availableGames: Record<GameID, GameDefinition> = {1000: PickupGame};
     static roomName: number = 1;
 
 
@@ -119,7 +119,7 @@ export default class GameManager {
     static async getAvailableGameNames() {
         // Potential: caching
         const list = await Database.getGamesList();
-        return list?.concat({name: 'Pickup', id: 0});
+        return list?.concat({name: 'Pickup', id: 1000});
     }
 
     static async getGameDefinition(id: GameID): Promise<GameDefinition | null> {

@@ -32,6 +32,10 @@ CREATE TABLE IF NOT EXISTS savedrules (
     FOREIGN KEY (parent) REFERENCES savedrules(id)
 );
 
+-- These are used to set the starting user ID's to large numbers, so that they don't conflict with true/false checks at 0
+-- ALTER TABLE savedrules AUTO_INCREMENT=1001;
+-- ALTER TABLE users AUTO_INCREMENT=1001;
+
 CREATE TABLE IF NOT EXISTS favorites (
     user MEDIUMINT NOT NULL,
     game MEDIUMINT NOT NULL,
