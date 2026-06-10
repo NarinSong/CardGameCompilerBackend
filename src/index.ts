@@ -2,8 +2,9 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
-import { clientRequestChangeColor, clientRequestClickLabel, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetGameInfo, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 import { LobbyView } from './Components/Lobby.js';
+import { ClientID } from './schemas/types.js';
 
 // Execution begins here
 // All socket connections come through here. Incoming AND outgoing.
@@ -25,7 +26,7 @@ const SOCKET_ID_TO_CLIENT_ID : Record<string, number> = {};
 /**
  * Maps client ids to their socket ids
  */
-const SOCKETS : Record<number, Socket> = {};
+const SOCKETS : Record<ClientID, Socket> = {};
 
 io.on('connection', (socket: Socket) => {
     console.log('New socket connected');
@@ -37,7 +38,7 @@ io.on('connection', (socket: Socket) => {
     SOCKET_ID_TO_CLIENT_ID[socket.id] = client.identifier;
     SOCKETS[client.identifier] = socket;
 
-    const id = client.identifier;
+    const id: ClientID = client.identifier;
 
     // Listeners
     socket.on('ping', (callback) => {clientRequestPing(id, callback);});
@@ -48,7 +49,9 @@ io.on('connection', (socket: Socket) => {
     socket.on('signOut', (callback) => {clientRequestSignOut(id, callback);});
 
     // Account management
+    socket.on('getColor', (callback) => {clientRequestGetColor(id, callback);});
     socket.on('setColor', (color, callback) => {clientRequestChangeColor(id, color, callback);});
+    socket.on('setDisplayName', (displayName, callback) => {clientRequestChangeDisplayName(id, displayName, callback);});
 
 
     // Game Builder
@@ -66,7 +69,11 @@ io.on('connection', (socket: Socket) => {
     socket.on('startNewGame', (callback) => {clientRequestStartNewGame(id, callback);});
 
     // Game play
-    socket.on('playerClickEvent', (label, callback) => {clientRequestClickLabel(id, label, callback);});
+    socket.on('playerClickEvent', (label, cardId, callback) => {clientRequestClickLabel(id, label, cardId, callback);});
+
+    // Game scene buttons
+    socket.on('leaveGame', (callback) => {clientRequestLeaveGame(id, callback);});
+    socket.on('endGame', (callback) => {clientRequestEndGame(id, callback);});
 
     // Disconnect
     socket.on('disconnect', () => {
@@ -81,7 +88,7 @@ io.on('connection', (socket: Socket) => {
  * @param clientId - Client id that was supposed to receive.
  * @param functionName - Function name that it failed on.
  */
-function failedSend(clientId: number, functionName: string) {
+function failedSend(clientId: ClientID, functionName: string) {
     Logger.log(`Failed emit: ${clientId} attempted ${functionName}`);
 }
 
@@ -92,7 +99,7 @@ function failedSend(clientId: number, functionName: string) {
  * @param gamestate - Game state to send to client.
  * @returns void
  */
-function sendClientGamestate(clientId: number, gamestate: ClientView) {
+function sendClientGamestate(clientId: ClientID, gamestate: ClientView) {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendClientGamestate()');
@@ -102,7 +109,17 @@ function sendClientGamestate(clientId: number, gamestate: ClientView) {
     socket.emit('gamestate', gamestate);
 }
 
-function sendLobbyStatus(clientId: number, lobbyStatus: LobbyView) {
+function sendGameEnded(clientId: ClientID) {
+    const socket = SOCKETS[clientId];
+    if (!socket) {
+        failedSend(clientId, 'sendGameEnded()');
+        return;
+    }
+
+    socket.emit('gameEnded');
+}
+
+function sendLobbyStatus(clientId: ClientID, lobbyStatus: LobbyView) {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendClientGamestate()');
@@ -112,7 +129,7 @@ function sendLobbyStatus(clientId: number, lobbyStatus: LobbyView) {
     socket.emit('lobbyStatus', lobbyStatus);
 }
 
-function sendLobbyClosed(clientId: number) {
+function sendLobbyClosed(clientId: ClientID) {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendLobbyClosed()');
@@ -123,4 +140,4 @@ function sendLobbyClosed(clientId: number) {
 }
 
 // Exports. Note: socket is not exported
-export { sendClientGamestate, sendLobbyStatus, sendLobbyClosed };
+export { sendClientGamestate, sendGameEnded, sendLobbyStatus, sendLobbyClosed };

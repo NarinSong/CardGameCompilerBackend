@@ -8,6 +8,7 @@ import { ActionRole, DisplayName, ButtonType, Visibility } from "../schemas/type
  */
 export default class ButtonDefinition {
     label: Label;
+    visibility: Visibility;
     displayName: DisplayName;
     actionRoles: ActionRole[];
     type: ButtonType;
@@ -19,6 +20,7 @@ export default class ButtonDefinition {
      */
     constructor(definition: {
         labelManager: LabelManager,
+        visibility?: Visibility | undefined,
         label?: string | undefined,
         displayName?: string | undefined,
         actionRoles?: string[] | undefined,
@@ -26,6 +28,7 @@ export default class ButtonDefinition {
         range?: { min?: number | undefined, max?: number | undefined, increment?: number | undefined } | undefined,
     }) {
         this.label = definition.labelManager.createLabel(this, definition.label);
+        this.visibility = definition.visibility ?? Visibility.FACE_UP;
         this.displayName = definition.displayName ?? this.label;
         this.actionRoles = definition.actionRoles ?? [this.label];
         this.type = definition.type ?? ButtonType.CLICK;

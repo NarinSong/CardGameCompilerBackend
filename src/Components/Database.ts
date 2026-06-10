@@ -29,13 +29,13 @@ export default class Database {
      * @param username - username to get password hash from.
      * @returns Promise resolving to an array containing the password hash and display name, or null on failure. 
      */
-    static async getHashByUsername(username: string): Promise<{ passwordHash: string; displayName: string }[] | null> {
+    static async getHashByUsername(username: string): Promise<{ passwordHash: string; displayName: string, color: string }[] | null> {
         let conn;
         let password = null;
 
         try {
             conn = await pool.getConnection();
-            password = await conn.query("SELECT passwordHash, displayName FROM users WHERE username = ?", [username]);
+            password = await conn.query("SELECT passwordHash, displayName, color FROM users WHERE username = ?", [username]);
         } catch (error) {
             console.error(error);
         } finally {
@@ -52,14 +52,46 @@ export default class Database {
      * @param displayName - display name to save.
      * @returns Promise for true if successfully saved, else false.
      */
-    static async saveUserCredentials(username: string, passwordHash: string, displayName: string): Promise<boolean> {
+    static async saveUserCredentials(username: string, passwordHash: string, displayName: string, color: string): Promise<boolean> {
         if (username === 'test') return true;
         
         let conn;
 
         try {
             conn = await pool.getConnection();
-            await conn.query("INSERT INTO users (username, passwordHash, displayName) VALUES (?, ?, ?)", [username, passwordHash, displayName]);
+            await conn.query("INSERT INTO users (username, passwordHash, displayName, color) VALUES (?, ?, ?, ?)", [username, passwordHash, displayName, color]);
+        } catch (error) {
+            console.error(error);
+            return false;
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return true;
+    }
+
+    static async saveUserColor(username: string, color: string): Promise<boolean> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            await conn.query("UPDATE users SET color = ? WHERE username = ?", [color, username]);
+        } catch (error) {
+            console.error(error);
+            return false;
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return true;
+    }
+
+    static async saveUserDisplayName(username: string, displayName: string): Promise<boolean> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            await conn.query("UPDATE users SET displayName = ? WHERE username = ?", [displayName, username]);
         } catch (error) {
             console.error(error);
             return false;

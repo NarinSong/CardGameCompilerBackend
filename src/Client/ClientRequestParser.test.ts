@@ -434,7 +434,7 @@ describe("clientRequestGetAvailableBlocks", () => {
 
 describe("clientRequestClickLabel", () => {
     it("does nothing if callback is not a function", async () => {
-        expect(() => clientRequestClickLabel(1,"ddwadaw")).not.toThrow();
+        expect(() => clientRequestClickLabel(1,"ddwadaw", 0)).not.toThrow();
     });
 
 

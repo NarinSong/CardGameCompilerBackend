@@ -2,15 +2,18 @@
 // Note: anything starting with # will not be sent
 
 import ValueMap from "../Components/ValueMap.js";
-import { PlayerID, Visibility } from "../schemas/types.js";
+import { ButtonType, PlayerID, PlayerType, Visibility } from "../schemas/types.js";
 import Board from "../Game/Board.js";
 import Counter from "../Game/Counter.js";
 import Game from "../Game/Game.js";
 import Pile from "../Game/Pile.js";
 import Player from "../Game/Player.js";
+import Button from "../Game/Button.js";
 
 type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number, id: number}[], label: string, displayName: string, actionRoles: string[] };
 type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[] };
+type ClientButtonType = { owner: number, visibility: Visibility, label: string, actionRoles: string[], displayName: string, type: ButtonType, range: { min: number | undefined, max: number | undefined, increment: number } | undefined };
+type ClientPlayerType = { playerId: PlayerID, type: PlayerType };
 
 /**
  * The current gamestate from the perspective of the client.
@@ -21,26 +24,25 @@ export default class ClientView {
     // These are readonly so that they can be linked to the actual gamestate without having to worry about side-effects
     readonly piles: ClientPileType[];
     readonly counters: ClientCounterType[];
-    readonly players: Record<PlayerID, Player>;
-    readonly board: Board;
+    readonly buttons: ClientButtonType[];
+    readonly players: ClientPlayerType[];
 
     /**
      * Creates the ClientView.
      * @param piles - Piles in the game.
      * @param counters - Counters in the game.
      * @param players - The players in the game.
-     * @param board - The game board.
      */
     private constructor(
         piles: ClientPileType[],
         counters: ClientCounterType[],
-        players: Record<PlayerID, Player>,
-        board: Board
+        buttons: ClientButtonType[],
+        players: ClientPlayerType[]
     ) {
         this.piles = piles;
         this.counters = counters;
+        this.buttons = buttons;
         this.players = players;
-        this.board = board;
     }
 
     /**
@@ -102,6 +104,24 @@ export default class ClientView {
         return counterView;
     }
 
+    static buttonView(button: Button, owner: number, player: Player) {
+        if (button.visibility == Visibility.INVISIBLE) return null;
+
+        //let hide = button.visibility == Visibility.FACE_DOWN;
+
+        const buttonView: ClientButtonType = {
+            owner: owner,
+            visibility: button.visibility,
+            label: button.label,
+            displayName: button.displayName,
+            actionRoles: button.actionRoles,
+            type: button.type,
+            range: button.range,
+        }
+
+        return buttonView;
+    }
+
     /**
      * Creates the view that the client will see from the game state
      * @param g - running game instance.
@@ -111,6 +131,8 @@ export default class ClientView {
     static fromGamestate(g: Game, p: Player) {
         const piles: ClientPileType[] = [];
         const counters: ClientCounterType[] = [];
+        const buttons: ClientButtonType[] = [];
+        const players: ClientPlayerType[] = [];
 
         for (let key of Object.keys(g.gameState.piles)) {
             let item = g.gameState.piles[key];
@@ -128,8 +150,25 @@ export default class ClientView {
             if (counterView) counters.push(counterView);
         }
 
+        for (let key of Object.keys(g.gameState.buttons)) {
+            let item = g.gameState.buttons[key];
+            if (!item || !item.button) continue;
+
+            let buttonView = ClientView.buttonView(item.button, item.owner, p);
+            if (buttonView) buttons.push(buttonView);
+        }
+
+        const gamePlayers = Object.entries(g.gameState.players);
+
+        for (let player of gamePlayers) {
+            players.push({
+                playerId: player[1].id,
+                type: player[1].type
+            })
+        }
+
         return new ClientView(
-            piles, counters, g.gameState.players, g.gameState.board
+            piles, counters, buttons, players
         );
     }
 }

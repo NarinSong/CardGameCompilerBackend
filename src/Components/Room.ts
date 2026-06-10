@@ -4,34 +4,47 @@
 
 import { Worker } from "node:worker_threads";
 
-import Client from "../Client/Client.js";
-import Game from "../Game/Game.js";
-import Player from "../Game/Player.js";
+
 import GameManager from "../GameManager.js";
-import { PlayerType } from "../schemas/types.js";
-import GameDefinition from "../Rules/GameDefinition.js";
+import { ClientID, LobbyID, PlayerID, PlayerType, RoomID, GameID } from "../schemas/types.js";
+import { sendClientGamestate } from "../index.js";
+import ClientView from "../Client/ClientView.js";
+
+
+
+
+/** 
+ * Each room has its own dedicated worker thread (RoomWorker.ts) that owns the game instance.
+ * This file acts as the parent thread. it receives socket events and forwards them to the 
+ * worker via postMessage(). The worker processes game logic and sends results back,
+ * which the parent thread then uses to update clients.
+ */
+
+
+
+
 
 /**
  * Defines the properties for a room.
  * 
- * A Room consists of the running game instance, the list of clients, and the name of the room.
+ * A Room consists of the gameId, the list of clients, and the name of the room.
  */
 export default class Room {
     worker: Worker;
-    game: Game;
-    clients: Record<number, number>; // ClientId: playerId
-    name: string;
-    lobby: string;
+    gameId: GameID;
+    clients: Record<ClientID, PlayerID>;
+    name: RoomID;
+    lobby: LobbyID;
     started: boolean;
 
     /**
      * Creates a room.
-     * @param game - The running game instance.
+     * @param gameId - The gameId.
      * @param name - Name of the room.
      * @param lobby - join code of the lobby.
      */
-    constructor(game: Game, name: string, lobby: string) {
-        this.game = game;
+    constructor(gameId: GameID, name: string, lobby: string) {
+        this.gameId = gameId;
         this.clients = {};
         this.name = name;
         this.lobby = lobby;
@@ -39,13 +52,13 @@ export default class Room {
 
 
         this.worker = new Worker(new URL("./RoomWorker.js", import.meta.url), {
-            workerData: {gameDefinition: game.definition}
+            workerData: {gameDefinitionJson: GameManager.getRegisteredGameDefinitionJson(gameId)}
         });
 
         this.worker.on("message", (msg) => {
             switch (msg.type){
                 case "GAME_STATE":
-                    this.emitGameState(msg.state);
+                    this.emitGameState(msg.views);
                     break;
         
             }
@@ -61,22 +74,36 @@ export default class Room {
      * Send the updated game state to all clients.
      * 
      */
-    emitGameState(state: unknown) {
-        for (let c in this.clients) {
-            if (!this.game.players[0]) continue;
-            
-            const client = GameManager.clientFromId(+c);
-            if (!client) continue;
+    emitGameState(views: {playerId: number, view: ClientView}[]) {
+        
+        for(const clientId in this.clients)
+        {
+            const playerId = this.clients[clientId];
+            const client = GameManager.clientFromId(+clientId);
+            if(!client) continue;
 
-            client.updateGamestate(state);
+            const playerView = views.find(v=> v.playerId===playerId);
+            if (!playerView) continue;
+
+            sendClientGamestate(client.identifier,  playerView.view );
         }
+
+        // for (let c in this.clients) {
+        //     if (!this.game.players[0]) continue;
+            
+        //     const client = GameManager.clientFromId(+c);
+        //     if (!client) continue;
+
+        //     client.updateGamestate(state);
+        // }
     }
 
     /**
      * Handles the action whenever a player clicks an object (Pile, Card, etc.).
      * @param label - The object that the user clicked.
+     * @todo use cardId and player number to build action context
      */
-    handlePlayerClick(label: string) {
+    handlePlayerClick(label: string, cardId: number) {
         if (!this.started) return;
         this.worker.postMessage({type: "PLAYER_CLICK", label})
         // let actionTaken = this.game.clickAction(label); // TODO: player number?
@@ -88,20 +115,34 @@ export default class Room {
     }
 
     // This function should *only* be called by the parent lobby, and *only* during room creation, before the game begins
-    handleJoinRoom(client: Client) {
+    handleJoinRoom(clientId: ClientID) {
         if (this.started) return false;
 
-        const player = this.game.handlePlayerJoin(PlayerType.HUMAN);
-        if (!player) return false;
+        const client = GameManager.clientFromId(clientId);
+        if (!client) return false;
 
-        const pn = player.id;
-        this.clients[client.identifier] = pn;
 
-        client.inGame = true;
-        client.room = this;
-        client.player = player;
+         
+        /**       
+         * Returns a Promise that resolves to true if the player successfully joined, false otherwise.
+         * A one-time listener is set up on the worker before sending the "JOIN_ROOM" message,
+         * so the response is captured when the worker sends back "PLAYER_JOINED".
+         * If successful, the client is mapped to their player ID and marked as in-game.
+         */
+        return new Promise((resolve) => {
+            this.worker.once("message", (msg) => {
+                if(msg.type !== "PLAYER_JOINED" || !msg.playerId) return resolve(false);
+                
+                this.clients[client.identifier] = msg.playerId;
 
-        return true;
+                client.inGame = true;
+                client.roomId = this.name;
+                client.player = msg.playerId;
+                resolve(true)
+            })
+            this.worker.postMessage({ type: "JOIN_ROOM", playerType: PlayerType.HUMAN });
+        });
+       
     }
 
     startGame() {
@@ -111,6 +152,10 @@ export default class Room {
         return true;
     }
 
+    clearTimeouts() {
+        // TODO: As timeouts are added, remove them here.
+        
+    }
 
     //Terminate the thread after the room is done
     destroy(){

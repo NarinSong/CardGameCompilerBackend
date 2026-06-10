@@ -10,6 +10,7 @@ import GameLabels from "./GameLabels.js";
  */
 export default class Button {
     label: Label;
+    visibility: Visibility;
     actionRoles: ActionRole[];
     displayName: DisplayName;
     type: ButtonType;
@@ -26,6 +27,7 @@ export default class Button {
      */
     private constructor(
         label: Label,
+        visibility: Visibility,
         gameLabels: GameLabels,
         actionRoles: ActionRole[],
         displayName: DisplayName,
@@ -33,6 +35,7 @@ export default class Button {
         range: { min: number | undefined, max: number | undefined, increment: number } | undefined,
     ) {
         this.label = label;
+        this.visibility = visibility;
         this.actionRoles = actionRoles;
         this.displayName = displayName;
         this.type = type;
@@ -50,6 +53,7 @@ export default class Button {
     static fromDefinition(definition: ButtonDefinition, gameLabels: GameLabels) {
         return new Button(
             definition.label,
+            definition.visibility,
             gameLabels,
             definition.actionRoles,
             definition.displayName,
@@ -70,12 +74,13 @@ export default class Button {
      */
     static create(
         label: Label,
+        visibility: Visibility,
         gameLabels: GameLabels,
         actionRoles: ActionRole[],
         displayName: DisplayName,
         type: ButtonType,
         range: { min: number | undefined, max: number | undefined, increment: number } | undefined,
     ) {
-        return new Button(label, gameLabels, actionRoles, displayName, type, range);
+        return new Button(label, visibility, gameLabels, actionRoles, displayName, type, range);
     }
 }

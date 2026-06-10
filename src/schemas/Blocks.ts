@@ -163,3 +163,4 @@ export const BLOCKS = {
 } as const;
 
 export type BlockName = keyof typeof BLOCKS;
+export const BlockNames = Object.keys(BLOCKS) as [...BlockName[]];

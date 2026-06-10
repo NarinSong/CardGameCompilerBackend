@@ -13,7 +13,7 @@ export default class Card {
     rank: rank;
     suit: suit;
     id: number;
-    private static nextId: number = 0;
+    private static nextId: number = 1000;
 
     /**
      * Creates a card.

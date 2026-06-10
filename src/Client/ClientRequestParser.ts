@@ -143,7 +143,18 @@ export async function clientRequestSignOut(clientId: number, callback: unknown =
     return callback(true);
 }
 
-export function clientRequestChangeColor(clientId: number, color: unknown, callback: unknown = noop) {
+export async function clientRequestGetColor(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(color: hex string, defaults to '#ffffff' on failure) => void
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback('#ffffff');
+    if (!client.isAuthenticated) return callback('#ffffff');
+    if (!client.color) return callback('#ffffff');
+
+    callback(client.color);
+}
+
+export async function clientRequestChangeColor(clientId: number, color: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean) => void
 
     const checkColor = z
@@ -159,12 +170,40 @@ export function clientRequestChangeColor(clientId: number, color: unknown, callb
     const client = GameManager.clientFromId(clientId);
     if (!client) return callback(false);
     if (!client.isAuthenticated) return callback(false);
+    if (!client.username) return callback(false);
 
-    client.color = checkColor.data;
+    const success = await Database.saveUserColor(client.username, checkColor.data);
+
+    if (success)
+        client.color = checkColor.data;
+
+    callback(success);
+}
+
+export async function clientRequestChangeDisplayName(clientId: number, displayName: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean) => void
+
+    const displayNameCheck = z
+        .string()
+        .min(3)
+        .max(16)
+        .regex(/^[a-zA-Z0-9 ]+$/)
+        .safeParse(displayName);
+
+    if (!displayNameCheck.success)
+        return callback(false);
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(false);
+    if (!client.isAuthenticated) return callback(false);
+    if (!client.username) return callback(false);
     
-    // TODO: store color in database
+    const success = await Database.saveUserDisplayName(client.username, displayNameCheck.data);
 
-    callback(true);
+    if (success)
+        client.updateDisplayName(displayNameCheck.data);
+
+    callback(success);
 }
 
 /**
@@ -173,24 +212,12 @@ export function clientRequestChangeColor(clientId: number, color: unknown, callb
  * @param clientId - The id of the client requesting the available games.
  * @param callback - Response handler. Called with the list of game names and its id.
  * @returns void if callback is not a function, returns callback(games) for the games found in the database.
- * @todo replace placeholder with database call.
  */
-export function clientRequestGetAvailableGames(clientId: number, callback: unknown = noop) {
+export async function clientRequestGetAvailableGames(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(games: { [name: string]: number }) => void
 
     // Get the available games from the database and send those to the client
-    const games: {name: string, id: number}[] = [
-        { name: 'Pickup', id: 0},{ name: 'War', id: 1 },
-        { name: 'aPickup', id: 2},{ name: 'Attack', id: 3 },
-        { name: 'bPickup', id: 4},{ name: 'Send', id: 5 },
-        { name: 'cPickup', id: 6},{ name: 'Mahjong', id: 7 },
-        { name: 'rePickup', id: 8},{ name: 'Next', id: 9 },
-        { name: 'rePickup', id: 10},{ name: 'Skipbo', id: 11 },
-        { name: 'dPickup', id: 12},{ name: 'Go', id: 13 },
-        { name: 'gPickup', id: 14},{ name: 'Chess', id: 15 },
-    ]; //TODO: replace with database call
-
-    //const games = GameManager.availableGames();
+    const games = await GameManager.getAvailableGameNames();
 
     callback(games);
 }
@@ -279,7 +306,7 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, gam
     await Database.saveGameJson(JSON.stringify(jsonCheck.data), gameNameCheck.data, username, parentIdCheck.data ?? null, gameDescriptionCheck.data, isPrivateCheck.data);
     
     // todo: get save id from database
-    GameManager.registerGameDefinition(def, id); 
+    GameManager.registerGameDefinition(def, id, JSON.stringify(jsonCheck.data)); 
 
     callback(true, id);
 }
@@ -351,7 +378,7 @@ export function clientRequestRemoveFromLobby(clientId: number, username: unknown
 
     const lobby = GameManager.lobbyFromCode(client.lobby);
     if (!lobby) return callback(false);
-    if (!lobby.isHost(client.username)) return callback(false);
+    if (!lobby.isHost(clientId)) return callback(false);
 
     const success = lobby.removeFromLobby(usernameCheck.data);
 
@@ -389,12 +416,12 @@ export async function clientRequestSelectGame(clientId: number, gameId: unknown,
     const lobby = GameManager.lobbyFromCode(client.lobby);
     if (!lobby) return callback(false);
 
-    if (!lobby.isHost(client.username)) return callback(false);
+    if (!lobby.isHost(clientId)) return callback(false);
 
     const game = await GameManager.getGameDefinition(gameIdCheck.data);
     if (!game) return callback(false);
 
-    lobby.selectGame(game);
+    lobby.selectGame(gameIdCheck.data);
 
     callback(true);
 }
@@ -406,7 +433,7 @@ export async function clientRequestSelectGame(clientId: number, gameId: unknown,
  * @param callback - Response handler. Called with the name of room.
  * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
  */
-export function clientRequestStartNewGame(clientId: number, callback: unknown = noop) {
+export async function clientRequestStartNewGame(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(succeess: boolean) => void
 
     const client = GameManager.clientFromId(clientId);
@@ -416,9 +443,9 @@ export function clientRequestStartNewGame(clientId: number, callback: unknown = 
     const lobby = GameManager.lobbyFromCode(client.lobby);
     if (!lobby) return callback(false);
 
-    if (!lobby.isHost(client.username)) return callback(false);
+    if (!lobby.isHost(clientId)) return callback(false);
 
-    const success = lobby.startGame();
+    const success = await lobby.startGame();
 
     callback(success);
 }
@@ -430,20 +457,63 @@ export function clientRequestStartNewGame(clientId: number, callback: unknown = 
  * @param callback - Response handler. Called with the boolean true.
  * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
  */
-export function clientRequestClickLabel(clientId: number, label: unknown, callback: unknown = noop) {
+export function clientRequestClickLabel(clientId: number, label: unknown, cardId: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(succeeded: boolean) => void 
 
-    const result = z.string().safeParse(label)
-    if (!result.success)
+    const labelCheck = z
+        .string()
+        .safeParse(label);
+
+    if (!labelCheck.success)
+        return callback(false);
+
+    const cardIdCheck = z
+        .number()
+        .safeParse(cardId);
+
+    if (!cardIdCheck.success)
         return callback(false);
 
     const client = GameManager.clientFromId(clientId);
-    if (!client) return callback(false);
+    if (!client || !client.roomId) return callback(false);
 
-    const room = client.room;
+    const room = GameManager.getRoomFromId(client.roomId);
     if (!room) return callback(false);
 
-    room.handlePlayerClick(result.data);
+    room.handlePlayerClick(labelCheck.data, cardIdCheck.data);
 
     callback(true);
+}
+
+export function clientRequestLeaveGame(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(succeess: boolean) => void
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.isAuthenticated || !client.username || !client.inLobby || !client.lobby || !client.inGame) 
+        return callback(false);
+
+    const lobby = GameManager.lobbyFromCode(client.lobby);
+    if (!lobby) return callback(false);
+
+    const success = GameManager.leaveGame(clientId);
+
+    callback(success);
+}
+
+export function clientRequestEndGame(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(succeess: boolean) => void
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.isAuthenticated || !client.username || !client.inLobby || !client.lobby || !client.inGame) 
+        return callback(false);
+
+    const lobby = GameManager.lobbyFromCode(client.lobby);
+    if (!lobby) return callback(false);
+
+    if (!lobby.isHost(clientId)) return callback(false);
+
+    // Leave game does the same thing as end game at the moment :)
+    const success = GameManager.leaveGame(clientId);
+
+    callback(success);
 }

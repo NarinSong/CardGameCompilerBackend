@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     profileUrl TEXT, -- a url to a png file. Can be null
     profileDescription VARCHAR(500), -- user-inputted text. Can be null. Max 500 characters
     passwordHash TEXT NOT NULL, -- created by argon2ID
+    color CHAR(7) DEFAULT '#ffffff' NOT NULL, -- a hex code color, starting with # and followed by 6 0-f values
     createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- should be automatic based on date of creation
 );
 
@@ -30,6 +31,10 @@ CREATE TABLE IF NOT EXISTS savedrules (
     FOREIGN KEY (creator) REFERENCES users(id),
     FOREIGN KEY (parent) REFERENCES savedrules(id)
 );
+
+-- These are used to set the starting user ID's to large numbers, so that they don't conflict with true/false checks at 0
+-- ALTER TABLE savedrules AUTO_INCREMENT=1001;
+-- ALTER TABLE users AUTO_INCREMENT=1001;
 
 CREATE TABLE IF NOT EXISTS favorites (
     user MEDIUMINT NOT NULL,

@@ -13,6 +13,7 @@ import ClientView from "./ClientView.js";
 import { buildGameFromJSON } from "./GameBuilder.js";
 import { sendClientGamestate } from "../index.js";
 import Auth from "../Components/Auth.js";
+import { PlayerID } from "../schemas/types.js";
 
 /**
  * Client's state of authentication 
@@ -40,12 +41,12 @@ type AuthState =
 export default class Client {
     static #nextId : number = 1000;
     identifier: number;
-    room: Room | null = null;
-    lobby: string | undefined;
+    roomId: string | null = null;
+    lobby: string | null = null;
     inLobby: boolean = false;
     inGame: boolean = false;
-    player: Player | null = null;
-    color: string = "#000000";
+    player: PlayerID | null = null;
+    color: string = "#ffffff";
 
     private authState: AuthState = {
         isAuthenticated: false,
@@ -59,6 +60,25 @@ export default class Client {
      */
     constructor()  {
         this.identifier = Client.nextId;
+    }
+
+    randomColor() {
+        let colors = [
+            '#ffcccc',
+            '#ffd9cc',
+            '#ffe5cc',
+            '#fff2cc',
+            '#e6ffcc',
+            '#d9ffcc',
+            '#ccfff2',
+            '#ccf2ff',
+            '#cce5ff',
+            '#d9ccff',
+            '#e6ccff',
+            '#ffccf2'
+        ];
+
+        return colors[Math.floor(Math.random() * colors.length)] ?? '#ffcccc';
     }
 
     /**
@@ -81,6 +101,8 @@ export default class Client {
             isAuthenticated: true,
         };
 
+        this.color = success.color;
+
         return success.token;
     }
 
@@ -92,7 +114,8 @@ export default class Client {
      * @returns If successful it returns a sessionId, otherwise null.
      */
     async signUp(username: string, password: string, displayName: string) {
-        const success = await Auth.createNewUser(username, password, displayName);
+        let color = this.randomColor();
+        const success = await Auth.createNewUser(username, password, displayName, color);
         if (!success) return null;
 
         this.authState = {
@@ -101,6 +124,8 @@ export default class Client {
             displayName: displayName,
             isAuthenticated: true,
         };
+
+        this.color = color;
 
         return success;
     }
@@ -146,8 +171,14 @@ export default class Client {
      * @param game - Current game instance.
      */
     updateGamestate(game: Game) {
-        if (!this.player) return;
-        sendClientGamestate(this.identifier, ClientView.fromGamestate(game, this.player));
+        if (this.player === null) return;
+        const player = game.getPlayer(this.player);
+        if (!player) return;
+        sendClientGamestate(this.identifier, ClientView.fromGamestate(game, player));
+    }
+
+    updateDisplayName(name: string) {
+        this.authState.displayName = name;
     }
 
     static get nextId() {

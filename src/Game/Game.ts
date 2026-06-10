@@ -5,7 +5,7 @@
 
 import GameDefinition from "../Rules/GameDefinition.js";
 import StepDefinition from "../Rules/StepDefinition.js";
-import { ActionRole, PlayerType, TriggerType } from "../schemas/types.js";
+import { ActionRole, PlayerID, PlayerType, TriggerType } from "../schemas/types.js";
 import GameState from "./GameState.js";
 import Player from "./Player.js";
 import { GamePiece } from "./GameLabels.js";
@@ -105,6 +105,10 @@ export default class Game {
         }
 
         return false;
+    }
+
+    getPlayer(id: PlayerID) {
+        return this.gameState.players[id];
     }
 
     /**
