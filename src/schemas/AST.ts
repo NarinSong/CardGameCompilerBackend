@@ -26,8 +26,8 @@ const CardSchema = z.any();
 const PileSchema = z.any();
 const PileStateSchema = z.any();
 const VisibilitySchema = z.any();
-const PlayerIDSchema = z.any();
-const BoardIDSchema = z.any();
+const PlayerIDSchema = z.int().min(1);
+const BoardIDSchema = z.literal(-1);
 const TriggerSchema = z.any();
 
 
@@ -166,6 +166,16 @@ export const ValueNodeSchema: z.ZodType<any> = z.lazy(() =>
     z.object({
     type: z.literal("GET_VARIABLE"),
     name: ValueNodeSchema,
+    }),
+
+    z.object({
+      type: z.literal("SET_PHASE"),
+      primary: ValueNodeSchema,
+    }),
+
+    z.object({
+      type: z.literal("SET_STEP"),
+      primary: ValueNodeSchema,
     }),
   ])
 );

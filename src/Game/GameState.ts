@@ -6,7 +6,7 @@ import BoardDefinition from "../Rules/BoardDefinition.js";
 import ButtonDefinition from "../Rules/ButtonDefinition.js";
 import CounterDefinition from "../Rules/CounterDefinition.js";
 import GameDefinition from "../Rules/GameDefinition.js";
-import { Label } from "../Rules/LabelManager.js";
+import { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
 import PileDefinition from "../Rules/PileDefinition.js";
 import StepDefinition from "../Rules/StepDefinition.js";
 import { BoardID, PileState, PlayerID, Visibility } from "../schemas/types.js";
@@ -173,12 +173,20 @@ export default class GameState {
         }
     }
 
+    moveToPhase(phaseName: PhaseLabel) {
+        const phase = this.gameLabels.getPhaseFromLabel(phaseName);
+
+        if (!phase || !phase.steps[0]) return;
+
+        this.currentStep = phase.steps[0];
+    }
+
     /**
      * Moves the game state to the next step.
      * @param stepName - The label of the next step.
      * @returns undefined if the step does not exist.
      */
-    moveToStep(stepName: string) {
+    moveToStep(stepName: StepLabel) {
         const step = this.gameLabels.getStepFromLabel(stepName);
 
         if (!step) return;

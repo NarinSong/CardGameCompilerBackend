@@ -1,5 +1,5 @@
 import Game from "../Game/Game.js";
-import { Label } from "../Rules/LabelManager.js";
+import { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
 import { PileState, Visibility } from "../schemas/types.js";
 import Card from "./Card.js";
 
@@ -203,6 +203,21 @@ function evaluateAssignRoleSingular(g: Game, c: ActionContext, node: ActionNode)
     return false;
 }
 
+
+function evaluateSmallerThan(g: Game, c: ActionContext, node: ActionNode): boolean {
+
+    let first = evaluate(g, c, node.primary);
+    let second = evaluate(g, c, node.secondary);
+
+    const map = g.definition.gameMeta.maps['CARD_RANK_MAP'];
+    if (!map) return false;
+
+    let firstVal = map.get(first);
+    let secondVal = map.get(second);
+
+    return firstVal < secondVal;
+}
+
 /**
  * Executes a "ADD_VARIABLE" value node.
  * @param g - The current game instance.
@@ -243,6 +258,23 @@ function executeUpdateVariable(g: Game, c: ActionContext, node: ValueNode) {
     g.definition.gameMeta.variables[name] = value;
 
     return value;
+}
+
+function executeSetPhase(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== 'SET_PHASE') throw new Error("Called executeSetPhase with invalid node");
+    
+    const phaseLabel: PhaseLabel = evaluate(g, c, node.primary);
+
+    g.gameState.moveToPhase(phaseLabel);
+}
+
+
+function executeSetStep(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== 'SET_STEP') throw new Error("Called executeSetStep with invalid node");
+    
+    const stepLabel: StepLabel = evaluate(g, c, node.primary);
+
+    g.gameState.moveToStep(stepLabel);
 }
 
 // Note: calls to evaluate should *always* be wrapped in a try-catch :)
@@ -304,6 +336,9 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | un
         case 'ADD_VARIABLE': return executeAddVariable(g, c, node);
         case 'UPDATE_VARIABLE': return executeUpdateVariable(g, c, node);
         case 'GET_VARIABLE': return g.definition.gameMeta.variables[evaluate(g, c, node.name) as string];
+        // Phase and Step Logic
+        case 'SET_PHASE': executeSetPhase(g, c, node); return;
+        case 'SET_STEP': executeSetStep(g, c, node); return;
     }
 
     //throw new Error(`Unsupported type ${node.type}`);

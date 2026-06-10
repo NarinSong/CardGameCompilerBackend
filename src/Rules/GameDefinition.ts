@@ -120,7 +120,7 @@ export default class GameDefinition {
         displayName?: string | undefined,
         actionRoles?: string[] | undefined,
         type?: ButtonType | undefined,
-        range: { min?: number | undefined, max?: number | undefined, increment?: number | undefined } | undefined,
+        range?: { min?: number | undefined, max?: number | undefined, increment?: number | undefined } | undefined,
     }) {
         const button = new ButtonDefinition({ labelManager: this.labelManger, ... definition });
         this.board.buttons.push(button);

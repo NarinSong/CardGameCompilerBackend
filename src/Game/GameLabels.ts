@@ -1,5 +1,5 @@
 import GamePhaseDefinition from "../Rules/GamePhaseDefinition.js";
-import LabelManager, { Label, StepLabel } from "../Rules/LabelManager.js";
+import LabelManager, { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
 import StepDefinition from "../Rules/StepDefinition.js";
 import Button from "./Button.js";
 import Counter from "./Counter.js";
@@ -69,6 +69,10 @@ export default class GameLabels {
      */
     getFromLabel(label: Label) {
         return this.gameObjectLabels[label];
+    }
+
+    getPhaseFromLabel(label: PhaseLabel) {
+        return this.gamePhaseLabels[label];
     }
 
     /**
