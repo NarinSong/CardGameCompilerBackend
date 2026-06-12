@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ActionNodeSchema, ValueNodeSchema } from "./AST.js";
-import { ActionRoleSchema, ActionRolesSchema, PileStateSchema, TriggerTypeSchema, VisibilitySchema } from "./types.js";
+import { ActionRoleSchema, ActionRolesSchema, ButtonTypeSchema, PileStateSchema, TriggerTypeSchema, Visibility, VisibilitySchema } from "./types.js";
 
 // Arguments to definitions
 export const GameMetaArgsSchema = z.object({
@@ -30,9 +30,23 @@ export const CounterSchema = z.object({
     actionRoles: ActionRolesSchema.optional(),
 });
 
+export const ButtonSchema = z.object({
+    label: z.string().optional(),
+    visibility: VisibilitySchema.optional(),
+    actionRoles: ActionRolesSchema.optional(),
+    displayName: z.string().optional(),
+    type: ButtonTypeSchema.optional(),
+    range: z.object({
+        min: z.number().optional(),
+        max: z.number().optional(),
+        increment: z.number().optional(),
+    }).optional(),
+})
+
 export const PlayerSchema = z.object({
     piles: z.array(PileSchema).optional(),
     counters: z.array(CounterSchema).optional(),
+    buttons: z.array(ButtonSchema).optional(),
 })
 
 export const BoardSchema = z.object({
