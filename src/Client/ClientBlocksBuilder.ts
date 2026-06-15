@@ -22,7 +22,6 @@ function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDe
     switch (blockNode.kind) {
         case 'block':
             return nonLiteralBlockNodeToAst(blockNode);
-            break;
         case 'literal':
             const literal: ValueNode = {
                 type: 'Literal',
