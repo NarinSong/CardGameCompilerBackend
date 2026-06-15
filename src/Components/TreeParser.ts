@@ -28,6 +28,18 @@ function executeCreateArray(g: Game, c: ActionContext, node: ValueNode) {
     return arr;
 }
 
+function executeForEach(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== 'FOR_EACH') throw new Error("Called executeForEach with an invalid node");
+
+    const array = evaluate(g, c, node.primary);
+
+    // TODO: somehow pass array value as part of the context?
+
+    for (let n of array) {
+        evaluate(g, c, node.secondary);
+    }
+}
+
 /**
  * Executes a "DEAL_CARDS" action node.
  * @param g - The current game instance.
@@ -313,6 +325,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | un
         // Game Logic
         case 'IF': if (evaluate(g, c, node.primary)) { evaluate(g, c, node.secondary) } else if (node.tertiary) { evaluate(g, c, node.tertiary) }; return;
         case 'SEQUENCE': for (let action of node.primary) { evaluate(g, c, action); } return;
+        case 'FOR_EACH': executeForEach(g, c, node); return;
         // Game Actions
         case 'DEAL_CARDS': executeDealCards(g, c, node); return;
         case 'CREATE_PILE': return executeCreatePile(g, c, node);

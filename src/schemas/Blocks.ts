@@ -14,6 +14,8 @@ export const ValueTypes = {
   PileStateEnum: PileStateSchema,
   VisibilityEnum: VisibilitySchema,
   ActionRoleArray: z.string().array(),
+  Undefined: z.undefined(),
+  Array: z.array(z.any()),
 } as const;
 
 export type ValueTypeName = keyof typeof ValueTypes;
@@ -47,6 +49,16 @@ function defineBlock<
 }
 
 // Each block is created using the "defineBlock" helper function
+
+const UNDEFINED = defineBlock({
+    name: "UNDEFINED",
+    displayName: "Undefined",
+    returnType: "Undefined",
+    arguments: []
+});
+
+
+
 const DEAL_CARDS = defineBlock({
     name: "DEAL_CARDS",
     displayName: "Deal Cards",
@@ -154,12 +166,33 @@ const IF = defineBlock({
     ]
 });
 
+const FOR_EACH = defineBlock({
+    "name": "FOR_EACH",
+    "displayName": "For",
+    "returnType": "Void",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Array",
+            "type": "Array",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Do",
+            "type": "Void",
+            "optional": false
+        }
+    ]
+})
+
 // Put the blocks together in a registry to export them
 export const BLOCKS = {
   DEAL_CARDS,
   CREATE_PILE,
   REMOVE_PILE,
   IF,
+  FOR_EACH,
 } as const;
 
 export type BlockName = keyof typeof BLOCKS;

@@ -1,6 +1,6 @@
 // Schemas are used to verify client input (using zod)
 
-import { number, z } from "zod";
+import { z } from "zod";
 
 const Literal = z.literal("LITERAL");
 const Structures = z.literal("ARRAY");
@@ -195,6 +195,12 @@ export const ActionNodeSchema: z.ZodType<any> = z.lazy(() =>
     z.object({
       type: z.literal("SEQUENCE"),
       primary: z.array(ActionNodeSchema)
+    }),
+
+    z.object({
+      type: z.literal("FOR_EACH"),
+      primary: ValueNodeSchema,
+      secondary: ActionNodeSchema,
     }),
 
     /* Game actions */
