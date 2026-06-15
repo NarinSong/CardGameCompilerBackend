@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS blockeditorsaves (
 
     FOREIGN KEY (creator) REFERENCES users(id),
     FOREIGN KEY (parent) REFERENCES blockeditorsaves(id)
-)
+);
 
 -- These are used to set the starting user ID's to large numbers, so that they don't conflict with true/false checks at 0
 -- ALTER TABLE savedrules AUTO_INCREMENT=1001;
