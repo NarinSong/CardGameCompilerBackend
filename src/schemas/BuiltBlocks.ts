@@ -1,14 +1,25 @@
 // This file is for blocks that are put together on the client side and sent to the server
 
 import { z } from "zod";
-import { ArgDef, BlockName, BlockNames, BLOCKS, ValueTypeName, ValueTypes } from "./Blocks";
-import { BoardSchema, GameMetaArgsSchema, PlayerSchema, TriggerSchema } from "./GameDefinitionArgs";
+import { ArgDef, BlockName, BlockNames, BLOCKS, ValueTypeName, ValueTypeNameSchema, ValueTypes } from "./Blocks.js";
+import { BoardSchema, GameMetaArgsSchema, PlayerSchema, TriggerSchema } from "./GameDefinitionArgs.js";
 
 type LiteralNode = {
   kind: "literal";
   valueType: ValueTypeName;
-  value: unknown; // literals can be anything
+  value: any; // literals can be anything
 };
+
+export type SequenceNode = {
+  kind: "sequence",
+  blocks: ClientNode[]
+}
+
+export type ArrayNode = {
+  kind: "array",
+  valueType: ValueTypeName,
+  value: ClientNode[];
+}
 
 export type BlockNode = {
   kind: "block";
@@ -17,24 +28,33 @@ export type BlockNode = {
 };
 
 // ClientNode is any block or literal sent by the client
-export type ClientNode = LiteralNode | BlockNode;
+export type ClientNode = LiteralNode | BlockNode | SequenceNode | ArrayNode;
 
 
 // These Zod schemas verify structure only. That they are blocks, rather than what blocks they are.
 const LiteralSchema = z.object({
   kind: z.literal("literal"),
-  valueType: z.enum(["Void", "Number", "String", "Boolean", "PileLabel"]),
-  value: z.unknown(),
+  valueType: ValueTypeNameSchema,
+  value: z.any(),
 });
 
 const ClientNodeSchema: z.ZodType<ClientNode> = z.lazy(() =>
-  z.union([
+  z.discriminatedUnion('kind', [
     LiteralSchema,
     z.object({
       kind: z.literal("block"),
       block: z.enum(BlockNames),
-      args: z.record(z.string(), ClientNodeSchema),
+      args: z.record(z.string(), ClientNodeSchema as z.ZodType<BlockNode>),
     }),
+    z.object({
+      kind: z.literal("sequence"),
+      blocks: z.array(ClientNodeSchema)
+    }),
+    z.object({
+      kind: z.literal("array"),
+      valueType: ValueTypeNameSchema,
+      value: z.array(ClientNodeSchema),
+    })
   ])
 );
 
@@ -43,6 +63,12 @@ const ClientNodeSchema: z.ZodType<ClientNode> = z.lazy(() =>
 function inferNodeType(node: ClientNode): ValueTypeName {
   if (node.kind === "literal") {
     return node.valueType;
+  }
+  if (node.kind === "sequence") {
+    return "Void";
+  }
+  if (node.kind === "array") {
+    return "Array";
   }
 
   const block = BLOCKS[node.block as BlockName];
@@ -60,6 +86,34 @@ export function validateNode(node: ClientNode): void {
     const schema = ValueTypes[node.valueType];
 
     schema.parse(node.value);
+
+    return;
+  }
+  if (node.kind === "sequence") {
+    for (const block of node.blocks) {
+      // Sequence doesn't care about the return types of the child nodes
+      validateNode(block);
+    }
+
+    return;
+  }
+  if (node.kind === "array") {
+    for (const value of node.value) {
+      if (typeof value === 'undefined') {
+          throw new Error(`Undefined array value`);
+      }
+
+      validateNode(value);
+
+      const actualType = inferNodeType(value);
+
+      if (actualType !== node.valueType) {
+        throw new Error(
+          `Type mismatch for array: expected ${node.valueType}, got ${actualType}`
+        );
+      }
+    }
+
 
     return;
   }

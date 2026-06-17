@@ -1,0 +1,96 @@
+{
+  "gameMeta": {
+    "minPlayers": 1,
+    "maxPlayers": 32,
+    "name": "Pickup"
+  },
+  "playerDefinition": {},
+  "boardDefinition": {
+    "piles": [
+            {
+                "label": "Deck",
+                "initialState": "SHUFFLED",
+                "visibility": "FACE_DOWN"
+            }
+        ]
+  },
+  "phases": [
+    {
+        "name": "Main",
+        "steps": [
+            {
+                "name": "step1",
+                "actions": [
+                    {
+                        "trigger": { "type": "CLICK", "target": "Deck" },
+                        "filter": null,
+                        "result": {
+                            "kind": "sequence",
+                            "blocks": [
+                                {
+                                    "kind": "block",
+                                    "block": "DEAL_CARDS",
+                                    "args": {
+                                        "primary": {
+                                            "kind": "block",
+                                            "block": "CLICKED_LABEL",
+                                            "args": {}
+                                        },
+                                        "secondary": {
+                                            "kind": "block",
+                                            "block": "CREATE_PILE",
+                                            "args": {
+                                                "visibility": {
+                                                    "kind": "literal",
+                                                    "valueType": "Visibility",
+                                                    "value": "FACE_UP"
+                                                },
+                                                "actionRoles": {
+                                                    "kind": "array",
+                                                    "valueType": "String",
+                                                    "value": [
+                                                        {    
+                                                            "kind": "literal",
+                                                            "valueType": "String",
+                                                            "value": "Card"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "tertiary": {
+                                            "kind": "literal",
+                                            "valueType": "Number",
+                                            "value": 1
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "trigger": {"type":"CLICK", "target": "Card"},
+                        "filter": null,
+                        "result": {
+                            "kind": "block",
+                            "block": "REMOVE_PILE",
+                            "args": {
+                                "pile": {
+                                    "kind": "block",
+                                    "block": "CLICKED_LABEL",
+                                    "args": {}
+                                },
+                                "sendTo": {
+                                    "kind": "literal",
+                                    "valueType": "PileLabel",
+                                    "value": "Deck"
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+  ]
+}
