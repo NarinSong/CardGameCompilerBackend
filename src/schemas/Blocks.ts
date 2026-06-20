@@ -6,19 +6,26 @@ import { PileStateSchema, VisibilitySchema } from "./types.js";
 
 // These are the values that can be used inside the blocks and their corresponding JS types
 export const ValueTypes = {
+  Unknown: z.unknown(),
   Void: z.void(),
   Number: z.number(),
   String: z.string(),
   Boolean: z.boolean(),
   PileLabel: z.string(),
-  PileStateEnum: PileStateSchema,
-  VisibilityEnum: VisibilitySchema,
-  ActionRoleArray: z.string().array(),
+  PileState: PileStateSchema,
+  Visibility: VisibilitySchema,
   Undefined: z.undefined(),
   Array: z.array(z.any()),
 } as const;
 
-export type ValueTypeName = keyof typeof ValueTypes;
+export const ValueTypeNameSchema = z.enum(
+  Object.keys(ValueTypes) as [
+    keyof typeof ValueTypes,
+    ...(keyof typeof ValueTypes)[]
+  ]
+);
+
+export type ValueTypeName = z.infer<typeof ValueTypeNameSchema>;
 
 // Helper types and functions to define blocks
 
@@ -90,7 +97,7 @@ const CREATE_PILE = defineBlock({
         {
             name: "state",
             displayName: "Initial State",
-            type: "PileStateEnum",
+            type: "PileState",
             optional: true
         },
         {
@@ -102,7 +109,7 @@ const CREATE_PILE = defineBlock({
         {
             "name": "visibility",
             "displayName": "Visibility",
-            "type": "VisibilityEnum",
+            "type": "Visibility",
             "optional": true
         },
         {
@@ -114,7 +121,13 @@ const CREATE_PILE = defineBlock({
         {
             "name": "actionRoles",
             "displayName": "Action Roles",
-            "type": "ActionRoleArray",
+            "type": "Array",
+            "optional": true
+        },
+        {
+            "name": "owner",
+            "displayName": "Owner",
+            "type": "Number",
             "optional": true
         }
     ] as const
@@ -184,15 +197,24 @@ const FOR_EACH = defineBlock({
             "optional": false
         }
     ]
-})
+});
+
+const CLICKED_LABEL = defineBlock({
+    "name": "CLICKED_LABEL",
+    "displayName": "Clicked Label",
+    "returnType": "PileLabel",
+    "arguments": []
+});
 
 // Put the blocks together in a registry to export them
 export const BLOCKS = {
-  DEAL_CARDS,
-  CREATE_PILE,
-  REMOVE_PILE,
-  IF,
-  FOR_EACH,
+    UNDEFINED,
+    DEAL_CARDS,
+    CREATE_PILE,
+    REMOVE_PILE,
+    IF,
+    FOR_EACH,
+    CLICKED_LABEL,
 } as const;
 
 export type BlockName = keyof typeof BLOCKS;

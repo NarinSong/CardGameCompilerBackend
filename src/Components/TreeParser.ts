@@ -330,8 +330,8 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | un
         case 'DEAL_CARDS': executeDealCards(g, c, node); return;
         case 'CREATE_PILE': return executeCreatePile(g, c, node);
         case 'REMOVE_PILE': executeRemovePile(g, c, node); return;
-        case 'CLICKED_LABEL': return c.label;
         // Action context
+        case 'CLICKED_LABEL': return c.label;
         case 'CTX_CARD': return c.card;
         case 'CTX_ID': return c.id;
         // Users and roles
