@@ -6,10 +6,11 @@ import BoardDefinition from "../Rules/BoardDefinition.js";
 import ButtonDefinition from "../Rules/ButtonDefinition.js";
 import CounterDefinition from "../Rules/CounterDefinition.js";
 import GameDefinition from "../Rules/GameDefinition.js";
+import GameMeta from "../Rules/GameMeta.js";
 import { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
 import PileDefinition from "../Rules/PileDefinition.js";
 import StepDefinition from "../Rules/StepDefinition.js";
-import { BoardID, PileState, PlayerID, Visibility } from "../schemas/types.js";
+import { BoardID, Location, PileState, PlayerID, Visibility } from "../schemas/types.js";
 import Board from "./Board.js";
 import Button from "./Button.js";
 import Counter from "./Counter.js";
@@ -33,6 +34,7 @@ export default class GameState {
     piles: Record<Label, {pile: Pile, owner: PlayerID | BoardID}>;
     counters: Record<Label, {counter: Counter, owner: PlayerID | BoardID}>;
     buttons: Record<Label, {button: Button, owner: PlayerID | BoardID}>;
+    gameMeta: GameMeta;
 
     /**
      * Creates a new GameState instance.
@@ -47,6 +49,7 @@ export default class GameState {
         this.piles = {};
         this.counters = {};
         this.buttons = {};
+        this.gameMeta = definition.gameMeta; // Linked
         this.initializeBoard(definition.board);
     }
 
@@ -103,7 +106,7 @@ export default class GameState {
      * @param obj - An object containing the pile's configuration.
      * @returns The pile label.
      */
-    createPile(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined } = {}) {
+    createPile(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined, location?: Location | undefined } = {}) {
         const name = obj.name        ?? this.gameLabels.nextId;
 
         const pile = Pile.create(
@@ -113,6 +116,7 @@ export default class GameState {
             this.gameLabels,
             obj.actionRoles ?? [name],
             obj.displayName ?? name,
+            obj.location ?? this.gameMeta.nextPileLocation(),
         );
         this.piles[name] = { pile: pile, owner: obj.owner ?? -1 };
 
@@ -124,7 +128,7 @@ export default class GameState {
      * @param obj - An object containing the pile's configuration.
      * @returns The pile label.
      */
-    createPileOnBoard(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined } = {}) {
+    createPileOnBoard(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, location?: Location | undefined } = {}) {
         return this.createPile({ ...obj, owner: -1 });
     }
 
@@ -133,7 +137,7 @@ export default class GameState {
      * @param obj - An object containing the pile's configuration.
      * @returns The pile label.
      */
-    createPileForPlayer(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | undefined } = {}) {
+    createPileForPlayer(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | undefined, location?: Location | undefined } = {}) {
         return this.createPile(obj);
     }
 

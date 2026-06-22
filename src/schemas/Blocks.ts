@@ -26,6 +26,10 @@ export const ValueTypes = {
   PlayerRole: z.string(),
   Step: z.string(),
   Phase: z.string(),
+  Location: z.object({
+    x: z.number(),
+    y: z.number(),
+  })
 } as const;
 
 export const ValueTypeNameSchema = z.enum(
@@ -138,6 +142,12 @@ const CREATE_PILE = defineBlock({
             "name": "owner",
             "displayName": "Owner",
             "type": "Number",
+            "optional": true
+        },
+        {
+            "name": "location",
+            "displayName": "Location",
+            "type": "Location",
             "optional": true
         }
     ] as const

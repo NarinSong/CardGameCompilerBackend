@@ -2,7 +2,7 @@
 // Note: anything starting with # will not be sent
 
 import ValueMap from "../Components/ValueMap.js";
-import { ButtonType, PlayerID, PlayerType, Visibility } from "../schemas/types.js";
+import { ButtonType, Location, PlayerID, PlayerType, Visibility } from "../schemas/types.js";
 import Board from "../Game/Board.js";
 import Counter from "../Game/Counter.js";
 import Game from "../Game/Game.js";
@@ -10,9 +10,9 @@ import Pile from "../Game/Pile.js";
 import Player from "../Game/Player.js";
 import Button from "../Game/Button.js";
 
-type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number, id: number}[], label: string, displayName: string, actionRoles: string[] };
-type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[] };
-type ClientButtonType = { owner: number, visibility: Visibility, label: string, actionRoles: string[], displayName: string, type: ButtonType, range: { min: number | undefined, max: number | undefined, increment: number } | undefined };
+type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number, id: number}[], label: string, displayName: string, actionRoles: string[], location: Location };
+type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[], location: Location };
+type ClientButtonType = { owner: number, visibility: Visibility, label: string, actionRoles: string[], displayName: string, type: ButtonType, range: { min: number | undefined, max: number | undefined, increment: number } | undefined, location: Location };
 type ClientPlayerType = { playerId: PlayerID, type: PlayerType };
 
 /**
@@ -75,6 +75,7 @@ export default class ClientView {
             actionRoles: pile.actionRoles,
             displayName: pile.displayName,
             cards: cards,
+            location: pile.location,
         };
 
         return pileView;
@@ -99,6 +100,7 @@ export default class ClientView {
             label: counter.label,
             displayName: counter.displayName,
             actionRoles: counter.actionRoles,
+            location: counter.location,
         }
 
         return counterView;
@@ -117,6 +119,7 @@ export default class ClientView {
             actionRoles: button.actionRoles,
             type: button.type,
             range: button.range,
+            location: button.location,
         }
 
         return buttonView;

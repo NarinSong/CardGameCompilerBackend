@@ -11,7 +11,7 @@ import LabelManager, { PhaseLabel, StepLabel } from "./LabelManager.js";
 import PileDefinition from "./PileDefinition.js";
 import PlayerDefinition from "./PlayerDefinition.js";
 import StepDefinition from "./StepDefinition.js";
-import { ButtonType, PileState, Visibility } from "../schemas/types.js";
+import { ButtonType, Location, PileState, Visibility } from "../schemas/types.js";
 import Game from "../Game/Game.js";
 import Logger from "../Components/Logger.js";
 import ButtonDefinition from "./ButtonDefinition.js";
@@ -61,8 +61,15 @@ export default class GameDefinition {
             actionRole?: string | undefined,
             initialValue?: PileState | undefined,
             visibility?: Visibility | undefined,
+            location?: Location | undefined,
         }) {
-        const pile = new PileDefinition({ labelManager: this.labelManger, ... definition });
+
+        const dfn = {
+            ... definition,
+            location: definition.location ?? this.gameMeta.nextPileLocation()
+        };
+
+        const pile = new PileDefinition({ labelManager: this.labelManger, ... dfn });
         this.player.piles.push(pile);
     }
 
@@ -76,8 +83,15 @@ export default class GameDefinition {
             actionRole?: string | undefined,
             initialValue?: number | undefined,
             visibility?: Visibility | undefined,
+            location?: Location | undefined,
         }) {
-        const counter = new CounterDefinition({ labelManager: this.labelManger, ... definition });
+
+        const dfn = {
+            ... definition,
+            location: definition.location ?? this.gameMeta.nextCounterLocation()
+        };
+
+        const counter = new CounterDefinition({ labelManager: this.labelManger, ... dfn });
         this.player.counters.push(counter);
     }
 
@@ -91,8 +105,15 @@ export default class GameDefinition {
             actionRole?: string | undefined,
             initialValue?: PileState | undefined,
             visibility?: Visibility | undefined,
+            location?: Location | undefined,
         }) {
-        const pile = new PileDefinition({ labelManager: this.labelManger, ... definition });
+
+        const dfn = {
+            ... definition,
+            location: definition.location ?? this.gameMeta.nextPileLocation()
+        };
+
+        const pile = new PileDefinition({ labelManager: this.labelManger, ... dfn });
         this.board.piles.push(pile);
     }
 
@@ -106,8 +127,15 @@ export default class GameDefinition {
             actionRole?: string | undefined,
             initialValue?: number | undefined,
             visibility?: Visibility | undefined,
+            location?: Location | undefined,
         }) {
-        const counter = new CounterDefinition({ labelManager: this.labelManger, ... definition });
+
+        const dfn = {
+            ... definition,
+            location: definition.location ?? this.gameMeta.nextCounterLocation()
+        };
+
+        const counter = new CounterDefinition({ labelManager: this.labelManger, ... dfn });
         this.board.counters.push(counter);
     }
 
@@ -121,8 +149,15 @@ export default class GameDefinition {
         actionRoles?: string[] | undefined,
         type?: ButtonType | undefined,
         range?: { min?: number | undefined, max?: number | undefined, increment?: number | undefined } | undefined,
+        location?: Location | undefined,
     }) {
-        const button = new ButtonDefinition({ labelManager: this.labelManger, ... definition });
+
+        const dfn = {
+            ... definition,
+            location: definition.location ?? this.gameMeta.nextButtonLocation()
+        };
+
+        const button = new ButtonDefinition({ labelManager: this.labelManger, ... dfn });
         this.board.buttons.push(button);
     }
 

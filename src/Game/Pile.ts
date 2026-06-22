@@ -1,7 +1,7 @@
 import Card from "../Components/Card.js";
 import { Label } from "../Rules/LabelManager.js";
 import PileDefinition from "../Rules/PileDefinition.js";
-import { ActionRole, DisplayName, PileState, Visibility } from "../schemas/types.js";
+import { ActionRole, DisplayName, Location, PileState, Visibility } from "../schemas/types.js";
 import GameLabels from "./GameLabels.js";
 
 /**
@@ -15,6 +15,7 @@ export default class Pile {
     visibility: Visibility;
     actionRoles: ActionRole[];
     displayName: DisplayName;
+    location: Location;
 
     /**
      * Creates a new pile.
@@ -35,12 +36,14 @@ export default class Pile {
         gameLabels: GameLabels,
         actionRoles: ActionRole[],
         displayName: DisplayName,
+        location: Location,
     ) {
         this.cards = Card.fromInitialState(initialState);
         this.label = label;
         this.visibility = visibility;
         this.actionRoles = actionRoles;
         this.displayName = displayName;
+        this.location = location;
 
         gameLabels.registerPile(this, this.label);
     }
@@ -59,6 +62,7 @@ export default class Pile {
             gameLabels,
             definition.actionRoles,
             definition.displayName,
+            definition.location,
         );
     }
 
@@ -79,7 +83,8 @@ export default class Pile {
         gameLabels: GameLabels,
         actionRoles: ActionRole[],
         displayName: DisplayName,
+        location: Location,
     ) {
-        return new Pile(initialState, label, visibility, gameLabels, actionRoles, displayName);
+        return new Pile(initialState, label, visibility, gameLabels, actionRoles, displayName, location);
     }
 }

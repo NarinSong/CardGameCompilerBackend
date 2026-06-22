@@ -1,6 +1,7 @@
 // Schemas are used to verify client input (using zod)
 
 import { z } from "zod";
+import { LocationSchema } from "./types";
 
 const Literal = z.literal("LITERAL");
 const Structures = z.literal("ARRAY");
@@ -90,7 +91,8 @@ export const ValueNodeSchema: z.ZodType<any> = z.lazy(() =>
       visibility: ValueNodeSchema,
       actionRoles: ValueNodeSchema,
       displayName: ValueNodeSchema,
-      owner: ValueNodeSchema
+      owner: ValueNodeSchema,
+      location: LocationSchema,
     }),
 
     z.object({

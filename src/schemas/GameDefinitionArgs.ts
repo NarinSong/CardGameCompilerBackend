@@ -11,7 +11,10 @@ export const GameMetaArgsSchema = z.object({
     clientSuitMap: z.record(z.string(), z.number()).optional(),
     clientRankMap: z.record(z.string(), z.number()).optional(),
     variables: z.record(z.string(), z.number()).optional(),
-
+    locations: z.record(z.string(), z.object({
+        x: z.number(),
+        y: z.number(),
+    })).optional(),
 })
 
 export const PileSchema = z.object({

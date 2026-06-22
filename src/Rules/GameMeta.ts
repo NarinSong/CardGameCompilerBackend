@@ -1,5 +1,6 @@
 import ValueMap, { CardValueMap, DEFAULT_CARD_RANK_MAP, DEFAULT_CLIENT_VIEW_RANK_MAP, DEFAULT_CLIENT_VIEW_SUIT_MAP, DEFAULT_VALUE_MAP } from "../Components/ValueMap.js";
 import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
+import { Location } from "../schemas/types.js";
 
 
 /**
@@ -16,6 +17,7 @@ export default class GameMeta {
     clientSuitMap: ValueMap<string, number>;
     clientRankMap: ValueMap<string, number>;
     variables: Record<string, number>;
+    locations: Record<string, Location>;
 
     /**
      * Creates a new GameMeta configuration.
@@ -30,6 +32,50 @@ export default class GameMeta {
         this.clientSuitMap = obj.clientSuitMap ? new ValueMap<string, number>(obj.clientSuitMap) : DEFAULT_CLIENT_VIEW_SUIT_MAP;
         this.clientRankMap = obj.clientRankMap ? new ValueMap<string, number>(obj.clientRankMap) : DEFAULT_CLIENT_VIEW_RANK_MAP;
         this.variables = obj.variables ?? {};
+        this.locations = {
+            'DEFAULT_PILE': {x: 0, y: 50},
+            'DEFAULT_BUTTON': {x: 0, y: -50},
+            'DEFAULT_COUNTER': {x: 0, y: 0},
+        };
+
+        for (let i in obj.locations) {
+            if (!obj.locations[i]) continue;
+            this.locations[i] = obj.locations[i];
+        }
+    }
+
+    nextLocation(location: Location): Location {
+        const x = location.x + 10;
+        if (x > 100)
+            return { x: -100, y: location.y + 10 };
+
+        return { x: x, y: location.y };
+    }
+
+    nextLocationFor(type: string): Location {
+        let defaultLocation = this.locations[type];
+
+        if (!defaultLocation) {
+            defaultLocation = { x: 0, y: 0 };
+        }
+
+        defaultLocation = this.nextLocation(defaultLocation);
+
+        this.locations[type] = defaultLocation;
+
+        return defaultLocation;
+    }
+
+    nextPileLocation(): Location {
+        return this.nextLocationFor('DEFAULT_PILE');
+    }
+
+    nextButtonLocation(): Location {
+        return this.nextLocationFor('DEFAULT_BUTTON');
+    }
+
+    nextCounterLocation(): Location {
+        return this.nextLocationFor('DEFAULT_COUNTER');
     }
 
     // Prevent the minimum number of players from being larger than the maximum

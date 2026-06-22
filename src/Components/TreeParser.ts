@@ -1,6 +1,6 @@
 import Game from "../Game/Game.js";
 import { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
-import { PileState, Visibility } from "../schemas/types.js";
+import { Location, PileState, Visibility } from "../schemas/types.js";
 import Card from "./Card.js";
 
 // Using Zod schemas
@@ -71,7 +71,8 @@ function executeCreatePile(g: Game, c: ActionContext, node: ValueNode) {
                 visibility: evaluate(g, c, node.visibility) as Visibility | undefined,
                 actionRoles: evaluate(g, c, node.actionRoles) as string[] | undefined,
                 displayName: evaluate(g, c, node.displayName) as string | undefined,
-                owner: evaluate(g, c, node.owner) as number | undefined
+                owner: evaluate(g, c, node.owner) as number | undefined,
+                location: evaluate(g, c, node.location) as Location | undefined,
             });
 }
 

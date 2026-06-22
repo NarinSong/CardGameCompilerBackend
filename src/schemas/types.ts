@@ -73,6 +73,10 @@ export const DisplayNameSchema = z.string();
 export const ActionRoleSchema = z.string();
 export const ActionRolesSchema = z.array(z.string());
 export const PlayerIDSchema = z.number();
+export const LocationSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+});
 
 /* BoardID must equal -1 */
 export const BoardIDSchema = z.literal(-1);
@@ -96,6 +100,7 @@ export type PlayerID = z.infer<typeof PlayerIDSchema>;
 export type BoardID = z.infer<typeof BoardIDSchema>;
 export type rank = z.infer<typeof RankSchema>;
 export type suit = z.infer<typeof SuitSchema>;
+export type Location = z.infer<typeof LocationSchema>;
 
 // IDs
 export type ClientID = number;
