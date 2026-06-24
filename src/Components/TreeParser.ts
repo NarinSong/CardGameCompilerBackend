@@ -7,6 +7,8 @@ import Card from "./Card.js";
 import { ActionContext, ValueNode, AST } from "../schemas/AST.js";
 import Player from "../Game/Player.js";
 import { ValueReturn } from "../schemas/Blocks.js";
+import { NODE_NAMES } from "../schemas/Constants.js";
+import { NodeBenchmarkRunner } from "vitest/dist/runners.js";
 
 // Helper functions
 /**
@@ -311,54 +313,58 @@ function executeSetStep(g: Game, c: ActionContext, node: ValueNode) {
 export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
     switch (node.type) {
         // Literal
-        case 'UNDEFINED': return undefined;
-        case 'LITERAL': return node.primary;
-        case 'ARRAY': return executeCreateArray(g, c, node);
+        case NODE_NAMES.Undefined: return undefined;
+        case NODE_NAMES.Literal: return node.primary;
+        case NODE_NAMES.Array: return executeCreateArray(g, c, node);
         // Boolean
-        case 'AND': return evaluate(g, c, node.primary) && evaluate(g, c, node.secondary);
-        case 'OR': return evaluate(g, c, node.primary) || evaluate(g, c, node.secondary);
-        case 'NOT': return !evaluate(g, c, node.primary);
+        case NODE_NAMES.And: return evaluate(g, c, node.primary) && evaluate(g, c, node.secondary);
+        case NODE_NAMES.Or: return evaluate(g, c, node.primary) || evaluate(g, c, node.secondary);
+        case NODE_NAMES.Not: return !evaluate(g, c, node.primary);
+        case NODE_NAMES.LessThan: return (evaluate(g, c, node.primary) as number) < (evaluate(g, c, node.secondary) as number);
+        case NODE_NAMES.GreaterThan: return (evaluate(g, c, node.primary) as number) > (evaluate(g, c, node.secondary) as number);
+        case NODE_NAMES.Equal: return (evaluate(g, c, node.primary) as number) == (evaluate(g, c, node.secondary) as number);
         // Arithmetic
-        case 'PLUS': return (evaluate(g, c, node.primary) as number) + (evaluate(g, c, node.secondary) as number);
-        case 'TIMES': return (evaluate(g, c, node.primary) as number) * (evaluate(g, c, node.secondary) as number);
-        case 'MINUS': return (evaluate(g, c, node.primary) as number) - (evaluate(g, c, node.secondary) as number);
-        case 'DIV': return (evaluate(g, c, node.primary) as number) / (evaluate(g, c, node.secondary) as number);
+        case NODE_NAMES.Plus: return (evaluate(g, c, node.primary) as number) + (evaluate(g, c, node.secondary) as number);
+        case NODE_NAMES.Times: return (evaluate(g, c, node.primary) as number) * (evaluate(g, c, node.secondary) as number);
+        case NODE_NAMES.Minus: return (evaluate(g, c, node.primary) as number) - (evaluate(g, c, node.secondary) as number);
+        case NODE_NAMES.Div: return (evaluate(g, c, node.primary) as number) / (evaluate(g, c, node.secondary) as number);
         // Strings
-        case 'STRING_EQ': return (evaluate(g, c, node.primary) as string) == (evaluate(g, c, node.secondary) as string);
+        case NODE_NAMES.StringEq: return (evaluate(g, c, node.primary) as string) == (evaluate(g, c, node.secondary) as string);
         // Ternary
-        case 'TERNARY': return evaluate(g, c, node.primary) ? evaluate(g, c, node.secondary) : evaluate(g, c, node.tertiary);
+        case NODE_NAMES.Ternary: return evaluate(g, c, node.primary) ? evaluate(g, c, node.secondary) : evaluate(g, c, node.tertiary);
         // Game Logic
-        case 'IF': if (evaluate(g, c, node.primary)) { evaluate(g, c, node.secondary) } else if (node.tertiary) { evaluate(g, c, node.tertiary) }; return;
-        case 'SEQUENCE': for (let action of node.primary) { evaluate(g, c, action); } return;
+        case NODE_NAMES.If: if (evaluate(g, c, node.primary)) { evaluate(g, c, node.secondary) } else if (node.tertiary) { evaluate(g, c, node.tertiary) }; return;
+        case NODE_NAMES.Sequence: for (let action of node.primary) { evaluate(g, c, action); } return;
+        case NODE_NAMES.While: while (evaluate(g,c,node.primary)) {evaluate(g,c,node.secondary)}; return;
         //case 'FOR_EACH': executeForEach(g, c, node); return;
         // Game Actions
-        case 'DEAL_CARDS': executeDealCards(g, c, node); return;
-        case 'CREATE_PILE': return executeCreatePile(g, c, node);
-        case 'REMOVE_PILE': executeRemovePile(g, c, node); return;
+        case NODE_NAMES.DealCards: executeDealCards(g, c, node); return;
+        case NODE_NAMES.CreatePile: return executeCreatePile(g, c, node);
+        case NODE_NAMES.RemovePile: executeRemovePile(g, c, node); return;
         // Action context
-        case 'CLICKED_LABEL': return c.label;
-        case 'CTX_CARD': return c.card;
-        case 'CTX_ID': return c.id;
+        case NODE_NAMES.ClickedLabel: return c.label;
+        case NODE_NAMES.CtxCard: return c.card;
+        case NODE_NAMES.CtxId: return c.id;
         // Users and roles
-        case 'GET_ID_FROM_ROLE': return evaluateIdFromRole(g, c, node);
-        case 'PILE_OF': return evaluatePileOf(g, c, node);
-        case 'HAS_ROLE': return evaluateIdHasRole(g, c, node);
-        case 'ASSIGN_ROLE': return evaluateAssignRole(g, c, node);
-        case 'UNASSIGN_ROLE': return evaluateUnassignRole(g, c, node);
-        case 'ASSIGN_ROLE_SINGULAR': return evaluateAssignRoleSingular(g, c, node);
+        case NODE_NAMES.GetIdFromRole: return evaluateIdFromRole(g, c, node);
+        case NODE_NAMES.PileOf: return evaluatePileOf(g, c, node);
+        case NODE_NAMES.HasRole: return evaluateIdHasRole(g, c, node);
+        case NODE_NAMES.AssignRole: return evaluateAssignRole(g, c, node);
+        case NODE_NAMES.UnassignRole: return evaluateUnassignRole(g, c, node);
+        case NODE_NAMES.AssignRoleSingular: return evaluateAssignRoleSingular(g, c, node);
         // Game info extraction
-        case 'RANK': return (evaluate(g, c, node.primary) as Card).rank;
-        case 'SUIT': return (evaluate(g, c, node.primary) as Card).suit;
+        case NODE_NAMES.Rank: return (evaluate(g, c, node.primary) as Card).rank;
+        case NODE_NAMES.Suit: return (evaluate(g, c, node.primary) as Card).suit;
         // Map usage
-        case 'MAP': return (g.definition.gameMeta.maps[ evaluate(g, c, node.secondary) as string ]?.get( evaluate(g, c, node.primary) ));
-        case 'ADD_VARIABLE': return executeAddVariable(g, c, node);
-        case 'UPDATE_VARIABLE': return executeUpdateVariable(g, c, node);
-        case 'GET_VARIABLE': return g.definition.gameMeta.variables[evaluate(g, c, node.name) as string];
+        case NODE_NAMES.Map: return (g.definition.gameMeta.maps[ evaluate(g, c, node.secondary) as string ]?.get( evaluate(g, c, node.primary) ));
+        case NODE_NAMES.AddVariable: return executeAddVariable(g, c, node);
+        case NODE_NAMES.UpdateVariable: return executeUpdateVariable(g, c, node);
+        case NODE_NAMES.GetVariable: return g.definition.gameMeta.variables[evaluate(g, c, node.name) as string];
         // Phase and Step Logic
-        case 'SET_PHASE': executeSetPhase(g, c, node); return;
-        case 'SET_STEP': executeSetStep(g, c, node); return;
+        case NODE_NAMES.SetPhase: executeSetPhase(g, c, node); return;
+        case NODE_NAMES.SetStep: executeSetStep(g, c, node); return;
     }
 
-    //throw new Error(`Unsupported type ${node.type}`);
+    throw new Error(`Unsupported type ${node.type}`);
 }
 

@@ -3,91 +3,70 @@
 import { z } from "zod";
 import { TriggerSchema, LabelSchema, CardSchema } from "./types.js";
 import { ValueReturn, ValueReturnSchema } from "./Blocks.js";
-
-export const AST_NAMES = {
-  Undefined: "UNDEFINED",
-  Array: "ARRAY",
-  Literal: "LITERAL",
-  Not: "NOT",
-  And: "AND",
-  Or: "OR",
-  Plus: "PLUS",
-  Times: "TIMES",
-  Div: "DIV",
-  Minus: "MINUS",
-  StringEq: "STRING_EQ",
-  Map: "MAP",
-  Ternary: "TERNARY",
-  ClickedLabel: "CLICKED_LABEL",
-  CtxId: "CTX_ID",
-  CtxCard: "CTX_CARD",
-  Rank: "RANK",
-  Suit: "SUIT",
-  SetPhase: "SET_PHASE",
-  SetStep: "SET_STEP",
-  HasRole: "HAS_ROLE",
-  AssignRole: "ASSIGN_ROLE",
-  UnassignRole: "UNASSIGN_ROLE",
-  AssignRoleSingular: "ASSIGN_ROLE_SINGULAR",
-  DealCards: "DEAL_CARDS",
-  If: "IF",
-  CreatePile: "CREATE_PILE",
-  GetIdFromRole: "GET_ID_FROM_ROLE",
-  PileOf: "PILE_OF",
-  AddVariable: "ADD_VARIABLE",
-  UpdateVariable: "UPDATE_VARIABLE",
-  GetVariable: "GET_VARIABLE",
-  Sequence: "SEQUENCE",
-  RemovePile: "REMOVE_PILE",
-} as const;
+import { NODE_NAMES } from "./Constants.js";
 
 // Group nodes based on structure
 
 const LiteralSchema = z.enum([
-  AST_NAMES.Literal,
+  NODE_NAMES.Literal,
 ]);
-const StructuresSchema = z.literal(AST_NAMES.Array);
-const UndefinedSchema = z.literal(AST_NAMES.Undefined);
+const StructuresSchema = z.literal(NODE_NAMES.Array);
+const UndefinedSchema = z.literal(NODE_NAMES.Undefined);
 
 const OperatorlessSchema = z.enum([
-  AST_NAMES.ClickedLabel,
-  AST_NAMES.CtxId,
-  AST_NAMES.CtxCard,
+  NODE_NAMES.ClickedLabel,
+  NODE_NAMES.CtxId,
+  NODE_NAMES.CtxCard,
+  NODE_NAMES.FirstPlayer,
 ]);
 const UnaryOperatorsSchema = z.enum([
-  AST_NAMES.Not,
-  AST_NAMES.Rank,
-  AST_NAMES.Suit,
-  AST_NAMES.SetPhase,
-  AST_NAMES.SetStep,
+  NODE_NAMES.Not,
+  NODE_NAMES.Rank,
+  NODE_NAMES.Suit,
+  NODE_NAMES.SetPhase,
+  NODE_NAMES.SetStep,
+  NODE_NAMES.NextPlayer,
+  NODE_NAMES.NumCardsInPile,
+  NODE_NAMES.ValueOf,
 ]);
 const BinaryOperatorsSchema = z.enum([
-  AST_NAMES.And,
-  AST_NAMES.Or,
-  AST_NAMES.Plus,
-  AST_NAMES.Times,
-  AST_NAMES.Div,
-  AST_NAMES.Minus,
-  AST_NAMES.StringEq,
-  AST_NAMES.Map
+  NODE_NAMES.And,
+  NODE_NAMES.Or,
+  NODE_NAMES.Plus,
+  NODE_NAMES.Times,
+  NODE_NAMES.Div,
+  NODE_NAMES.Minus,
+  NODE_NAMES.StringEq,
+  NODE_NAMES.Map,
+  NODE_NAMES.While,
+  NODE_NAMES.LessThan,
+  NODE_NAMES.GreaterThan,
+  NODE_NAMES.Equal,
+  NODE_NAMES.ShuffleInto,
+  NODE_NAMES.Location,
 ]);
 
 const TernaryOperatorsSchema = z.enum([
-  AST_NAMES.Ternary,
-  AST_NAMES.DealCards,
-  AST_NAMES.If,
+  NODE_NAMES.Ternary,
+  NODE_NAMES.DealCards,
+  NODE_NAMES.If,
+  NODE_NAMES.MoveCounterValue,
+  NODE_NAMES.IsBetween,
+  NODE_NAMES.Win,
+  NODE_NAMES.Lose,
+  NODE_NAMES.ButtonRange,
 ]);
 
 const RoleOperatorsSchema = z.enum([
-  AST_NAMES.AssignRole,
-  AST_NAMES.UnassignRole,
-  AST_NAMES.AssignRoleSingular,
-  AST_NAMES.HasRole,
+  NODE_NAMES.AssignRole,
+  NODE_NAMES.UnassignRole,
+  NODE_NAMES.AssignRoleSingular,
+  NODE_NAMES.HasRole,
 ]);
 
 const VariableOperatorsSchema = z.enum([
-  AST_NAMES.AddVariable,
-  AST_NAMES.UpdateVariable,
+  NODE_NAMES.AddVariable,
+  NODE_NAMES.UpdateVariable,
 ])
 
 type LiteralNames = z.infer<typeof LiteralSchema>;
@@ -130,7 +109,7 @@ export type AST_Node =
   type: StructuresNames;
   sequence: AST_Node[];
 } | {
-  type: typeof AST_NAMES.CreatePile;
+  type: typeof NODE_NAMES.CreatePile;
   state: AST_Node;
   name: AST_Node;
   visibility: AST_Node;
@@ -139,11 +118,11 @@ export type AST_Node =
   owner: AST_Node;
   location: AST_Node;
 } | {
-  type: typeof AST_NAMES.GetIdFromRole;
+  type: typeof NODE_NAMES.GetIdFromRole;
   role: AST_Node;
   index: AST_Node;
 } | {
-  type: typeof AST_NAMES.PileOf;
+  type: typeof NODE_NAMES.PileOf;
   id: AST_Node;
   actionRole: AST_Node;
 } | {
@@ -151,15 +130,35 @@ export type AST_Node =
   name: AST_Node;
   value: AST_Node;
 } | {
-  type: typeof AST_NAMES.GetVariable;
+  type: typeof NODE_NAMES.GetVariable;
   name: AST_Node;
 } | {
-  type: typeof AST_NAMES.Sequence;
+  type: typeof NODE_NAMES.Sequence;
   primary: AST_Node[];
 } | {
-  type: typeof AST_NAMES.RemovePile;
+  type: typeof NODE_NAMES.RemovePile;
   pile: AST_Node;
   sendTo: AST_Node;
+} | {
+  type: typeof NODE_NAMES.CreateCounter;
+  state: AST_Node;
+  name: AST_Node;
+  visibility: AST_Node;
+  actionRoles: AST_Node;
+  displayName: AST_Node;
+  owner: AST_Node;
+  location: AST_Node;
+} | {
+  type: typeof NODE_NAMES.CreateButton;
+  state: AST_Node;
+  name: AST_Node;
+  visibility: AST_Node;
+  actionRoles: AST_Node;
+  displayName: AST_Node;
+  owner: AST_Node;
+  location: AST_Node;
+  buttonType: AST_Node;
+  range: AST_Node;
 };
 
 export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
@@ -202,7 +201,7 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
     }),
 
     z.object({
-      type: z.literal(AST_NAMES.CreatePile),
+      type: z.literal(NODE_NAMES.CreatePile),
       state: ValueNodeSchema,
       name: ValueNodeSchema,
       visibility: ValueNodeSchema,
@@ -213,13 +212,37 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
     }),
 
     z.object({
-      type: z.literal(AST_NAMES.GetIdFromRole),
+      type: z.literal(NODE_NAMES.CreateCounter),
+      state: ValueNodeSchema,
+      name: ValueNodeSchema,
+      visibility: ValueNodeSchema,
+      actionRoles: ValueNodeSchema,
+      displayName: ValueNodeSchema,
+      owner: ValueNodeSchema,
+      location: ValueNodeSchema,
+    }),
+
+    z.object({
+      type: z.literal(NODE_NAMES.CreateButton),
+      state: ValueNodeSchema,
+      name: ValueNodeSchema,
+      visibility: ValueNodeSchema,
+      actionRoles: ValueNodeSchema,
+      displayName: ValueNodeSchema,
+      owner: ValueNodeSchema,
+      location: ValueNodeSchema,
+      buttonType: ValueNodeSchema,
+      range: ValueNodeSchema,
+    }),
+
+    z.object({
+      type: z.literal(NODE_NAMES.GetIdFromRole),
       role: ValueNodeSchema,
       index: ValueNodeSchema
     }),
 
     z.object({
-      type: z.literal(AST_NAMES.PileOf),
+      type: z.literal(NODE_NAMES.PileOf),
       id: ValueNodeSchema,
       actionRole: ValueNodeSchema
     }),
@@ -239,21 +262,21 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
     }),
 
     z.object({
-    type: z.literal(AST_NAMES.GetVariable),
+    type: z.literal(NODE_NAMES.GetVariable),
     name: ValueNodeSchema,
     }),
 
     /* Logic */
 
     z.object({
-      type: z.literal(AST_NAMES.Sequence),
+      type: z.literal(NODE_NAMES.Sequence),
       primary: z.array(ValueNodeSchema)
     }),
 
     /* Game actions */
 
     z.object({
-      type: z.literal(AST_NAMES.RemovePile),
+      type: z.literal(NODE_NAMES.RemovePile),
       pile: ValueNodeSchema,
       sendTo: ValueNodeSchema
     })
