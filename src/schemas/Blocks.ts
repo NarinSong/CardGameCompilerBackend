@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { CardSchema, LocationSchema, PileStateSchema, VisibilitySchema } from "./types.js";
+import { CardSchema, LocationResolverSchema, LocationSchema, PileStateSchema, VisibilitySchema } from "./types.js";
 
 // These are the values that can be used inside the blocks and their corresponding JS types
 export const ValueTypes = {
@@ -26,10 +26,7 @@ export const ValueTypes = {
   PlayerRole: z.string(),
   Step: z.string(),
   Phase: z.string(),
-  Location: z.object({
-    x: z.number(),
-    y: z.number(),
-  })
+  Location: LocationResolverSchema
 } as const;
 
 export const ValueTypeNameSchema = z.enum(
@@ -48,7 +45,7 @@ export const ValueReturnSchema = z.union([
   z.array(z.any()),
   PileStateSchema,
   VisibilitySchema,
-  LocationSchema,
+  LocationResolverSchema,
   CardSchema,
 ]);
 
