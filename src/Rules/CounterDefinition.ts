@@ -1,4 +1,4 @@
-import { ActionRole, DisplayName, Location, Visibility } from "../schemas/types.js";
+import { ActionRole, DisplayName, LocationResolver, Visibility } from "../schemas/types.js";
 import LabelManager, { Label } from "./LabelManager.js";
 
 
@@ -13,7 +13,7 @@ export default class CounterDefinition {
     displayName: DisplayName;
     actionRoles: ActionRole[];
     visibility: Visibility;
-    location: Location;
+    location: LocationResolver;
 
     /**
      * Creates a new counter.
@@ -26,7 +26,7 @@ export default class CounterDefinition {
         actionRoles?: string[] | undefined,
         initialValue?: number | undefined,
         visibility?: Visibility | undefined,
-        location: Location,
+        location: LocationResolver,
     }) {
         this.number = definition.initialValue ?? 0;
         this.label = definition.labelManager.createLabel(this, definition.label);

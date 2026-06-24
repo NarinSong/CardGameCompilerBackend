@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ValueNodeSchema } from "./AST.js";
-import { ActionRoleSchema, ActionRolesSchema, ButtonTypeSchema, PileStateSchema, TriggerSchema, TriggerTypeSchema, Visibility, VisibilitySchema } from "./types.js";
+import { ActionRolesSchema, ButtonTypeSchema, DefaultLocationSchema, LocationResolverSchema, PileStateSchema, TriggerSchema, VisibilitySchema } from "./types.js";
 
 // Arguments to definitions
 export const GameMetaArgsSchema = z.object({
@@ -11,10 +11,7 @@ export const GameMetaArgsSchema = z.object({
     clientSuitMap: z.record(z.string(), z.number()).optional(),
     clientRankMap: z.record(z.string(), z.number()).optional(),
     variables: z.record(z.string(), z.number()).optional(),
-    locations: z.record(z.string(), z.object({
-        x: z.number(),
-        y: z.number(),
-    })).optional(),
+    locations: z.record(z.string(), DefaultLocationSchema).optional(),
 })
 
 export const PileSchema = z.object({
@@ -23,6 +20,7 @@ export const PileSchema = z.object({
     visibility: VisibilitySchema.optional(),
     displayName: z.string().optional(),
     actionRoles: ActionRolesSchema.optional(),
+    location: LocationResolverSchema.optional(),
 });
 
 export const CounterSchema = z.object({
@@ -31,6 +29,7 @@ export const CounterSchema = z.object({
     visibility: VisibilitySchema.optional(),
     displayName: z.string().optional(),
     actionRoles: ActionRolesSchema.optional(),
+    location: LocationResolverSchema.optional(),
 });
 
 export const ButtonSchema = z.object({
@@ -44,6 +43,7 @@ export const ButtonSchema = z.object({
         max: z.number().optional(),
         increment: z.number().optional(),
     }).optional(),
+    location: LocationResolverSchema.optional(),
 })
 
 export const PlayerSchema = z.object({

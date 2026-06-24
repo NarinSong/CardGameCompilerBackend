@@ -2,18 +2,31 @@
 // Note: anything starting with # will not be sent
 
 import ValueMap from "../Components/ValueMap.js";
-import { ButtonType, Location, PlayerID, PlayerType, Visibility } from "../schemas/types.js";
+import { ButtonType, Location, LocationResolver, PlayerID, PlayerType, Visibility } from "../schemas/types.js";
 import Board from "../Game/Board.js";
 import Counter from "../Game/Counter.js";
 import Game from "../Game/Game.js";
 import Pile from "../Game/Pile.js";
 import Player from "../Game/Player.js";
 import Button from "../Game/Button.js";
+import GameMeta from "../Rules/GameMeta.js";
 
 type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number, id: number}[], label: string, displayName: string, actionRoles: string[], location: Location };
 type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[], location: Location };
 type ClientButtonType = { owner: number, visibility: Visibility, label: string, actionRoles: string[], displayName: string, type: ButtonType, range: { min: number | undefined, max: number | undefined, increment: number } | undefined, location: Location };
 type ClientPlayerType = { playerId: PlayerID, type: PlayerType };
+
+function resolveLocation(location: LocationResolver, locations: Record<string, Location>, gameMeta: GameMeta): Location {
+    if (location.locationType === 'exact') return location.location;
+
+    const toReturn = gameMeta.nextLocation(
+        location.location, locations[location.location]
+    );
+
+    locations[location.location] = toReturn;
+
+    return toReturn;
+}
 
 /**
  * The current gamestate from the perspective of the client.
@@ -54,7 +67,7 @@ export default class ClientView {
      * @param rankMap - Map between the rank and its value.
      * @returns Created pileView object, else null if the pile is supposed to be invisible.
      */
-    static pileView(pile: Pile, owner: number, player: Player, suitMap: ValueMap<string, number>, rankMap: ValueMap<string, number>) {
+    static pileView(pile: Pile, owner: number, player: Player, suitMap: ValueMap<string, number>, rankMap: ValueMap<string, number>, locations: Record<string, Location>, gameMeta: GameMeta) {
         // Do *not* mutate pile, since it's from the gamestate
         if (pile.visibility == Visibility.INVISIBLE) return null;
         
@@ -75,7 +88,7 @@ export default class ClientView {
             actionRoles: pile.actionRoles,
             displayName: pile.displayName,
             cards: cards,
-            location: pile.location,
+            location: resolveLocation(pile.location, locations, gameMeta),
         };
 
         return pileView;
@@ -88,7 +101,7 @@ export default class ClientView {
      * @param player - Player object of the client.
      * @returns Created counterView object, else null if the counter is supposed to be invisible.
      */
-    static counterView(counter: Counter, owner: number, player: Player) {
+    static counterView(counter: Counter, owner: number, player: Player, locations: Record<string, Location>, gameMeta: GameMeta) {
         if (counter.visibility == Visibility.INVISIBLE) return null;
 
         let hide = counter.visibility == Visibility.FACE_DOWN;
@@ -100,13 +113,13 @@ export default class ClientView {
             label: counter.label,
             displayName: counter.displayName,
             actionRoles: counter.actionRoles,
-            location: counter.location,
+            location: resolveLocation(counter.location, locations, gameMeta),
         }
 
         return counterView;
     }
 
-    static buttonView(button: Button, owner: number, player: Player) {
+    static buttonView(button: Button, owner: number, player: Player, locations: Record<string, Location>, gameMeta: GameMeta) {
         if (button.visibility == Visibility.INVISIBLE) return null;
 
         //let hide = button.visibility == Visibility.FACE_DOWN;
@@ -119,7 +132,7 @@ export default class ClientView {
             actionRoles: button.actionRoles,
             type: button.type,
             range: button.range,
-            location: button.location,
+            location: resolveLocation(button.location, locations, gameMeta),
         }
 
         return buttonView;
@@ -137,11 +150,13 @@ export default class ClientView {
         const buttons: ClientButtonType[] = [];
         const players: ClientPlayerType[] = [];
 
+        const locations: Record<string, Location> = {};
+
         for (let key of Object.keys(g.gameState.piles)) {
             let item = g.gameState.piles[key];
             if (!item || !item.pile) continue;
 
-            let pileView = ClientView.pileView(item.pile, item.owner, p, g.definition.gameMeta.clientSuitMap, g.definition.gameMeta.clientRankMap);
+            let pileView = ClientView.pileView(item.pile, item.owner, p, g.definition.gameMeta.clientSuitMap, g.definition.gameMeta.clientRankMap, locations, g.definition.gameMeta);
             if (pileView) piles.push(pileView);
         }
 
@@ -149,7 +164,7 @@ export default class ClientView {
             let item = g.gameState.counters[key];
             if (!item || !item.counter) continue;
 
-            let counterView = ClientView.counterView(item.counter, item.owner, p);
+            let counterView = ClientView.counterView(item.counter, item.owner, p, locations, g.definition.gameMeta);
             if (counterView) counters.push(counterView);
         }
 
@@ -157,7 +172,7 @@ export default class ClientView {
             let item = g.gameState.buttons[key];
             if (!item || !item.button) continue;
 
-            let buttonView = ClientView.buttonView(item.button, item.owner, p);
+            let buttonView = ClientView.buttonView(item.button, item.owner, p, locations, g.definition.gameMeta);
             if (buttonView) buttons.push(buttonView);
         }
 

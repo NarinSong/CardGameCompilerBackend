@@ -84,6 +84,27 @@ export const LocationSchema = z.object({
   x: z.number(),
   y: z.number(),
 });
+export const DefaultLocationSchema = z.object({
+    anchor: z.object({
+        x: z.number(),
+        y: z.number(),
+    }),
+    direction: z.union([z.literal('VERTICAL'), z.literal('HORIZONTAL')]),
+    verticalOffset: z.number(),
+    horizontalOffset: z.number(),
+    wraptAt: z.number(),
+    wrapTo: z.number(),
+});
+export const LocationResolverSchema = z.discriminatedUnion('locationType', [
+  z.object({
+    locationType: z.literal('exact'),
+    location: LocationSchema
+  }),
+  z.object({
+    locationType: z.literal('relative'),
+    location: z.string()
+  })
+]);
 
 /* BoardID must equal -1 */
 export const BoardIDSchema = z.literal(-1);
@@ -122,9 +143,48 @@ export type rank = z.infer<typeof RankSchema>;
 export type suit = z.infer<typeof SuitSchema>;
 export type CardType = z.infer<typeof CardSchema>;
 export type Location = z.infer<typeof LocationSchema>;
+export type DefaultLocation = z.infer<typeof DefaultLocationSchema>;
+export type LocationResolver = z.infer<typeof LocationResolverSchema>;
 
 // IDs
 export type ClientID = number;
 export type GameID = number;
 export type RoomID = string;
 export type LobbyID = string;
+
+
+// Default locations
+
+export const DEFAULT_PILE_LOCATION: DefaultLocation = {
+    anchor: {
+        x: 0,
+        y: 50,
+    },
+    direction: "HORIZONTAL",
+    verticalOffset: 10,
+    horizontalOffset: 10,
+    wraptAt: 100,
+    wrapTo: -100,
+};
+export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
+    anchor: {
+        x: 0,
+        y: 0,
+    },
+    direction: "HORIZONTAL",
+    verticalOffset: 10,
+    horizontalOffset: 10,
+    wraptAt: 100,
+    wrapTo: -100,
+};
+export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
+    anchor: {
+        x: 0,
+        y: -50,
+    },
+    direction: "HORIZONTAL",
+    verticalOffset: 10,
+    horizontalOffset: 10,
+    wraptAt: 100,
+    wrapTo: -100,
+};

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { TriggerSchema, LabelSchema, CardSchema } from "./types.js";
 import { ValueReturn, ValueReturnSchema } from "./Blocks.js";
 
-const AST_NAMES = {
+export const AST_NAMES = {
   Undefined: "UNDEFINED",
   Array: "ARRAY",
   Literal: "LITERAL",

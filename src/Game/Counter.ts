@@ -1,6 +1,6 @@
 import CounterDefinition from "../Rules/CounterDefinition.js";
 import { Label } from "../Rules/LabelManager.js";
-import { ActionRole, DisplayName, Location, Visibility } from "../schemas/types.js";
+import { ActionRole, DisplayName, LocationResolver, Visibility } from "../schemas/types.js";
 import GameLabels from "./GameLabels.js";
 
 /**
@@ -14,7 +14,7 @@ export default class Counter {
     actionRoles: ActionRole[];
     displayName: DisplayName;
     visibility: Visibility;
-    location: Location;
+    location: LocationResolver;
     
     /**
      * Creates a new counter instance.
@@ -35,7 +35,7 @@ export default class Counter {
         gameLabels: GameLabels,
         actionRoles: ActionRole[],
         displayName: DisplayName,
-        location: Location,
+        location: LocationResolver,
     ) {
         this.value = initialState;
         this.label = label;
@@ -82,7 +82,7 @@ export default class Counter {
         gameLabels: GameLabels,
         actionRoles: ActionRole[],
         displayName: DisplayName,
-        location: Location,
+        location: LocationResolver,
     ) {
         return new Counter(initialState, label, visibility, gameLabels, actionRoles, displayName, location);
     }

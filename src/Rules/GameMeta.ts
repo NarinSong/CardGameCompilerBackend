@@ -1,6 +1,6 @@
 import ValueMap, { CardValueMap, DEFAULT_CARD_RANK_MAP, DEFAULT_CLIENT_VIEW_RANK_MAP, DEFAULT_CLIENT_VIEW_SUIT_MAP, DEFAULT_VALUE_MAP } from "../Components/ValueMap.js";
 import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
-import { Location } from "../schemas/types.js";
+import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DefaultLocation, Location } from "../schemas/types.js";
 
 
 /**
@@ -17,7 +17,7 @@ export default class GameMeta {
     clientSuitMap: ValueMap<string, number>;
     clientRankMap: ValueMap<string, number>;
     variables: Record<string, number>;
-    locations: Record<string, Location>;
+    locations: Record<string, DefaultLocation>;
 
     /**
      * Creates a new GameMeta configuration.
@@ -33,9 +33,9 @@ export default class GameMeta {
         this.clientRankMap = obj.clientRankMap ? new ValueMap<string, number>(obj.clientRankMap) : DEFAULT_CLIENT_VIEW_RANK_MAP;
         this.variables = obj.variables ?? {};
         this.locations = {
-            'DEFAULT_PILE': {x: 0, y: 50},
-            'DEFAULT_BUTTON': {x: 0, y: -50},
-            'DEFAULT_COUNTER': {x: 0, y: 0},
+            'DEFAULT_PILE': DEFAULT_PILE_LOCATION,
+            'DEFAULT_BUTTON': DEFAULT_BUTTON_LOCATION,
+            'DEFAULT_COUNTER': DEFAULT_COUNTER_LOCATION,
         };
 
         for (let i in obj.locations) {
@@ -44,38 +44,43 @@ export default class GameMeta {
         }
     }
 
-    nextLocation(location: Location): Location {
-        const x = location.x + 10;
-        if (x > 100)
-            return { x: -100, y: location.y + 10 };
-
-        return { x: x, y: location.y };
+    static locationOffset(current: number, offset: number, threshold: number, wrapTo: number): { value: number, wrapped: boolean } {
+        current += offset;
+        let wrapped = false;
+        if (current > threshold) {
+            current = wrapTo;
+            wrapped = true;
+        }
+        return { value: current, wrapped: wrapped };
     }
 
-    nextLocationFor(type: string): Location {
-        let defaultLocation = this.locations[type];
-
-        if (!defaultLocation) {
-            defaultLocation = { x: 0, y: 0 };
+    nextLocation(locationName: string, currentLocation?: Location | undefined): Location {
+        const defaultLocation: DefaultLocation | undefined = this.locations[locationName];
+        if (!defaultLocation) return {x:0, y:0};
+        
+        if (!currentLocation) {
+            // Spelled out so that it clones and does not hold a reference
+            currentLocation = {
+                x: defaultLocation.anchor.x,
+                y: defaultLocation.anchor.y
+            }
         }
 
-        defaultLocation = this.nextLocation(defaultLocation);
+        if (defaultLocation.direction === 'HORIZONTAL') {
+            const base = GameMeta.locationOffset(currentLocation.x, defaultLocation.horizontalOffset, defaultLocation.wraptAt, defaultLocation.wrapTo);
+            if (base.wrapped) {
+                currentLocation.y += defaultLocation.verticalOffset;
+            }
+            currentLocation.x = base.value;
+        } else if (defaultLocation.direction === 'VERTICAL') {
+            const base = GameMeta.locationOffset(currentLocation.y, defaultLocation.verticalOffset, defaultLocation.wraptAt, defaultLocation.wrapTo);
+            if (base.wrapped) {
+                currentLocation.x += defaultLocation.horizontalOffset;
+            }
+            currentLocation.y = base.value;
+        }
 
-        this.locations[type] = defaultLocation;
-
-        return defaultLocation;
-    }
-
-    nextPileLocation(): Location {
-        return this.nextLocationFor('DEFAULT_PILE');
-    }
-
-    nextButtonLocation(): Location {
-        return this.nextLocationFor('DEFAULT_BUTTON');
-    }
-
-    nextCounterLocation(): Location {
-        return this.nextLocationFor('DEFAULT_COUNTER');
+        return currentLocation;
     }
 
     // Prevent the minimum number of players from being larger than the maximum
