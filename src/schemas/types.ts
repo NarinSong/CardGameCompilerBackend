@@ -41,6 +41,7 @@ export const TriggerTypeSchema = z.enum([
 ]);
 
 
+
 /**
  * Standard card ranks used by the game.
  */
@@ -69,8 +70,14 @@ export const SUIT = [
 ] as const;
 
 export const SuitSchema = z.enum(SUIT);
+export const CardSchema = z.object({
+  rank: RankSchema,
+  suit: SuitSchema,
+  id: z.number()
+});
 export const DisplayNameSchema = z.string();
 export const ActionRoleSchema = z.string();
+export const LabelSchema = z.string();
 export const ActionRolesSchema = z.array(z.string());
 export const PlayerIDSchema = z.number();
 export const LocationSchema = z.object({
@@ -80,6 +87,18 @@ export const LocationSchema = z.object({
 
 /* BoardID must equal -1 */
 export const BoardIDSchema = z.literal(-1);
+
+export const TriggerSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal(TriggerTypeSchema.enum.CLICK),
+    target: ActionRoleSchema,
+  }),
+
+  z.object({
+    type: z.literal(TriggerTypeSchema.enum.AUTO),
+    target: z.undefined().optional(),
+  }),
+]);
 
 // Enums
 export const Visibility = VisibilitySchema.enum;
@@ -96,10 +115,12 @@ export type Visibility = z.infer<typeof VisibilitySchema>;
 export type TriggerType = z.infer<typeof TriggerTypeSchema>;
 export type DisplayName = z.infer<typeof DisplayNameSchema>;
 export type ActionRole = z.infer<typeof ActionRoleSchema>;
+export type Label = z.infer<typeof LabelSchema>;
 export type PlayerID = z.infer<typeof PlayerIDSchema>;
 export type BoardID = z.infer<typeof BoardIDSchema>;
 export type rank = z.infer<typeof RankSchema>;
 export type suit = z.infer<typeof SuitSchema>;
+export type CardType = z.infer<typeof CardSchema>;
 export type Location = z.infer<typeof LocationSchema>;
 
 // IDs

@@ -35,7 +35,7 @@ const variables = ['up', 'down']; // TODO
 function L(v: any): ValueNode {
     return {type: 'LITERAL', primary: v};
 }
-
+/*
 const flipCard = new Action(
     {
         type: TriggerType.CLICK,
@@ -90,5 +90,5 @@ const makeGuess = new Action(
 
 AboveBelow.addActionToStep(flip, flipCard);
 AboveBelow.addActionToStep(flop, makeGuess);
-
+*/
 export default AboveBelow;

@@ -4,8 +4,9 @@ import { Location, PileState, Visibility } from "../schemas/types.js";
 import Card from "./Card.js";
 
 // Using Zod schemas
-import { ActionContext, ValueNode, ActionNode, AST, ValueReturn } from "../schemas/AST.js";
+import { ActionContext, ValueNode, AST } from "../schemas/AST.js";
 import Player from "../Game/Player.js";
+import { ValueReturn } from "../schemas/Blocks.js";
 
 // Helper functions
 /**
@@ -28,6 +29,7 @@ function executeCreateArray(g: Game, c: ActionContext, node: ValueNode) {
     return arr;
 }
 
+/*
 function executeForEach(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'FOR_EACH') throw new Error("Called executeForEach with an invalid node");
 
@@ -39,6 +41,7 @@ function executeForEach(g: Game, c: ActionContext, node: ValueNode) {
         evaluate(g, c, node.secondary);
     }
 }
+*/
 
 /**
  * Executes a "DEAL_CARDS" action node.
@@ -47,7 +50,7 @@ function executeForEach(g: Game, c: ActionContext, node: ValueNode) {
  * @param node - DEAL_CARDS action node to execute.
  * @throws Error if the node is not a DEAL_CARDS node.
  */
-function executeDealCards(g: Game, c: ActionContext, node: ActionNode) {
+function executeDealCards(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'DEAL_CARDS') throw new Error("Called executeDealCards with an invalid node");
     
     g.gameState.dealCards(evaluate(g, c, node.primary) as Label, evaluate(g, c, node.secondary) as Label, evaluate(g, c, node.tertiary) as number);
@@ -83,7 +86,7 @@ function executeCreatePile(g: Game, c: ActionContext, node: ValueNode) {
  * @param node - REMOVE_PILE action node to execute.
  * @throws Error if the node is not a REMOVE_PILE node.
  */
-function executeRemovePile(g: Game, c: ActionContext, node: ActionNode) {
+function executeRemovePile(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'REMOVE_PILE') throw new Error("Called executeRemovePile with an invalid node");
 
     g.gameState.removePileByLabel(
@@ -100,10 +103,10 @@ function executeRemovePile(g: Game, c: ActionContext, node: ActionNode) {
  * @throws Error if the node is not a GET_ID_FROM_ROLE node.
  * @returns Id of first player with that role in that index.
  */
-function evaluateIdFromRole(g: Game, c: ActionContext, node: ActionNode) {
+function evaluateIdFromRole(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'GET_ID_FROM_ROLE') throw new Error("Called evaluateIdFromRole with an invalid node");
 
-    return g.gameState.roles[ evaluate(g, c, node.role ) ]?.at( evaluate(g, c, node.index ) ?? 0 );
+    return g.gameState.roles[ evaluate(g, c, node.role ) as string ]?.at( evaluate(g, c, node.index ) as number ?? 0 );
 }
 
 /**
@@ -114,7 +117,7 @@ function evaluateIdFromRole(g: Game, c: ActionContext, node: ActionNode) {
  * @throws Error if the node is not a PILE_OF node.
  * @returns The label of the matching pile, or null if none is found.
  */
-function evaluatePileOf(g: Game, c: ActionContext, node: ActionNode) {
+function evaluatePileOf(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'PILE_OF') throw new Error("Called evaluatePileOf with an invalid node");
 
     const playerId = evaluate(g, c, node.id) as number;
@@ -138,7 +141,7 @@ function evaluatePileOf(g: Game, c: ActionContext, node: ActionNode) {
  * @throws Error if the node is not a HAS_ROLE node.
  * @returns True if user has a certain role, else false.
  */
-function evaluateIdHasRole(g: Game, c: ActionContext, node: ActionNode) {
+function evaluateIdHasRole(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'HAS_ROLE') throw new Error("Called evaluateIdHasRole with an invalid node");
 
     const role = evaluate(g, c, node.role) as string;
@@ -155,7 +158,7 @@ function evaluateIdHasRole(g: Game, c: ActionContext, node: ActionNode) {
  * @throws Error if the node is not a ASSIGN_ROLE node.
  * @returns True if the player was successfully added to the role, false if the role doesn't exist or the player already has it.
  */
-function evaluateAssignRole(g: Game, c: ActionContext, node: ActionNode) {
+function evaluateAssignRole(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'ASSIGN_ROLE') throw new Error("Called evaluateAssignRole with an invalid node");
 
     const role = evaluate(g, c, node.role) as string;
@@ -177,7 +180,7 @@ function evaluateAssignRole(g: Game, c: ActionContext, node: ActionNode) {
  * @throws Error if the node is not a UNASSIGN_ROLE node.
  * @returns true if unassigning the role was successful, else false.
  */
-function evaluateUnassignRole(g: Game, c: ActionContext, node: ActionNode) {
+function evaluateUnassignRole(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'UNASSIGN_ROLE') throw new Error("Called evaluateUnassignRole with an invalid node");
 
     const role = evaluate(g, c, node.role) as string;
@@ -202,7 +205,7 @@ function evaluateUnassignRole(g: Game, c: ActionContext, node: ActionNode) {
  * @throws Error if the node is not a ASSIGN_ROLE_SINGULAR node.
  * @returns True if successfully assigned, false if the role doesn't exist or the player already holds it.
  */
-function evaluateAssignRoleSingular(g: Game, c: ActionContext, node: ActionNode) {
+function evaluateAssignRoleSingular(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'ASSIGN_ROLE_SINGULAR') throw new Error("Called evaluateAssignRoleSingular with an invalid node");
 
     const role = evaluate(g, c, node.role) as string;
@@ -216,8 +219,8 @@ function evaluateAssignRoleSingular(g: Game, c: ActionContext, node: ActionNode)
     return false;
 }
 
-
-function evaluateSmallerThan(g: Game, c: ActionContext, node: ActionNode): boolean {
+/*
+function evaluateSmallerThan(g: Game, c: ActionContext, node: ValueNode): boolean {
 
     let first = evaluate(g, c, node.primary);
     let second = evaluate(g, c, node.secondary);
@@ -230,6 +233,7 @@ function evaluateSmallerThan(g: Game, c: ActionContext, node: ActionNode): boole
 
     return firstVal < secondVal;
 }
+*/
 
 /**
  * Executes a "ADD_VARIABLE" value node.
@@ -276,7 +280,7 @@ function executeUpdateVariable(g: Game, c: ActionContext, node: ValueNode) {
 function executeSetPhase(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'SET_PHASE') throw new Error("Called executeSetPhase with invalid node");
     
-    const phaseLabel: PhaseLabel = evaluate(g, c, node.primary);
+    const phaseLabel: PhaseLabel = evaluate(g, c, node.primary) as string;
 
     g.gameState.moveToPhase(phaseLabel);
 }
@@ -285,7 +289,7 @@ function executeSetPhase(g: Game, c: ActionContext, node: ValueNode) {
 function executeSetStep(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== 'SET_STEP') throw new Error("Called executeSetStep with invalid node");
     
-    const stepLabel: StepLabel = evaluate(g, c, node.primary);
+    const stepLabel: StepLabel = evaluate(g, c, node.primary) as string;
 
     g.gameState.moveToStep(stepLabel);
 }
@@ -304,7 +308,7 @@ function executeSetStep(g: Game, c: ActionContext, node: ValueNode) {
  * @param node - AST node to evaluate.
  * @returns The evaluated value or undefined if the node does not produce a value.
  */
-export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | undefined {
+export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
     switch (node.type) {
         // Literal
         case 'UNDEFINED': return undefined;
@@ -326,7 +330,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn | un
         // Game Logic
         case 'IF': if (evaluate(g, c, node.primary)) { evaluate(g, c, node.secondary) } else if (node.tertiary) { evaluate(g, c, node.tertiary) }; return;
         case 'SEQUENCE': for (let action of node.primary) { evaluate(g, c, action); } return;
-        case 'FOR_EACH': executeForEach(g, c, node); return;
+        //case 'FOR_EACH': executeForEach(g, c, node); return;
         // Game Actions
         case 'DEAL_CARDS': executeDealCards(g, c, node); return;
         case 'CREATE_PILE': return executeCreatePile(g, c, node);

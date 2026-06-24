@@ -55,7 +55,8 @@ const playCard = new Action(
                     displayName: L('Card Pile'),
                     state: { type: 'UNDEFINED' },
                     name: { type: 'UNDEFINED' },
-                    owner: L(-1)
+                    owner: L(-1),
+                    location: { type: 'UNDEFINED' }
                 },
                 tertiary: L(1)
             }

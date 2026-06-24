@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { PileStateSchema, VisibilitySchema } from "./types.js";
+import { CardSchema, LocationSchema, PileStateSchema, VisibilitySchema } from "./types.js";
 
 // These are the values that can be used inside the blocks and their corresponding JS types
 export const ValueTypes = {
@@ -39,7 +39,21 @@ export const ValueTypeNameSchema = z.enum(
   ]
 );
 
+export const ValueReturnSchema = z.union([
+  z.unknown(),
+  z.void(),
+  z.undefined(),
+  z.string(),
+  z.boolean(),
+  z.array(z.any()),
+  PileStateSchema,
+  VisibilitySchema,
+  LocationSchema,
+  CardSchema,
+]);
+
 export type ValueTypeName = z.infer<typeof ValueTypeNameSchema>;
+export type ValueReturn = z.infer<typeof ValueReturnSchema>;
 
 // Helper types and functions to define blocks
 

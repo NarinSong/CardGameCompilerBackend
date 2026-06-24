@@ -27,7 +27,7 @@ export default class GameMeta {
         this.#name = obj.name;
         this.#minPlayers = obj.minPlayers || 1;
         this.#maxPlayers = obj.maxPlayers || 4;
-        this.cardValueMap = obj.cardValueMap ?? DEFAULT_VALUE_MAP;
+        this.cardValueMap = /*obj.cardValueMap ??*/ DEFAULT_VALUE_MAP;
         this.maps = { 'CARD_RANK_MAP': DEFAULT_CARD_RANK_MAP }
         this.clientSuitMap = obj.clientSuitMap ? new ValueMap<string, number>(obj.clientSuitMap) : DEFAULT_CLIENT_VIEW_SUIT_MAP;
         this.clientRankMap = obj.clientRankMap ? new ValueMap<string, number>(obj.clientRankMap) : DEFAULT_CLIENT_VIEW_RANK_MAP;

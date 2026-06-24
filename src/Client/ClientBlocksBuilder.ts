@@ -1,6 +1,6 @@
 // This file will take in the client payload and turn it into the "ClientGameDefinition" expected by GameBuilder
 
-import { ActionNode, ValueNode } from "../schemas/AST.js";
+import { ValueNode } from "../schemas/AST.js";
 import { BLOCKS } from "../schemas/Blocks.js";
 import { ArrayNode, BlockNode, ClientBuiltBlocksSchema, ClientNode, SequenceNode, validateNode } from "../schemas/BuiltBlocks.js";
 import ClientGameDefinition from "../schemas/ClientGameDefinition.js";
@@ -9,7 +9,7 @@ import { GameDefinitionNode, GameDefinitionPhase, GameDefinitionStep } from "../
 const UndefinedAST: GameDefinitionNode = { type: 'UNDEFINED' };
 
 function nonLiteralBlockNodeToAst(blockNode: BlockNode): GameDefinitionNode {
-    const node: GameDefinitionNode = {
+    const node: any = {
         type: blockNode.block
     };
 
@@ -35,13 +35,15 @@ function nonLiteralBlockNodeToAst(blockNode: BlockNode): GameDefinitionNode {
 }
 
 function sequenceNodeToAst(blockNode: SequenceNode): GameDefinitionNode {
-    const node: ActionNode = {
+    const node: ValueNode = {
         type: 'SEQUENCE',
         primary: []
     };
 
     for (const block of blockNode.blocks) {
-        node.primary.push(blockNodeToAst(block));
+        const child = blockNodeToAst(block);
+        if (!child) continue;
+        node.primary.push(child);
     }
 
     return node;
@@ -54,7 +56,9 @@ function arrayNodeToAst(blockNode: ArrayNode): GameDefinitionNode {
     };
 
     for (const block of blockNode.value) {
-        node.sequence.push(blockNodeToAst(block));
+        const child = blockNodeToAst(block);
+        if (!child) continue;
+        node.sequence.push(child);
     }
 
     return node;
@@ -123,11 +127,17 @@ export function buildClientGameDefinitionFromblocks(json: unknown): ClientGameDe
                 validateNode(action.result);
                 if (action.filter) validateNode(action.filter);
 
+                const filter = blockNodeToAst(action.filter);
+                const result = blockNodeToAst(action.result);
+
+                if (!result) continue;
+                
                 const gameAction = {
                     trigger: action.trigger,
-                    filter: blockNodeToAst(action.filter),
-                    result: blockNodeToAst(action.result)
+                    filter: filter,
+                    result: result
                 }
+
                 gameStep.actions.push(gameAction);
             }
         }

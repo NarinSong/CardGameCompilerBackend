@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 import { ArgDef, BlockName, BlockNames, BLOCKS, ValueTypeName, ValueTypeNameSchema, ValueTypes } from "./Blocks.js";
-import { BoardSchema, GameMetaArgsSchema, PlayerSchema, TriggerSchema } from "./GameDefinitionArgs.js";
+import { BoardSchema, GameMetaArgsSchema, PlayerSchema } from "./GameDefinitionArgs.js";
+import { TriggerSchema } from "./types.js";
 
 type LiteralNode = {
   kind: "literal";
