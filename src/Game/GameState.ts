@@ -163,6 +163,31 @@ export default class GameState {
         delete this.piles[pile];
     }
 
+    removeButtonByLabel(button: Label) {
+        const mainButton: Button | undefined = this.buttons[button]?.button;
+
+        if (!mainButton)
+            return;
+
+        this.gameLabels.unregister(button);
+        delete this.buttons[button];
+    }
+
+    removeCounterByLabel(counter: Label, sendValueTo?: Label | undefined) {
+        const mainCounter: Counter | undefined = this.counters[counter]?.counter;
+        const to: Counter | undefined = sendValueTo ? this.counters[sendValueTo]?.counter : undefined;
+
+        if (!mainCounter)
+            return;
+
+        if (to) {
+            to.value += mainCounter.value;
+        }
+
+        this.gameLabels.unregister(counter);
+        delete this.counters[counter];
+    }
+
     createButton(obj: { name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined, type?: ButtonType | undefined, range?: ButtonRange | undefined, location?: LocationResolver | undefined } = {}) {
         const name = obj.name        ?? this.gameLabels.nextId;
 

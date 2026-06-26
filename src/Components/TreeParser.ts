@@ -9,6 +9,7 @@ import { ValueReturn } from "../schemas/Blocks.js";
 import { NODE_NAMES } from "../schemas/Constants.js";
 import Pile from "../Game/Pile.js";
 import Counter from "../Game/Counter.js";
+import Button from "../Game/Button.js";
 // Helper functions
 /**
  *  Evaluates an ARRAY value node and returns its computed array contents.
@@ -134,6 +135,23 @@ function executeRemovePile(g: Game, c: ActionContext, node: ValueNode) {
     )
 }
 
+function executeRemoveButton(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.RemoveButton) throw new Error("Called executeRemoveButton with an invalid node");
+
+    g.gameState.removeButtonByLabel(
+        evaluate(g, c, node.primary) as Label,
+    )
+}
+
+function executeRemoveCounter(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.RemoveCounter) throw new Error("Called executeRemoveCounter with an invalid node");
+
+    g.gameState.removeCounterByLabel(
+        evaluate(g, c, node.primary) as Label,
+        evaluate(g, c, node.secondary) as Label | undefined
+    )
+}
+
 function executeShuffleInto(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.ShuffleInto) throw new Error("Called executeShuffleInto with an invalid node");
 
@@ -162,6 +180,72 @@ function executeMoveCounterValue(g: Game, c: ActionContext, node: ValueNode) {
 
     fromCounter.counter.value -= move;
     toCounter.counter.value += move;
+}
+
+function executeSetCounterValue(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.SetCounterValue) throw new Error("Called executeSetCounterValue with an invalid node");
+
+    const counterLabel = evaluate(g, c, node.primary) as Label;
+    const counter = g.gameState.counters[counterLabel];
+    
+    if (counter) {
+        counter.counter.value = (evaluate(g, c, node.secondary) as number);
+    }
+
+    return counterLabel;
+}
+
+function executeSetRange(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.SetRange) throw new Error("Called executeSetRange with an invalid node");
+
+    const buttonLabel = evaluate(g, c, node.primary) as Label;
+    const button = g.gameState.buttons[buttonLabel];
+    
+    if (button) {
+        button.button.range = (evaluate(g, c, node.secondary) as ButtonRange);
+    }
+
+    return buttonLabel;
+}
+
+
+function executeSetCounterVisibility(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.SetCounterVisibility) throw new Error("Called executeSetCounterVisibility with an invalid node");
+
+    const counterLabel = evaluate(g, c, node.primary) as Label;
+    const counter = g.gameState.counters[counterLabel];
+    
+    if (counter) {
+        counter.counter.visibility = (evaluate(g, c, node.secondary) as Visibility);
+    }
+
+    return counterLabel;
+}
+
+function executeSetButtonVisibility(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.SetButtonVisisibility) throw new Error("Called executeSetButtonVisibility with an invalid node");
+
+    const buttonLabel = evaluate(g, c, node.primary) as Label;
+    const button = g.gameState.buttons[buttonLabel];
+    
+    if (button) {
+        button.button.visibility = (evaluate(g, c, node.secondary) as Visibility);
+    }
+
+    return buttonLabel;
+}
+
+function executeSetPileVisibility(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.SetPileVisibility) throw new Error("Called executeSetPileVisibility with an invalid node");
+
+    const pileLabel = evaluate(g, c, node.primary) as Label;
+    const pile = g.gameState.piles[pileLabel];
+    
+    if (pile) {
+        pile.pile.visibility = (evaluate(g, c, node.secondary) as Visibility);
+    }
+
+    return pileLabel;
 }
 
 /**
@@ -196,6 +280,38 @@ function evaluatePileOf(g: Game, c: ActionContext, node: ValueNode) {
         const pile = g.gameState.piles[p];
         if (pile?.owner === playerId
             && pile.pile.actionRoles.includes(actionRole)
+        ) return p;
+    }
+
+    return null;
+}
+
+function evaluateCounterOf(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.CounterOf) throw new Error("Called evaluateCounterOf with an invalid node");
+
+    const playerId = evaluate(g, c, node.primary) as number;
+    const actionRole = evaluate(g, c, node.secondary) as string;
+
+    for (let p in g.gameState.counters) {
+        const counter = g.gameState.counters[p];
+        if (counter?.owner === playerId
+            && counter.counter.actionRoles.includes(actionRole)
+        ) return p;
+    }
+
+    return null;
+}
+
+function evaluateButtonOf(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.ButtonOf) throw new Error("Called evaluateButtonOf with an invalid node");
+
+    const playerId = evaluate(g, c, node.primary) as number;
+    const actionRole = evaluate(g, c, node.secondary) as string;
+
+    for (let p in g.gameState.buttons) {
+        const button = g.gameState.buttons[p];
+        if (button?.owner === playerId
+            && button.button.actionRoles.includes(actionRole)
         ) return p;
     }
 
@@ -464,15 +580,25 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.CreateButton: return executeCreateButton(g, c, node);
         case NODE_NAMES.CreateCounter: return executeCreateCounter(g, c, node);
         case NODE_NAMES.RemovePile: executeRemovePile(g, c, node); return;
+        case NODE_NAMES.RemoveButton: executeRemoveButton(g, c, node); return;
+        case NODE_NAMES.RemoveCounter: executeRemoveCounter(g, c, node); return;
         case NODE_NAMES.ShuffleInto: return executeShuffleInto(g, c, node);
         case NODE_NAMES.MoveCounterValue: executeMoveCounterValue(g, c, node); return;
+        case NODE_NAMES.SetCounterValue: return executeSetCounterValue(g, c, node);
+        case NODE_NAMES.SetRange: return executeSetRange(g, c, node);
+        case NODE_NAMES.SetCounterVisibility: return executeSetCounterVisibility(g, c, node);
+        case NODE_NAMES.SetButtonVisisibility: return executeSetButtonVisibility(g, c, node);
+        case NODE_NAMES.SetPileVisibility: return executeSetPileVisibility(g, c, node);
         // Action context
         case NODE_NAMES.ClickedLabel: return c.label;
         case NODE_NAMES.CtxCard: return c.card;
         case NODE_NAMES.CtxId: return c.id;
+        case NODE_NAMES.ButtonValue: return c.buttonValue;
         // Users and roles
         case NODE_NAMES.GetIdFromRole: return evaluateIdFromRole(g, c, node);
         case NODE_NAMES.PileOf: return evaluatePileOf(g, c, node);
+        case NODE_NAMES.CounterOf: return evaluateCounterOf(g, c, node);
+        case NODE_NAMES.ButtonOf: return evaluateButtonOf(g, c, node);
         case NODE_NAMES.HasRole: return evaluateIdHasRole(g, c, node);
         case NODE_NAMES.AssignRole: return evaluateAssignRole(g, c, node);
         case NODE_NAMES.UnassignRole: return evaluateUnassignRole(g, c, node);
@@ -484,6 +610,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.Suit: return (evaluate(g, c, node.primary) as Card).suit;
         case NODE_NAMES.NumCardsInPile: return (evaluate(g, c, node.primary) as Pile).cards.length;
         case NODE_NAMES.ValueOf: return (evaluate(g, c, node.primary) as Counter).value;
+        case NODE_NAMES.CardOfPile: return (evaluate(g, c, node.primary) as Pile).cards[evaluate(g, c, node.secondary) as number ?? 0];
         // Map usage
         case NODE_NAMES.Map: return (g.definition.gameMeta.maps[ evaluate(g, c, node.secondary) as string ]?.get( evaluate(g, c, node.primary) ));
         case NODE_NAMES.AddVariable: return executeAddVariable(g, c, node);
