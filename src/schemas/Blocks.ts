@@ -1071,6 +1071,206 @@ const LOSE = defineBlock({
     ]
 });
 
+const BUTTON_VALUE = defineBlock({
+    "name": NODE_NAMES.ButtonValue,
+    "displayName": "Button Value",
+    "returnType": "Number",
+    "arguments": []
+});
+
+const CARD_OF_PILE = defineBlock({
+    "name": NODE_NAMES.CardOfPile,
+    "displayName": "Card of Pile",
+    "returnType": "Card",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Index",
+            "type": "Number",
+            "optional": true
+        },
+    ]
+});
+
+const SET_RANGE = defineBlock({
+    "name": NODE_NAMES.SetRange,
+    "displayName": "Set Range",
+    "returnType": "ButtonLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Button",
+            "type": "ButtonLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Range",
+            "type": "ButtonRange",
+            "optional": false
+        },
+    ]
+});
+
+const SET_COUNTER_VALUE = defineBlock({
+    "name": NODE_NAMES.SetCounterValue,
+    "displayName": "Set Counter Value",
+    "returnType": "CounterLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Counter",
+            "type": "CounterLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Value",
+            "type": "Number",
+            "optional": true
+        },
+    ]
+});
+
+const SET_PILE_VISIBILITY = defineBlock({
+    "name": NODE_NAMES.SetPileVisibility,
+    "displayName": "Set Pile Visibility",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Visibility",
+            "type": "Visibility",
+            "optional": true
+        },
+    ]
+});
+
+const SET_BUTTON_VISIBILITY = defineBlock({
+    "name": NODE_NAMES.SetButtonVisisibility,
+    "displayName": "Set Button Visibility",
+    "returnType": "ButtonLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Button",
+            "type": "ButtonLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Visibility",
+            "type": "Visibility",
+            "optional": true
+        },
+    ]
+});
+
+const SET_COUNTER_VISIBILITY = defineBlock({
+    "name": NODE_NAMES.SetCounterVisibility,
+    "displayName": "Set Counter Visibility",
+    "returnType": "CounterLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Counter",
+            "type": "CounterLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Visibility",
+            "type": "Visibility",
+            "optional": true
+        },
+    ]
+});
+
+const REMOVE_COUNTER = defineBlock({
+    "name": NODE_NAMES.RemoveCounter,
+    "displayName": "Remove Counter",
+    "returnType": "Void",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Counter",
+            "type": "CounterLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Send Value To",
+            "type": "CounterLabel",
+            "optional": true
+        },
+    ]
+});
+
+const REMOVE_BUTTON = defineBlock({
+    "name": NODE_NAMES.RemoveButton,
+    "displayName": "Remove Button",
+    "returnType": "ButtonLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Button",
+            "type": "ButtonLabel",
+            "optional": false
+        },
+    ]
+});
+
+const COUNTER_OF = defineBlock({
+    "name": NODE_NAMES.CounterOf,
+    "displayName": "Get a Player's Counter",
+    "returnType": "CounterLabel",
+    "arguments": [
+        {
+            "name": "id",
+            "displayName": "Player ID",
+            "type": "Player",
+            "optional": false
+        },
+        {
+            "name": "actionRole",
+            "displayName": "Counter's Action Role",
+            "type": "ActionRole",
+            "optional": false
+        }
+    ]
+});
+
+const BUTTON_OF = defineBlock({
+    "name": NODE_NAMES.ButtonOf,
+    "displayName": "Get a Player's Button",
+    "returnType": "ButtonLabel",
+    "arguments": [
+        {
+            "name": "id",
+            "displayName": "Player ID",
+            "type": "Player",
+            "optional": false
+        },
+        {
+            "name": "actionRole",
+            "displayName": "Button's Action Role",
+            "type": "ActionRole",
+            "optional": false
+        }
+    ]
+});
 
 // Put the blocks together in a registry to export them
 export const BLOCKS = {
@@ -1122,6 +1322,17 @@ export const BLOCKS = {
     WIN,
     LOSE,
     BUTTON_RANGE,
+    SET_RANGE,
+    BUTTON_VALUE,
+    CARD_OF_PILE,
+    SET_COUNTER_VALUE,
+    SET_PILE_VISIBILITY,
+    SET_BUTTON_VISIBILITY,
+    SET_COUNTER_VISIBILITY,
+    REMOVE_COUNTER,
+    REMOVE_BUTTON,
+    COUNTER_OF,
+    BUTTON_OF,
 } as const;
 
 export type BlockName = keyof typeof BLOCKS;

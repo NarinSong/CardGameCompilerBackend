@@ -18,6 +18,7 @@ const OperatorlessSchema = z.enum([
   NODE_NAMES.CtxId,
   NODE_NAMES.CtxCard,
   NODE_NAMES.FirstPlayer,
+  NODE_NAMES.ButtonValue,
 ]);
 const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.Not,
@@ -288,7 +289,8 @@ export const ActionContextSchema = z.object({
   trigger: TriggerSchema,
   id: z.number().optional(),
   label: LabelSchema.optional(),
-  card: CardSchema.optional()
+  card: CardSchema.optional(),
+  buttonValue: z.number().optional(),
 });
 
 export const ASTSchema = z.union([
