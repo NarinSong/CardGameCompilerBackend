@@ -66,7 +66,9 @@ export const SUIT = [
   "Clubs",
   "Diamonds",
   "Hearts",
-  "Spades"
+  "Spades",
+  "Jokers",
+  "Trumps",
 ] as const;
 
 export const SuitSchema = z.enum(SUIT);
