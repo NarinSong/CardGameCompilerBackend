@@ -29,6 +29,7 @@ const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.NextPlayer,
   NODE_NAMES.NumCardsInPile,
   NODE_NAMES.ValueOf,
+  NODE_NAMES.RemoveButton,
 ]);
 const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.And,
@@ -45,6 +46,15 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.Equal,
   NODE_NAMES.ShuffleInto,
   NODE_NAMES.Location,
+  NODE_NAMES.SetRange,
+  NODE_NAMES.CardOfPile,
+  NODE_NAMES.SetCounterValue,
+  NODE_NAMES.SetCounterVisibility,
+  NODE_NAMES.SetButtonVisisibility,
+  NODE_NAMES.SetPileVisibility,
+  NODE_NAMES.RemoveCounter,
+  NODE_NAMES.CounterOf,
+  NODE_NAMES.ButtonOf,
 ]);
 
 const TernaryOperatorsSchema = z.enum([

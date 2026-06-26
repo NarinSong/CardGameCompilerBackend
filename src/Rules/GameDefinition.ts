@@ -11,7 +11,7 @@ import LabelManager, { PhaseLabel, StepLabel } from "./LabelManager.js";
 import PileDefinition from "./PileDefinition.js";
 import PlayerDefinition from "./PlayerDefinition.js";
 import StepDefinition from "./StepDefinition.js";
-import { ButtonType, Location, LocationResolver, PileState, Visibility } from "../schemas/types.js";
+import { ButtonRange, ButtonType, Location, LocationResolver, PileState, Visibility } from "../schemas/types.js";
 import Game from "../Game/Game.js";
 import Logger from "../Components/Logger.js";
 import ButtonDefinition from "./ButtonDefinition.js";
@@ -94,6 +94,25 @@ export default class GameDefinition {
 
         const counter = new CounterDefinition({ labelManager: this.labelManger, ... dfn });
         this.player.counters.push(counter);
+    }
+
+    addPlayerButton(definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRole?: string | undefined,
+            visibility?: Visibility | undefined,
+            location?: LocationResolver | undefined,
+            type?: ButtonType | undefined,
+            range?: ButtonRange | undefined,
+        }) {
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'BUTTON')
+        };
+
+        const button = new ButtonDefinition({ labelManager: this.labelManger, ... dfn });
+        this.player.buttons.push(button);
     }
 
     /**
