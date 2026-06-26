@@ -1,6 +1,6 @@
 import { Label } from "../Rules/LabelManager.js";
 import ButtonDefinition from "../Rules/ButtonDefinition.js";
-import { ActionRole, ButtonType, DisplayName, Location, LocationResolver, PileState, Visibility } from "../schemas/types.js";
+import { ActionRole, ButtonRange, ButtonType, DisplayName, Location, LocationResolver, PileState, Visibility } from "../schemas/types.js";
 import GameLabels from "./GameLabels.js";
 
 /**
@@ -14,7 +14,7 @@ export default class Button {
     actionRoles: ActionRole[];
     displayName: DisplayName;
     type: ButtonType;
-    range: { min: number | undefined, max: number | undefined, increment: number } | undefined;
+    range: ButtonRange | undefined;
     location: LocationResolver;
 
     /**
@@ -33,7 +33,7 @@ export default class Button {
         actionRoles: ActionRole[],
         displayName: DisplayName,
         type: ButtonType,
-        range: { min: number | undefined, max: number | undefined, increment: number } | undefined,
+        range: ButtonRange | undefined,
         location: LocationResolver,
     ) {
         this.label = label;
@@ -83,7 +83,7 @@ export default class Button {
         actionRoles: ActionRole[],
         displayName: DisplayName,
         type: ButtonType,
-        range: { min: number | undefined, max: number | undefined, increment: number } | undefined,
+        range: ButtonRange | undefined,
         location: LocationResolver
     ) {
         return new Button(label, visibility, gameLabels, actionRoles, displayName, type, range, location);

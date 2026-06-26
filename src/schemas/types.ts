@@ -107,6 +107,11 @@ export const LocationResolverSchema = z.discriminatedUnion('locationType', [
     location: z.string()
   })
 ]);
+export const ButtonRangeSchema = z.object({
+  min: z.number().or(z.undefined()),
+  max: z.number().or(z.undefined()),
+  increment: z.number().or(z.undefined()),
+});
 
 /* BoardID must equal -1 */
 export const BoardIDSchema = z.literal(-1);
@@ -147,6 +152,7 @@ export type CardType = z.infer<typeof CardSchema>;
 export type Location = z.infer<typeof LocationSchema>;
 export type DefaultLocation = z.infer<typeof DefaultLocationSchema>;
 export type LocationResolver = z.infer<typeof LocationResolverSchema>;
+export type ButtonRange = z.infer<typeof ButtonRangeSchema>;
 
 // IDs
 export type ClientID = number;

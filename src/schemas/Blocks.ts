@@ -836,25 +836,25 @@ const MOVE_COUNTER_VALUE = defineBlock({
 
 const IS_BETWEEN = defineBlock({
     "name": NODE_NAMES.IsBetween,
-    "displayName": "Card is Between",
+    "displayName": "Number is Between",
     "returnType": "Boolean",
     "arguments": [
         {
             "name": "primary",
             "displayName": "Card",
-            "type": "Card",
+            "type": "Number",
             "optional": false
         },
         {
             "name": "secondary",
             "displayName": "Left",
-            "type": "Card",
+            "type": "Number",
             "optional": false
         },
         {
             "name": "tertiary",
             "displayName": "Right",
-            "type": "Card",
+            "type": "Number",
             "optional": false
         },
     ]

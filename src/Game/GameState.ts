@@ -11,7 +11,7 @@ import GameMeta from "../Rules/GameMeta.js";
 import { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
 import PileDefinition from "../Rules/PileDefinition.js";
 import StepDefinition from "../Rules/StepDefinition.js";
-import { BoardID, Location, LocationResolver, PileState, PlayerID, Visibility } from "../schemas/types.js";
+import { BoardID, ButtonRange, ButtonType, Location, LocationResolver, PileState, PlayerID, Visibility } from "../schemas/types.js";
 import Board from "./Board.js";
 import Button from "./Button.js";
 import Counter from "./Counter.js";
@@ -110,9 +110,6 @@ export default class GameState {
     createPile(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined, location?: LocationResolver | undefined } = {}) {
         const name = obj.name        ?? this.gameLabels.nextId;
 
-        
-
-
         const pile = Pile.create(
             obj.state       ?? PileState.EMPTY,
             name,
@@ -166,6 +163,42 @@ export default class GameState {
         delete this.piles[pile];
     }
 
+    createButton(obj: { name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined, type?: ButtonType | undefined, range?: ButtonRange | undefined, location?: LocationResolver | undefined } = {}) {
+        const name = obj.name        ?? this.gameLabels.nextId;
+
+        const button = Button.create(
+            name,
+            obj.visibility  ?? Visibility.FACE_DOWN,
+            this.gameLabels,
+            obj.actionRoles ?? [name],
+            obj.displayName ?? name,
+            obj.type ?? 'CLICK',
+            obj.range,
+            obj.location ?? coerceLocation(obj.location, 'BUTTON'),
+        );
+
+        this.buttons[name] = { button: button, owner: obj.owner ?? -1 };
+
+        return button.label;
+    }
+
+    createCounter(obj: { state?: number | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined, location?: LocationResolver | undefined } = {}) {
+        const name = obj.name        ?? this.gameLabels.nextId;
+
+        const counter = Counter.create(
+            obj.state       ?? 0,
+            name,
+            obj.visibility  ?? Visibility.FACE_DOWN,
+            this.gameLabels,
+            obj.actionRoles ?? [name],
+            obj.displayName ?? name,
+            obj.location ?? coerceLocation(obj.location, 'COUNTER'),
+        );
+        this.counters[name] = { counter: counter, owner: obj.owner ?? -1 };
+
+        return counter.label;
+    }
+
     /**
      * Deal a number of cards from one pile to another.
      * @param from - The pile where the cards will be dealt from.
@@ -178,6 +211,14 @@ export default class GameState {
 
         if (p1 && p2) {
             Card.dealCards(p1, p2, number);
+        }
+    }
+
+    shuffle(pile: Label) {
+        const p1 = this.gameLabels.getFromLabel(pile) as Pile;
+
+        if (p1) {
+            p1.cards = Card.shuffle(p1.cards);
         }
     }
 
