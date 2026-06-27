@@ -102,7 +102,6 @@ export default class Room {
      * Handles the action whenever a player clicks an object (Pile, Card, etc.).
      * @param label - The object that the user clicked.
      * @todo use cardId and player number to build action context
-     * @todo use cardId and player number to build action context
      */
     handlePlayerClick(label: string, cardId: number) {
         if (!this.started) return;
@@ -117,11 +116,10 @@ export default class Room {
 
     // This function should *only* be called by the parent lobby, and *only* during room creation, before the game begins
     handleJoinRoom(clientId: ClientID) {
-    handleJoinRoom(clientId: ClientID) {
         if (this.started) return false;
-
         const client = GameManager.clientFromId(clientId);
         if (!client) return false;
+
 
 
          
