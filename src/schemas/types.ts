@@ -41,6 +41,7 @@ export const TriggerTypeSchema = z.enum([
 ]);
 
 
+
 /**
  * Standard card ranks used by the game.
  */
@@ -65,17 +66,67 @@ export const SUIT = [
   "Clubs",
   "Diamonds",
   "Hearts",
-  "Spades"
+  "Spades",
+  "Jokers",
+  "Trumps",
 ] as const;
 
 export const SuitSchema = z.enum(SUIT);
+export const CardSchema = z.object({
+  rank: RankSchema,
+  suit: SuitSchema,
+  id: z.number()
+});
 export const DisplayNameSchema = z.string();
 export const ActionRoleSchema = z.string();
+export const LabelSchema = z.string();
 export const ActionRolesSchema = z.array(z.string());
 export const PlayerIDSchema = z.number();
+export const LocationSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+});
+export const DefaultLocationSchema = z.object({
+    anchor: z.object({
+        x: z.number(),
+        y: z.number(),
+    }),
+    direction: z.union([z.literal('VERTICAL'), z.literal('HORIZONTAL')]),
+    verticalOffset: z.number(),
+    horizontalOffset: z.number(),
+    wraptAt: z.number(),
+    wrapTo: z.number(),
+});
+export const LocationResolverSchema = z.discriminatedUnion('locationType', [
+  z.object({
+    locationType: z.literal('exact'),
+    location: LocationSchema
+  }),
+  z.object({
+    locationType: z.literal('relative'),
+    location: z.string()
+  })
+]);
+export const ButtonRangeSchema = z.object({
+  min: z.number().or(z.undefined()),
+  max: z.number().or(z.undefined()),
+  increment: z.number().or(z.undefined()),
+});
 
 /* BoardID must equal -1 */
 export const BoardIDSchema = z.literal(-1);
+
+export const TriggerSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal(TriggerTypeSchema.enum.CLICK),
+    target: ActionRoleSchema,
+  }),
+
+  z.object({
+    type: z.literal(TriggerTypeSchema.enum.AUTO),
+    target: z.undefined().optional(),
+  }),
+]);
 
 // Enums
 export const Visibility = VisibilitySchema.enum;
@@ -92,13 +143,56 @@ export type Visibility = z.infer<typeof VisibilitySchema>;
 export type TriggerType = z.infer<typeof TriggerTypeSchema>;
 export type DisplayName = z.infer<typeof DisplayNameSchema>;
 export type ActionRole = z.infer<typeof ActionRoleSchema>;
+export type Label = z.infer<typeof LabelSchema>;
 export type PlayerID = z.infer<typeof PlayerIDSchema>;
 export type BoardID = z.infer<typeof BoardIDSchema>;
 export type rank = z.infer<typeof RankSchema>;
 export type suit = z.infer<typeof SuitSchema>;
+export type CardType = z.infer<typeof CardSchema>;
+export type Location = z.infer<typeof LocationSchema>;
+export type DefaultLocation = z.infer<typeof DefaultLocationSchema>;
+export type LocationResolver = z.infer<typeof LocationResolverSchema>;
+export type ButtonRange = z.infer<typeof ButtonRangeSchema>;
 
 // IDs
 export type ClientID = number;
 export type GameID = number;
 export type RoomID = string;
 export type LobbyID = string;
+
+
+// Default locations
+
+export const DEFAULT_PILE_LOCATION: DefaultLocation = {
+    anchor: {
+        x: 0,
+        y: 50,
+    },
+    direction: "HORIZONTAL",
+    verticalOffset: 10,
+    horizontalOffset: 10,
+    wraptAt: 100,
+    wrapTo: -100,
+};
+export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
+    anchor: {
+        x: 0,
+        y: 0,
+    },
+    direction: "HORIZONTAL",
+    verticalOffset: 10,
+    horizontalOffset: 10,
+    wraptAt: 100,
+    wrapTo: -100,
+};
+export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
+    anchor: {
+        x: 0,
+        y: -50,
+    },
+    direction: "HORIZONTAL",
+    verticalOffset: 10,
+    horizontalOffset: 10,
+    wraptAt: 100,
+    wrapTo: -100,
+};

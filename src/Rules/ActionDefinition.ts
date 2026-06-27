@@ -3,7 +3,7 @@
 //      along with a filter (when they can do it)
 //      and a result (what happens when the action is taken)
 
-import { ActionNode, ValueNode } from "../schemas/AST.js";
+import { ValueNode } from "../schemas/AST.js";
 import { Trigger } from "./TriggerDefinition.js";
 
 /**
@@ -12,7 +12,7 @@ import { Trigger } from "./TriggerDefinition.js";
  *  An Action describes what causes the action (trigger), when it is allowed to occur (filter), and what happens when it executes (result).
  */
 export default class Action {
-    result: ActionNode;
+    result: ValueNode;
     filter: ValueNode;
     trigger: Trigger;
 
@@ -22,7 +22,7 @@ export default class Action {
      * @param filter - The condition that determines whether the action is allowed. If null, the action is always permitted.
      * @param result - The effect that occurs when the action executes.
      */
-    constructor(trigger: Trigger, filter: ValueNode | null, result: ActionNode) {
+    constructor(trigger: Trigger, filter: ValueNode | null, result: ValueNode) {
         this.trigger = trigger;
         this.filter = filter || { type: 'LITERAL', primary: true };
         this.result = result;

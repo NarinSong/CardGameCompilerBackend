@@ -1,17 +1,17 @@
 import { z } from "zod";
-import { ActionNodeSchema, ValueNodeSchema } from "./AST.js";
-import { ActionRoleSchema, ActionRolesSchema, PileStateSchema, TriggerTypeSchema, VisibilitySchema } from "./types.js";
+import { ValueNodeSchema } from "./AST.js";
+import { ActionRolesSchema, ButtonTypeSchema, DefaultLocationSchema, LocationResolverSchema, PileStateSchema, TriggerSchema, VisibilitySchema } from "./types.js";
 
 // Arguments to definitions
 export const GameMetaArgsSchema = z.object({
     minPlayers: z.number().optional(),
     maxPlayers: z.number().optional(),
     name: z.string().min(3).max(16).regex(/^[a-zA-Z0-9]+$/),
-    cardValueMap: ValueNodeSchema.optional(),
+    //cardValueMap: ValueNodeSchema.optional(),
     clientSuitMap: z.record(z.string(), z.number()).optional(),
     clientRankMap: z.record(z.string(), z.number()).optional(),
     variables: z.record(z.string(), z.number()).optional(),
-
+    locations: z.record(z.string(), DefaultLocationSchema).optional(),
 })
 
 export const PileSchema = z.object({
@@ -20,6 +20,7 @@ export const PileSchema = z.object({
     visibility: VisibilitySchema.optional(),
     displayName: z.string().optional(),
     actionRoles: ActionRolesSchema.optional(),
+    location: LocationResolverSchema.optional(),
 });
 
 export const CounterSchema = z.object({
@@ -28,11 +29,27 @@ export const CounterSchema = z.object({
     visibility: VisibilitySchema.optional(),
     displayName: z.string().optional(),
     actionRoles: ActionRolesSchema.optional(),
+    location: LocationResolverSchema.optional(),
 });
+
+export const ButtonSchema = z.object({
+    label: z.string().optional(),
+    visibility: VisibilitySchema.optional(),
+    actionRoles: ActionRolesSchema.optional(),
+    displayName: z.string().optional(),
+    type: ButtonTypeSchema.optional(),
+    range: z.object({
+        min: z.number().optional(),
+        max: z.number().optional(),
+        increment: z.number().optional(),
+    }).optional(),
+    location: LocationResolverSchema.optional(),
+})
 
 export const PlayerSchema = z.object({
     piles: z.array(PileSchema).optional(),
     counters: z.array(CounterSchema).optional(),
+    buttons: z.array(ButtonSchema).optional(),
 })
 
 export const BoardSchema = z.object({
@@ -43,22 +60,11 @@ export const BoardSchema = z.object({
 // Building up to phase definition
 
 // Start with actions
-export const TriggerSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal(TriggerTypeSchema.enum.CLICK),
-    target: ActionRoleSchema,
-  }),
-
-  z.object({
-    type: z.literal(TriggerTypeSchema.enum.AUTO),
-    target: z.undefined().optional(),
-  }),
-]);
 
 export const ActionSchema = z.object({
     trigger: TriggerSchema,
     filter: ValueNodeSchema.optional().or(z.null()),
-    result: ActionNodeSchema,
+    result: ValueNodeSchema,
 })
 
 export const StepSchema = z.object({
@@ -71,7 +77,7 @@ export const PhaseSchema = z.object({
     steps: z.array(StepSchema),
 })
 
-const NodeSchema = ActionNodeSchema.or(ValueNodeSchema);
+const NodeSchema = ValueNodeSchema;
 
 export type GameMetaArgs = z.infer<typeof GameMetaArgsSchema>;
 export type GameDefinitionPhase = z.infer<typeof PhaseSchema>;

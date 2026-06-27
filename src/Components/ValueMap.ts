@@ -92,12 +92,13 @@ export const DEFAULT_CLIENT_VIEW_RANK_MAP = DEFAULT_CARD_RANK_MAP;
 /**
  * Default mapping used by the client to display suit values.
  */
-export const DEFAULT_CLIENT_VIEW_SUIT_MAP = new ValueMap<suit | 'Jokers', number>({
+export const DEFAULT_CLIENT_VIEW_SUIT_MAP = new ValueMap<suit, number>({
     'Clubs': 0,
     'Diamonds': 1,
     'Spades': 2,
     'Hearts': 3,
     'Jokers': 4,
+    'Trumps': 5,
 });
 
 /**

@@ -5,7 +5,7 @@
 // And type (52-card, dominoes, etc.)
 
 import LabelManager, { Label } from "./LabelManager.js";
-import { ActionRole, DisplayName, PileState, Visibility } from "../schemas/types.js";
+import { ActionRole, DisplayName, LocationResolver, PileState, Visibility } from "../schemas/types.js";
 
 /**
  * Defines the properties that make up a pile in a game.
@@ -18,6 +18,8 @@ export default class PileDefinition {
     visibility: Visibility;
     displayName: DisplayName;
     actionRoles: ActionRole[];
+    location: LocationResolver;
+
     /**
      * Creates a new pile definition.
      * @param definition - Configuration for the pile, including its label manager, label, display name, action roles, initial value, and visibility.
@@ -29,11 +31,13 @@ export default class PileDefinition {
         actionRoles?: string[] | undefined,
         initialState?: PileState | undefined,
         visibility?: Visibility | undefined,
+        location: LocationResolver,
     }) {
         this.initialState = definition.initialState ?? PileState.EMPTY;
         this.label = definition.labelManager.createLabel(this, definition.label);
         this.displayName = definition.displayName ?? this.label;
         this.actionRoles = definition.actionRoles ?? [this.label];
         this.visibility = definition.visibility ?? Visibility.FACE_UP;
+        this.location = definition.location; // Location default is handled up a layer
     }
 }

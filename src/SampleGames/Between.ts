@@ -41,7 +41,7 @@ const step1 = Between.addStepToPhase(main, 'step1');
 function L(v: any): ValueNode {
     return {type: 'LITERAL', primary: v};
 }
-
+/*
 const start = new Action(
     {
         type: TriggerType.AUTO
@@ -170,6 +170,6 @@ const playCard = new Action(
 );
 
 Between.addActionToStep(step0, start);
-Between.addActionToStep(step1, playCard);
+Between.addActionToStep(step1, playCard);*/
 
 export default Between;

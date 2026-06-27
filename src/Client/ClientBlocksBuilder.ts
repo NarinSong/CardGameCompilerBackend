@@ -1,19 +1,67 @@
 // This file will take in the client payload and turn it into the "ClientGameDefinition" expected by GameBuilder
 
-import { ValueNode } from "../schemas/AST";
-import { BlockNode, ClientBuiltBlocksSchema, ClientNode, validateNode } from "../schemas/BuiltBlocks";
-import ClientGameDefinition from "../schemas/ClientGameDefinition";
-import { GameDefinitionNode, GameDefinitionPhase, GameDefinitionStep } from "../schemas/GameDefinitionArgs";
+import { ValueNode } from "../schemas/AST.js";
+import { BLOCKS } from "../schemas/Blocks.js";
+import { ArrayNode, BlockNode, ClientBuiltBlocksSchema, ClientNode, SequenceNode, validateNode } from "../schemas/BuiltBlocks.js";
+import ClientGameDefinition from "../schemas/ClientGameDefinition.js";
+import { GameDefinitionNode, GameDefinitionPhase, GameDefinitionStep } from "../schemas/GameDefinitionArgs.js";
+
+const UndefinedAST: GameDefinitionNode = { type: 'UNDEFINED' };
 
 function nonLiteralBlockNodeToAst(blockNode: BlockNode): GameDefinitionNode {
-    switch (blockNode.block) {
-        // TODO: add block kinds here based on "Blocks.ts"
-        case 'DEAL_CARDS':
-        case 'CREATE_PILE':
-        case 'IF':
-        case 'REMOVE_PILE':
-            throw new Error('Not yet implemented');
+    const node: any = {
+        type: blockNode.block
+    };
+
+
+    for (const i of Object.keys(blockNode.args)) {
+        const arg = blockNode.args[i];
+
+        node[i] = blockNodeToAst(arg) ?? UndefinedAST;
     }
+
+
+    // Fill in defaults (so client doens't have to)
+    const block = BLOCKS[blockNode.block];
+
+    for (const arg of block.arguments) {
+        const name = arg.name;
+
+        if (!node[name])
+            node[name] = UndefinedAST;
+    }
+
+    return node;
+}
+
+function sequenceNodeToAst(blockNode: SequenceNode): GameDefinitionNode {
+    const node: ValueNode = {
+        type: 'SEQUENCE',
+        primary: []
+    };
+
+    for (const block of blockNode.blocks) {
+        const child = blockNodeToAst(block);
+        if (!child) continue;
+        node.primary.push(child);
+    }
+
+    return node;
+}
+
+function arrayNodeToAst(blockNode: ArrayNode): GameDefinitionNode {
+    const node: ValueNode = {
+        type: "ARRAY",
+        sequence: []
+    };
+
+    for (const block of blockNode.value) {
+        const child = blockNodeToAst(block);
+        if (!child) continue;
+        node.sequence.push(child);
+    }
+
+    return node;
 }
 
 function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDefinitionNode {
@@ -22,10 +70,13 @@ function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDe
     switch (blockNode.kind) {
         case 'block':
             return nonLiteralBlockNodeToAst(blockNode);
-            break;
+        case 'sequence':
+            return sequenceNodeToAst(blockNode);
+        case 'array':
+            return arrayNodeToAst(blockNode);
         case 'literal':
             const literal: ValueNode = {
-                type: 'Literal',
+                type: 'LITERAL',
                 primary: blockNode.value
             };
             return literal;
@@ -40,7 +91,7 @@ export function safeBuildClientGameDefinitionFormBlocks(json: unknown): ClientGa
     return null;
 }
 
-function buildClientGameDefinitionFromblocks(json: unknown): ClientGameDefinition {
+export function buildClientGameDefinitionFromblocks(json: unknown): ClientGameDefinition {
     const checkJson = ClientBuiltBlocksSchema.safeParse(json);
     if (!checkJson.success) throw checkJson.error;
 
@@ -76,11 +127,17 @@ function buildClientGameDefinitionFromblocks(json: unknown): ClientGameDefinitio
                 validateNode(action.result);
                 if (action.filter) validateNode(action.filter);
 
+                const filter = blockNodeToAst(action.filter);
+                const result = blockNodeToAst(action.result);
+
+                if (!result) continue;
+                
                 const gameAction = {
                     trigger: action.trigger,
-                    filter: blockNodeToAst(action.filter),
-                    result: blockNodeToAst(action.result)
+                    filter: filter,
+                    result: result
                 }
+
                 gameStep.actions.push(gameAction);
             }
         }

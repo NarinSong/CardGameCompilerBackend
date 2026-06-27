@@ -1,5 +1,6 @@
 import ValueMap, { CardValueMap, DEFAULT_CARD_RANK_MAP, DEFAULT_CLIENT_VIEW_RANK_MAP, DEFAULT_CLIENT_VIEW_SUIT_MAP, DEFAULT_VALUE_MAP } from "../Components/ValueMap.js";
 import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
+import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DefaultLocation, Location } from "../schemas/types.js";
 
 
 /**
@@ -16,6 +17,7 @@ export default class GameMeta {
     clientSuitMap: ValueMap<string, number>;
     clientRankMap: ValueMap<string, number>;
     variables: Record<string, number>;
+    locations: Record<string, DefaultLocation>;
 
     /**
      * Creates a new GameMeta configuration.
@@ -25,11 +27,60 @@ export default class GameMeta {
         this.#name = obj.name;
         this.#minPlayers = obj.minPlayers || 1;
         this.#maxPlayers = obj.maxPlayers || 4;
-        this.cardValueMap = obj.cardValueMap ?? DEFAULT_VALUE_MAP;
+        this.cardValueMap = /*obj.cardValueMap ??*/ DEFAULT_VALUE_MAP;
         this.maps = { 'CARD_RANK_MAP': DEFAULT_CARD_RANK_MAP }
         this.clientSuitMap = obj.clientSuitMap ? new ValueMap<string, number>(obj.clientSuitMap) : DEFAULT_CLIENT_VIEW_SUIT_MAP;
         this.clientRankMap = obj.clientRankMap ? new ValueMap<string, number>(obj.clientRankMap) : DEFAULT_CLIENT_VIEW_RANK_MAP;
         this.variables = obj.variables ?? {};
+        this.locations = {
+            'DEFAULT_PILE': DEFAULT_PILE_LOCATION,
+            'DEFAULT_BUTTON': DEFAULT_BUTTON_LOCATION,
+            'DEFAULT_COUNTER': DEFAULT_COUNTER_LOCATION,
+        };
+
+        for (let i in obj.locations) {
+            if (!obj.locations[i]) continue;
+            this.locations[i] = obj.locations[i];
+        }
+    }
+
+    static locationOffset(current: number, offset: number, threshold: number, wrapTo: number): { value: number, wrapped: boolean } {
+        current += offset;
+        let wrapped = false;
+        if (current > threshold) {
+            current = wrapTo;
+            wrapped = true;
+        }
+        return { value: current, wrapped: wrapped };
+    }
+
+    nextLocation(locationName: string, currentLocation?: Location | undefined): Location {
+        const defaultLocation: DefaultLocation | undefined = this.locations[locationName];
+        if (!defaultLocation) return {x:0, y:0};
+        
+        if (!currentLocation) {
+            // Spelled out so that it clones and does not hold a reference
+            currentLocation = {
+                x: defaultLocation.anchor.x,
+                y: defaultLocation.anchor.y
+            }
+        }
+
+        if (defaultLocation.direction === 'HORIZONTAL') {
+            const base = GameMeta.locationOffset(currentLocation.x, defaultLocation.horizontalOffset, defaultLocation.wraptAt, defaultLocation.wrapTo);
+            if (base.wrapped) {
+                currentLocation.y += defaultLocation.verticalOffset;
+            }
+            currentLocation.x = base.value;
+        } else if (defaultLocation.direction === 'VERTICAL') {
+            const base = GameMeta.locationOffset(currentLocation.y, defaultLocation.verticalOffset, defaultLocation.wraptAt, defaultLocation.wrapTo);
+            if (base.wrapped) {
+                currentLocation.x += defaultLocation.horizontalOffset;
+            }
+            currentLocation.y = base.value;
+        }
+
+        return currentLocation;
     }
 
     // Prevent the minimum number of players from being larger than the maximum

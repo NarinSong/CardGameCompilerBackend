@@ -27,9 +27,27 @@ CREATE TABLE IF NOT EXISTS savedrules (
     gameDescription TEXT NOT NULL, -- player input, can be fairly long
     lastEditDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- should be automatic based on when this is updated
     privateGame BOOLEAN NOT NULL, -- either hidden or not hidden
+    blockeditorsaveid MEDIUMINT NOT NULL,
 
     FOREIGN KEY (creator) REFERENCES users(id),
     FOREIGN KEY (parent) REFERENCES savedrules(id)
+);
+
+CREATE TABLE IF NOT EXISTS blockeditorsaves (
+    id MEDIUMINT NOT NULL,
+    revision MEDIUMINT NOT NULL DEFAULT 0, -- incremements with each saved revision. Only the most recent X are saved (X TBD)
+    blockeditorstate TEXT NOT NULL, -- Structured JSON of the block state. Sent back to client exactly as received
+    creator MEDIUMINT NOT NULL, -- the user who created the game
+    parent MEDIUMINT, -- can be null. The savedrules that this was derived from
+    gameDescription TEXT NOT NULL, -- player input
+    lastEditDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- should be automatic based on when this is updated
+    privateGame BOOLEAN NOT NULL, -- either hidden or not hidden
+    gameid MEDIUMINT, -- can be null. The game id of the game created from these blocks
+
+    PRIMARY KEY (id, revision),
+
+    FOREIGN KEY (creator) REFERENCES users(id),
+    FOREIGN KEY (parent) REFERENCES blockeditorsaves(id)
 );
 
 -- These are used to set the starting user ID's to large numbers, so that they don't conflict with true/false checks at 0

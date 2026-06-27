@@ -1,203 +1,293 @@
 // Schemas are used to verify client input (using zod)
 
-import { number, z } from "zod";
+import { z } from "zod";
+import { TriggerSchema, LabelSchema, CardSchema } from "./types.js";
+import { ValueReturn, ValueReturnSchema } from "./Blocks.js";
+import { NODE_NAMES } from "./Constants.js";
 
-const Literal = z.literal("LITERAL");
-const Structures = z.literal("ARRAY");
-const Undefined = z.literal("UNDEFINED");
+// Group nodes based on structure
 
-const UnaryOperators = z.literal("NOT");
-const BinaryOperators = z.enum([
-  "AND",
-  "OR",
-  "PLUS",
-  "TIMES",
-  "DIV",
-  "MINUS",
-  "STRING_EQ",
-  "MAP"
+const LiteralSchema = z.enum([
+  NODE_NAMES.Literal,
+]);
+const StructuresSchema = z.literal(NODE_NAMES.Array);
+const UndefinedSchema = z.literal(NODE_NAMES.Undefined);
+
+const OperatorlessSchema = z.enum([
+  NODE_NAMES.ClickedLabel,
+  NODE_NAMES.CtxId,
+  NODE_NAMES.CtxCard,
+  NODE_NAMES.FirstPlayer,
+  NODE_NAMES.ButtonValue,
+]);
+const UnaryOperatorsSchema = z.enum([
+  NODE_NAMES.Not,
+  NODE_NAMES.Rank,
+  NODE_NAMES.Suit,
+  NODE_NAMES.SetPhase,
+  NODE_NAMES.SetStep,
+  NODE_NAMES.NextPlayer,
+  NODE_NAMES.NumCardsInPile,
+  NODE_NAMES.ValueOf,
+  NODE_NAMES.RemoveButton,
+]);
+const BinaryOperatorsSchema = z.enum([
+  NODE_NAMES.And,
+  NODE_NAMES.Or,
+  NODE_NAMES.Plus,
+  NODE_NAMES.Times,
+  NODE_NAMES.Div,
+  NODE_NAMES.Minus,
+  NODE_NAMES.StringEq,
+  NODE_NAMES.Map,
+  NODE_NAMES.While,
+  NODE_NAMES.LessThan,
+  NODE_NAMES.GreaterThan,
+  NODE_NAMES.Equal,
+  NODE_NAMES.ShuffleInto,
+  NODE_NAMES.Location,
+  NODE_NAMES.SetRange,
+  NODE_NAMES.CardOfPile,
+  NODE_NAMES.SetCounterValue,
+  NODE_NAMES.SetCounterVisibility,
+  NODE_NAMES.SetButtonVisisibility,
+  NODE_NAMES.SetPileVisibility,
+  NODE_NAMES.RemoveCounter,
+  NODE_NAMES.CounterOf,
+  NODE_NAMES.ButtonOf,
 ]);
 
-const TernaryOperators = z.literal("TERNARY");
-
-// TODO: fix these
-const LabelSchema = z.string();
-const CardSchema = z.any();
-const PileSchema = z.any();
-const PileStateSchema = z.any();
-const VisibilitySchema = z.any();
-const PlayerIDSchema = z.any();
-const BoardIDSchema = z.any();
-const TriggerSchema = z.any();
-
-
-const PileReturnInfoSchema = z.union([
-  PileStateSchema,
-  VisibilitySchema,
-  PlayerIDSchema,
-  BoardIDSchema
+const TernaryOperatorsSchema = z.enum([
+  NODE_NAMES.Ternary,
+  NODE_NAMES.DealCards,
+  NODE_NAMES.If,
+  NODE_NAMES.MoveCounterValue,
+  NODE_NAMES.IsBetween,
+  NODE_NAMES.Win,
+  NODE_NAMES.Lose,
+  NODE_NAMES.ButtonRange,
 ]);
 
-const ValueReturnSchema: z.ZodType<any> = z.union([
-  z.number(),
-  LabelSchema,
-  z.boolean(),
-  PileReturnInfoSchema,
-  CardSchema,
-  PileSchema,
-  z.array(z.any())
+const RoleOperatorsSchema = z.enum([
+  NODE_NAMES.AssignRole,
+  NODE_NAMES.UnassignRole,
+  NODE_NAMES.AssignRoleSingular,
+  NODE_NAMES.HasRole,
 ]);
 
-export const ValueNodeSchema: z.ZodType<any> = z.lazy(() =>
+const VariableOperatorsSchema = z.enum([
+  NODE_NAMES.AddVariable,
+  NODE_NAMES.UpdateVariable,
+])
+
+type LiteralNames = z.infer<typeof LiteralSchema>;
+type StructuresNames = z.infer<typeof StructuresSchema>;
+type UndefinedNames = z.infer<typeof UndefinedSchema>;
+type UnaryOperatorsNames = z.infer<typeof UnaryOperatorsSchema>;
+type OperatorlessNames = z.infer<typeof OperatorlessSchema>;
+type BinaryOperatorsNames = z.infer<typeof BinaryOperatorsSchema>;
+type TernaryOperatorsNames = z.infer<typeof TernaryOperatorsSchema>;
+type RoleOperatorsNames = z.infer<typeof RoleOperatorsSchema>;
+type VariableOperatorsNames = z.infer<typeof VariableOperatorsSchema>;
+
+// Typescript type structure
+
+export type AST_Node = 
+{
+  type: UndefinedNames;
+} | {
+  type: LiteralNames;
+  primary: ValueReturn;
+} | {
+  type: OperatorlessNames;
+} | {
+  type: UnaryOperatorsNames;
+  primary: AST_Node;
+} | {
+  type: BinaryOperatorsNames;
+  primary: AST_Node;
+  secondary: AST_Node;
+} | {
+  type: TernaryOperatorsNames;
+  primary: AST_Node;
+  secondary: AST_Node;
+  tertiary: AST_Node;
+} | {
+  type: RoleOperatorsNames;
+  id: AST_Node;
+  role: AST_Node;
+} | {
+  type: StructuresNames;
+  sequence: AST_Node[];
+} | {
+  type: typeof NODE_NAMES.CreatePile;
+  state: AST_Node;
+  name: AST_Node;
+  visibility: AST_Node;
+  actionRoles: AST_Node;
+  displayName: AST_Node;
+  owner: AST_Node;
+  location: AST_Node;
+} | {
+  type: typeof NODE_NAMES.GetIdFromRole;
+  role: AST_Node;
+  index: AST_Node;
+} | {
+  type: typeof NODE_NAMES.PileOf;
+  id: AST_Node;
+  actionRole: AST_Node;
+} | {
+  type: VariableOperatorsNames;
+  name: AST_Node;
+  value: AST_Node;
+} | {
+  type: typeof NODE_NAMES.GetVariable;
+  name: AST_Node;
+} | {
+  type: typeof NODE_NAMES.Sequence;
+  primary: AST_Node[];
+} | {
+  type: typeof NODE_NAMES.RemovePile;
+  pile: AST_Node;
+  sendTo: AST_Node;
+} | {
+  type: typeof NODE_NAMES.CreateCounter;
+  state: AST_Node;
+  name: AST_Node;
+  visibility: AST_Node;
+  actionRoles: AST_Node;
+  displayName: AST_Node;
+  owner: AST_Node;
+  location: AST_Node;
+} | {
+  type: typeof NODE_NAMES.CreateButton;
+  state: AST_Node;
+  name: AST_Node;
+  visibility: AST_Node;
+  actionRoles: AST_Node;
+  displayName: AST_Node;
+  owner: AST_Node;
+  location: AST_Node;
+  buttonType: AST_Node;
+  range: AST_Node;
+};
+
+export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
   z.discriminatedUnion("type", [
 
     z.object({
-      type: Undefined
+      type: UndefinedSchema
     }),
 
     z.object({
-      type: Literal,
+      type: LiteralSchema,
       primary: ValueReturnSchema
     }),
 
     z.object({
-      type: UnaryOperators,
+      type: OperatorlessSchema
+    }),
+
+    z.object({
+      type: UnaryOperatorsSchema,
       primary: ValueNodeSchema
     }),
 
     z.object({
-      type: BinaryOperators,
+      type: BinaryOperatorsSchema,
       primary: ValueNodeSchema,
       secondary: ValueNodeSchema
     }),
 
     z.object({
-      type: TernaryOperators,
+      type: TernaryOperatorsSchema,
       primary: ValueNodeSchema,
       secondary: ValueNodeSchema,
       tertiary: ValueNodeSchema
     }),
 
     z.object({
-      type: Structures,
+      type: StructuresSchema,
       sequence: z.array(ValueNodeSchema)
     }),
 
     z.object({
-      type: z.literal("CREATE_PILE"),
+      type: z.literal(NODE_NAMES.CreatePile),
       state: ValueNodeSchema,
       name: ValueNodeSchema,
       visibility: ValueNodeSchema,
       actionRoles: ValueNodeSchema,
       displayName: ValueNodeSchema,
-      owner: ValueNodeSchema
+      owner: ValueNodeSchema,
+      location: ValueNodeSchema,
     }),
 
     z.object({
-      type: z.literal("CLICKED_LABEL")
+      type: z.literal(NODE_NAMES.CreateCounter),
+      state: ValueNodeSchema,
+      name: ValueNodeSchema,
+      visibility: ValueNodeSchema,
+      actionRoles: ValueNodeSchema,
+      displayName: ValueNodeSchema,
+      owner: ValueNodeSchema,
+      location: ValueNodeSchema,
     }),
 
     z.object({
-      type: z.literal("RANK"),
-      primary: ValueNodeSchema
+      type: z.literal(NODE_NAMES.CreateButton),
+      state: ValueNodeSchema,
+      name: ValueNodeSchema,
+      visibility: ValueNodeSchema,
+      actionRoles: ValueNodeSchema,
+      displayName: ValueNodeSchema,
+      owner: ValueNodeSchema,
+      location: ValueNodeSchema,
+      buttonType: ValueNodeSchema,
+      range: ValueNodeSchema,
     }),
 
     z.object({
-      type: z.literal("SUIT"),
-      primary: ValueNodeSchema
-    }),
-
-    z.object({
-      type: z.literal("CTX_CARD")
-    }),
-
-    z.object({
-      type: z.literal("CTX_ID")
-    }),
-
-    z.object({
-      type: z.literal("GET_ID_FROM_ROLE"),
+      type: z.literal(NODE_NAMES.GetIdFromRole),
       role: ValueNodeSchema,
       index: ValueNodeSchema
     }),
 
     z.object({
-      type: z.literal("PILE_OF"),
+      type: z.literal(NODE_NAMES.PileOf),
       id: ValueNodeSchema,
       actionRole: ValueNodeSchema
     }),
 
     z.object({
-      type: z.literal("HAS_ROLE"),
+      type: RoleOperatorsSchema,
       id: ValueNodeSchema,
       role: ValueNodeSchema
     }),
 
-    z.object({
-      type: z.literal("ASSIGN_ROLE"),
-      id: ValueNodeSchema,
-      role: ValueNodeSchema
-    }),
+    /* Variables */
 
     z.object({
-      type: z.literal("UNASSIGN_ROLE"),
-      id: ValueNodeSchema,
-      role: ValueNodeSchema
-    }),
-
-    z.object({
-      type: z.literal("ASSIGN_ROLE_SINGULAR"),
-      id: ValueNodeSchema,
-      role: ValueNodeSchema
-    }),
-
-    z.object({
-      type: z.literal("ADD_VARIABLE"),
+      type: VariableOperatorsSchema,
       name: ValueNodeSchema,
       value: ValueNodeSchema,
     }),
 
     z.object({
-      type: z.literal("UPDATE_VARIABLE"),
-      name: ValueNodeSchema,
-      value: ValueNodeSchema,
-    }),
-
-    z.object({
-    type: z.literal("GET_VARIABLE"),
+    type: z.literal(NODE_NAMES.GetVariable),
     name: ValueNodeSchema,
     }),
-  ])
-);
-
-export const ActionNodeSchema: z.ZodType<any> = z.lazy(() =>
-  z.discriminatedUnion("type", [
 
     /* Logic */
 
     z.object({
-      type: z.literal("IF"),
-      primary: ValueNodeSchema,
-      secondary: ActionNodeSchema,
-      tertiary: ActionNodeSchema.optional()
-    }),
-
-    z.object({
-      type: z.literal("SEQUENCE"),
-      primary: z.array(ActionNodeSchema)
+      type: z.literal(NODE_NAMES.Sequence),
+      primary: z.array(ValueNodeSchema)
     }),
 
     /* Game actions */
 
     z.object({
-      type: z.literal("DEAL_CARDS"),
-      primary: ValueNodeSchema,
-      secondary: ValueNodeSchema,
-      tertiary: ValueNodeSchema
-    }),
-
-    z.object({
-      type: z.literal("REMOVE_PILE"),
+      type: z.literal(NODE_NAMES.RemovePile),
       pile: ValueNodeSchema,
       sendTo: ValueNodeSchema
     })
@@ -207,18 +297,16 @@ export const ActionNodeSchema: z.ZodType<any> = z.lazy(() =>
 
 export const ActionContextSchema = z.object({
   trigger: TriggerSchema,
-  id: z.number(),
+  id: z.number().optional(),
   label: LabelSchema.optional(),
-  card: CardSchema.optional()
+  card: CardSchema.optional(),
+  buttonValue: z.number().optional(),
 });
 
 export const ASTSchema = z.union([
-  ValueNodeSchema,
-  ActionNodeSchema
+  ValueNodeSchema
 ]);
 
-export type ValueReturn = z.infer<typeof ValueReturnSchema>;
 export type ValueNode = z.infer<typeof ValueNodeSchema>;
-export type ActionNode = z.infer<typeof ActionNodeSchema>;
 export type ActionContext = z.infer<typeof ActionContextSchema>;
 export type AST = z.infer<typeof ASTSchema>;

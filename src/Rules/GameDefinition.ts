@@ -11,10 +11,11 @@ import LabelManager, { PhaseLabel, StepLabel } from "./LabelManager.js";
 import PileDefinition from "./PileDefinition.js";
 import PlayerDefinition from "./PlayerDefinition.js";
 import StepDefinition from "./StepDefinition.js";
-import { ButtonType, PileState, Visibility } from "../schemas/types.js";
+import { ButtonRange, ButtonType, Location, LocationResolver, PileState, Visibility } from "../schemas/types.js";
 import Game from "../Game/Game.js";
 import Logger from "../Components/Logger.js";
 import ButtonDefinition from "./ButtonDefinition.js";
+import { coerceLocation } from "../Components/LocationUtils.js";
 
 
 /**
@@ -61,8 +62,15 @@ export default class GameDefinition {
             actionRole?: string | undefined,
             initialValue?: PileState | undefined,
             visibility?: Visibility | undefined,
+            location?: LocationResolver | undefined,
         }) {
-        const pile = new PileDefinition({ labelManager: this.labelManger, ... definition });
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'PILE')
+        };
+
+        const pile = new PileDefinition({ labelManager: this.labelManger, ... dfn });
         this.player.piles.push(pile);
     }
 
@@ -76,9 +84,35 @@ export default class GameDefinition {
             actionRole?: string | undefined,
             initialValue?: number | undefined,
             visibility?: Visibility | undefined,
+            location?: LocationResolver | undefined,
         }) {
-        const counter = new CounterDefinition({ labelManager: this.labelManger, ... definition });
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'COUNTER')
+        };
+
+        const counter = new CounterDefinition({ labelManager: this.labelManger, ... dfn });
         this.player.counters.push(counter);
+    }
+
+    addPlayerButton(definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRole?: string | undefined,
+            visibility?: Visibility | undefined,
+            location?: LocationResolver | undefined,
+            type?: ButtonType | undefined,
+            range?: ButtonRange | undefined,
+        }) {
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'BUTTON')
+        };
+
+        const button = new ButtonDefinition({ labelManager: this.labelManger, ... dfn });
+        this.player.buttons.push(button);
     }
 
     /**
@@ -91,8 +125,15 @@ export default class GameDefinition {
             actionRole?: string | undefined,
             initialValue?: PileState | undefined,
             visibility?: Visibility | undefined,
+            location?: LocationResolver | undefined,
         }) {
-        const pile = new PileDefinition({ labelManager: this.labelManger, ... definition });
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'PILE')
+        };
+
+        const pile = new PileDefinition({ labelManager: this.labelManger, ... dfn });
         this.board.piles.push(pile);
     }
 
@@ -106,8 +147,15 @@ export default class GameDefinition {
             actionRole?: string | undefined,
             initialValue?: number | undefined,
             visibility?: Visibility | undefined,
+            location?: LocationResolver | undefined,
         }) {
-        const counter = new CounterDefinition({ labelManager: this.labelManger, ... definition });
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'COUNTER')
+        };
+
+        const counter = new CounterDefinition({ labelManager: this.labelManger, ... dfn });
         this.board.counters.push(counter);
     }
 
@@ -120,9 +168,16 @@ export default class GameDefinition {
         displayName?: string | undefined,
         actionRoles?: string[] | undefined,
         type?: ButtonType | undefined,
-        range: { min?: number | undefined, max?: number | undefined, increment?: number | undefined } | undefined,
+        range?: { min?: number | undefined, max?: number | undefined, increment?: number | undefined } | undefined,
+        location?: LocationResolver | undefined,
     }) {
-        const button = new ButtonDefinition({ labelManager: this.labelManger, ... definition });
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'BUTTON')
+        };
+
+        const button = new ButtonDefinition({ labelManager: this.labelManger, ... dfn });
         this.board.buttons.push(button);
     }
 
