@@ -119,6 +119,7 @@ export default class Lobby {
 
         this.update();
 
+
         return true;
     }
 

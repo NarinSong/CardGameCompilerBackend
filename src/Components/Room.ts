@@ -133,7 +133,7 @@ export default class Room {
             const listener = (msg: any) => {
                 if (msg.type !== "PLAYER_JOINED") return;
                 this.worker.off("message", listener);
-                if (!msg.playerId) return resolve(false);
+                if (msg.playerId == null) return resolve(false);
 
                 this.clients[client.identifier] = msg.playerId;
                 client.inGame = true;
