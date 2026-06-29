@@ -421,6 +421,13 @@ export async function clientRequestSelectGame(clientId: number, gameId: unknown,
     const game = await GameManager.getGameDefinition(gameIdCheck.data);
     if (!game) return callback(false);
 
+    if (!GameManager.getRegisteredGameDefinitionJson(gameIdCheck.data)) {
+        const result = await Database.getGameFromId(gameIdCheck.data);
+        if (result?.[0]) {
+            GameManager.registerGameDefinition(game, gameIdCheck.data, result[0].gameRules);
+        }
+    }
+
     lobby.selectGame(gameIdCheck.data);
 
     callback(true);

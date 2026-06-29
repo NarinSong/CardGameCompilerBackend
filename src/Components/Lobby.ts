@@ -118,6 +118,8 @@ export default class Lobby {
         this.#rooms.push(room.name);
 
         this.update();
+
+        return true;
     }
 
     isHost(clientId: ClientID) {
