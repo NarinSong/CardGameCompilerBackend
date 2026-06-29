@@ -130,16 +130,18 @@ export default class Room {
          * If successful, the client is mapped to their player ID and marked as in-game.
          */
         return new Promise((resolve) => {
-            this.worker.once("message", (msg) => {
-                if(msg.type !== "PLAYER_JOINED" || !msg.playerId) return resolve(false);
-                
-                this.clients[client.identifier] = msg.playerId;
+            const listener = (msg: any) => {
+                if (msg.type !== "PLAYER_JOINED") return;
+                this.worker.off("message", listener);
+                if (!msg.playerId) return resolve(false);
 
+                this.clients[client.identifier] = msg.playerId;
                 client.inGame = true;
                 client.roomId = this.name;
                 client.player = msg.playerId;
                 resolve(true)
-            })
+            };
+            this.worker.on("message", listener);
             this.worker.postMessage({ type: "JOIN_ROOM", playerType: PlayerType.HUMAN });
         });
        

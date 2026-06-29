@@ -13,7 +13,7 @@ import GameMeta from "../Rules/GameMeta.js";
 
 type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number, id: number}[], label: string, displayName: string, actionRoles: string[], location: Location };
 type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[], location: Location };
-type ClientButtonType = { owner: number, visibility: Visibility, label: string, actionRoles: string[], displayName: string, type: ButtonType, range: { min: number | undefined, max: number | undefined, increment: number } | undefined, location: Location };
+type ClientButtonType = { owner: number, visibility: Visibility, label: string, actionRoles: string[], displayName: string, type: ButtonType, range: { min: number | undefined, max: number | undefined, increment: number | undefined } | undefined, location: Location };
 type ClientPlayerType = { playerId: PlayerID, type: PlayerType };
 
 function resolveLocation(location: LocationResolver, locations: Record<string, Location>, gameMeta: GameMeta): Location {

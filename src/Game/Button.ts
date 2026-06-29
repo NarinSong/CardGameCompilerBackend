@@ -86,6 +86,6 @@ export default class Button {
         range: ButtonRange | undefined,
         location: LocationResolver
     ) {
-        return new Button(label, gameLabels, actionRoles, displayName, type, range);
+        return new Button(label, visibility, gameLabels, actionRoles, displayName, type, range, location);
     }
 }
