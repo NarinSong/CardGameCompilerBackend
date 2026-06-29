@@ -18,7 +18,8 @@ import GameMeta from "../Rules/GameMeta.js";
 vi.mock("../GameManager.js", () => ({
     default: {
         clientFromId: vi.fn(),
-        registerGameDefinition: vi.fn(),
+        registerGameDefinition: vi.fn().mockReturnValue(1),
+        getAvailableGameNames: vi.fn().mockResolvedValue(["TestGame"]),
     }
 }));
 
@@ -38,6 +39,10 @@ function makeFakeClient(overrides = {}){
 
 beforeEach(() => {
     vi.clearAllMocks();
+
+    vi.mocked(buildGameFromJSON).mockReturnValue({ some: "gamedef" } as any);
+    vi.mocked(GameManager.registerGameDefinition).mockReturnValue(1);
+    vi.mocked(GameManager.getAvailableGameNames).mockResolvedValue(["TestGame"]);
 });
 
 /**
@@ -268,9 +273,9 @@ describe("clientRequestGetAvailableGames", () => {
         expect(() => clientRequestGetAvailableGames(1,"ddwadaw")).not.toThrow();
     });
 
-    it("calls callback with an array", () => {
+    it("calls callback with an array", async () => {
         const callback = vi.fn();
-        clientRequestGetAvailableGames(1, callback);
+        await clientRequestGetAvailableGames(1, callback);
 
         expect(callback).toHaveBeenCalledTimes(1);
         expect(callback).toHaveBeenCalledWith(expect.any(Array));
@@ -289,7 +294,9 @@ describe("clientRequestGetAvailableGames", () => {
  */
 
 const validGame = {
-    gameMeta: {},
+    gameMeta: {
+        name: "TestGame",
+    },
     playerDefinition: {},
     boardDefinition: {},
     phases: [],

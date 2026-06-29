@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import Card from "./Card.js";
 import Pile from "../Game/Pile.js";
-import { PileState, Visibility } from "../schemas/types.js";
+import { PileState, RANK, SUIT } from "../schemas/types.js";
 
 describe("Card.numberRank", () => {
     it("returns the correct index for a known rank", () => {
@@ -17,42 +17,48 @@ describe("Card.numberRank", () => {
 
 
 describe("Card.defaultDeck", () => {
-    it("returns 52 cards", () => {
-        expect(Card.defaultDeck().length).toBe(52);
+    it("creates one card for every rank/suit combination", () => {
+        const deck = Card.defaultDeck();
+
+        expect(deck.length).toBe(RANK.length * SUIT.length);
     });
 
     it("contains unique rank/suit combinations", () => {
         const deck = Card.defaultDeck();
         const unique = new Set(deck.map(c => `${c.suit}-${c.rank}`));
-        expect(unique.size).toBe(52);
+
+        expect(unique.size).toBe(RANK.length * SUIT.length);
     });
 });
 
 describe("Card.isBigger", () => {
-    /*it("returns true if first card has a higher rank", () => {
-        const card1 = new Card({rank:"King", suit:"Clubs"}); 
-        const card2 = new Card({rank:"One", suit:"Clubs"}); 
+    it("returns true if the first card has a higher rank", () => {
+        const card1 = new Card({rank: "King", suit: "Clubs"});
+        const card2 = new Card({rank: "Two", suit: "Clubs"});
+
         expect(Card.isBigger(card1, card2)).toBe(true);
     });
 
-    it("returns false if second card has a higher rank", () => {
-        const card1 = new Card({rank:"One", suit:"Clubs"}); 
-        const card2 = new Card({rank:"King", suit:"Clubs"}); 
+    it("returns false if the second card has a higher rank", () => {
+        const card1 = new Card({rank: "Two", suit: "Clubs"});
+        const card2 = new Card({rank: "King", suit: "Clubs"});
+
         expect(Card.isBigger(card1, card2)).toBe(false);
     });
-    
-    it("returns false if one of the cards is undefined", () => {
-        const card1 = new Card({rank:"odwadadadwadne", suit:"Clubs"}); 
-        const card2 = new Card({rank:"King", suit:"Clubs"}) 
-        expect(Card.isBigger(card1, card2)).toBe(false);
-    });*/
 
+    it("returns false if either card is undefined", () => {
+        const card = new Card({rank: "King", suit: "Clubs"});
+
+        expect(Card.isBigger(undefined, card)).toBe(false);
+        expect(Card.isBigger(card, undefined)).toBe(false);
+    });
 });
 
 describe("Card.fromInitialState", () => {
-    it("returns 52 shuffled cards for SHUFFLED state", () => {
-        const cards = Card.fromInitialState(PileState.SHUFFLED);
-        expect(cards.length).toBe(52);
+    it("returns a shuffled default deck for SHUFFLED state", () => {
+    	const cards = Card.fromInitialState(PileState.SHUFFLED);
+
+    	expect(cards.length).toBe(RANK.length * SUIT.length);
     });
 
     it("returns an empty array for non-SHUFFLED states", () => {
@@ -68,7 +74,7 @@ describe("Card.dealCards", () => {
 
         Card.dealCards(from, to, 5);
 
-        expect(from.cards.length).toBe(47);
+        expect(from.cards.length).toBe(RANK.length * SUIT.length - 5);
         expect(to.cards.length).toBe(5);
     });
 
