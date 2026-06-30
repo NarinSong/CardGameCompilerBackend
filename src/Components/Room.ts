@@ -36,6 +36,7 @@ export default class Room {
     name: RoomID;
     lobby: LobbyID;
     started: boolean;
+    private timeouts: Map<string, NodeJS.Timeout>;
 
     /**
      * Creates a room.
@@ -49,6 +50,8 @@ export default class Room {
         this.name = name;
         this.lobby = lobby;
         this.started = false;
+        this.timeouts = new Map();
+        this.resetInactivityTimeout();
 
 
         this.worker = new Worker(new URL("./RoomWorker.js", import.meta.url), {
@@ -67,6 +70,16 @@ export default class Room {
         this.worker.on("error", (err) => {
             console.error(`Room ${this.name} worker error:`, err);
         });
+    }
+
+    resetInactivityTimeout() {
+        const existing = this.timeouts.get("inactivity");
+        if (existing) clearTimeout(existing);
+        
+        this.timeouts.set("inactivity", setTimeout(() => {
+            console.log(`Room ${this.name} timed out due to inactivity`);
+            this.destroy();
+        }, 30 * 60 * 1000)); 
     }
 
     /**
@@ -105,6 +118,7 @@ export default class Room {
      */
     handlePlayerClick(label: string, cardId: number) {
         if (!this.started) return;
+        this.resetInactivityTimeout();
         this.worker.postMessage({type: "PLAYER_CLICK", label})
         // let actionTaken = this.game.clickAction(label); // TODO: player number?
 
@@ -119,7 +133,7 @@ export default class Room {
         if (this.started) return false;
         const client = GameManager.clientFromId(clientId);
         if (!client) return false;
-
+        this.resetInactivityTimeout();
 
 
          
@@ -150,17 +164,29 @@ export default class Room {
     startGame() {
         if (this.started) return false;
         this.started = true;
+        this.resetInactivityTimeout();
         this.worker.postMessage({type: "START_GAME"});
         return true;
     }
 
     clearTimeouts() {
-        // TODO: As timeouts are added, remove them here.
-        
+        for (const t of this.timeouts.values()){
+            clearTimeout(t);
+        }
+        this.timeouts.clear();
+    }
+
+    clearTimeoutByName(name: string){
+        const exists = this.timeouts.get(name);
+        if (exists){
+            clearTimeout(exists);
+            this.timeouts.delete(name);
+        }
     }
 
     //Terminate the thread after the room is done
     destroy(){
+        this.clearTimeouts();
         this.worker.terminate();
     }
 }
