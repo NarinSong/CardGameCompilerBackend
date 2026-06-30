@@ -78,12 +78,9 @@ export default class Room {
         
         this.timeouts.set("inactivity", setTimeout(() => {
             console.log(`Room ${this.name} timed out due to inactivity`);
-            for(const clientId in this.clients){
-                sendLobbyClosed(+clientId);
-            }
-
+            //TODO: notify clients that the room has timed out
             this.destroy();
-        }, 1 * 60 * 1000)); 
+        }, 30 * 60 * 1000)); 
     }
 
     /**
@@ -105,14 +102,7 @@ export default class Room {
             sendClientGamestate(client.identifier,  playerView.view );
         }
 
-        // for (let c in this.clients) {
-        //     if (!this.game.players[0]) continue;
-            
-        //     const client = GameManager.clientFromId(+c);
-        //     if (!client) continue;
 
-        //     client.updateGamestate(state);
-        // }
     }
 
     /**
@@ -124,12 +114,7 @@ export default class Room {
         if (!this.started) return;
         this.resetInactivityTimeout();
         this.worker.postMessage({type: "PLAYER_CLICK", label})
-        // let actionTaken = this.game.clickAction(label); // TODO: player number?
 
-        // if (actionTaken) {
-        //     // Update clients with new gamestate
-        //     this.emitGameState();
-        // }
     }
 
     // This function should *only* be called by the parent lobby, and *only* during room creation, before the game begins
