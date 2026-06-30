@@ -79,7 +79,7 @@ export default class Room {
         this.timeouts.set("inactivity", setTimeout(() => {
             console.log(`Room ${this.name} timed out due to inactivity`);
             this.destroy();
-        }, 30 * 60 * 1000)); 
+        }, 1 * 60 * 1000)); 
     }
 
     /**
