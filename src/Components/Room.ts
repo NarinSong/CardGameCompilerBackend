@@ -7,7 +7,7 @@ import { Worker } from "node:worker_threads";
 
 import GameManager from "../GameManager.js";
 import { ClientID, LobbyID, PlayerID, PlayerType, RoomID, GameID } from "../schemas/types.js";
-import { sendClientGamestate } from "../index.js";
+import { sendClientGamestate, sendLobbyClosed } from "../index.js";
 import ClientView from "../Client/ClientView.js";
 
 
@@ -78,6 +78,10 @@ export default class Room {
         
         this.timeouts.set("inactivity", setTimeout(() => {
             console.log(`Room ${this.name} timed out due to inactivity`);
+            for(const clientId in this.clients){
+                sendLobbyClosed(+clientId);
+            }
+
             this.destroy();
         }, 1 * 60 * 1000)); 
     }
