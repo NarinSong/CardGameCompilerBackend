@@ -128,6 +128,13 @@ export const TriggerSchema = z.discriminatedUnion("type", [
   }),
 ]);
 
+// Deck constructs
+const DeckPartSchema = z.object({
+  ranks: z.array(RankSchema),
+  suits: z.array(SuitSchema),
+});
+const DeckDefinitionSchema = z.array(DeckPartSchema);
+
 // Enums
 export const Visibility = VisibilitySchema.enum;
 export const PileState = PileStateSchema.enum;
@@ -153,6 +160,7 @@ export type Location = z.infer<typeof LocationSchema>;
 export type DefaultLocation = z.infer<typeof DefaultLocationSchema>;
 export type LocationResolver = z.infer<typeof LocationResolverSchema>;
 export type ButtonRange = z.infer<typeof ButtonRangeSchema>;
+export type DeckDefinition = z.infer<typeof DeckDefinitionSchema>;
 
 // IDs
 export type ClientID = number;
@@ -196,3 +204,11 @@ export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
     wraptAt: 100,
     wrapTo: -100,
 };
+
+// Default deck. TODO: Switch to RANKENUM.ACE, etc. so that it's more readable
+export const DEFAULT_DECK_DEFINITION: DeckDefinition = [
+  {
+    ranks: [RANK[0], RANK[1], RANK[2], RANK[3], RANK[4], RANK[5], RANK[6], RANK[7], RANK[8], RANK[9], RANK[10], RANK[11], RANK[12], ],
+    suits: [SUIT[0], SUIT[1], SUIT[2], SUIT[3]],
+  }
+];

@@ -1,6 +1,6 @@
 import Pile from "../Game/Pile.js";
 import { CardArgs } from "../schemas/GameComponentArgs.js";
-import { PileState, RANK, rank, SUIT, suit } from "../schemas/types.js";
+import { DeckDefinition, DEFAULT_DECK_DEFINITION, PileState, RANK, rank, SUIT, suit } from "../schemas/types.js";
 import Logger from "./Logger.js";
 import { CardValueMap } from "./ValueMap.js";
 
@@ -42,12 +42,15 @@ export default class Card {
      * Creates a default deck (one card for every unique combination of rank and suit).
      * @returns A list of cards.
      */
-    static defaultDeck() {
+    static defaultDeck(deckDefinition?: DeckDefinition) {
+        deckDefinition ??= DEFAULT_DECK_DEFINITION;
         const cards: Card[] = [];
 
-        for (const suit of SUIT) {
-            for (const rank of RANK) {
-                cards.push(new Card({rank: rank, suit: suit}));
+        for (const part of deckDefinition) {
+            for (const suit of part.suits) {
+                for (const rank of part.ranks) {
+                    cards.push(new Card({rank: rank, suit: suit}));
+                }
             }
         }
 
