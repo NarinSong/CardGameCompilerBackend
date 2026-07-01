@@ -12,14 +12,12 @@ import {
 } from "./ClientRequestParser.js";
 import GameManager from "../GameManager.js";
 import { buildGameFromJSON } from "./GameBuilder.js";
-import { execPath } from "node:process";
-import GameMeta from "../Rules/GameMeta.js";
 
 vi.mock("../GameManager.js", () => ({
     default: {
         clientFromId: vi.fn(),
         registerGameDefinition: vi.fn().mockReturnValue(1),
-        getAvailableGameNames: vi.fn().mockResolvedValue(["TestGame"]),
+        getAvailableGameNames: vi.fn().mockResolvedValue([{name: "TestGame", id: 1}]),
     }
 }));
 
@@ -41,8 +39,8 @@ beforeEach(() => {
     vi.clearAllMocks();
 
     vi.mocked(buildGameFromJSON).mockReturnValue({ some: "gamedef" } as any);
-    vi.mocked(GameManager.registerGameDefinition).mockReturnValue(1);
-    vi.mocked(GameManager.getAvailableGameNames).mockResolvedValue(["TestGame"]);
+    vi.mocked(GameManager.registerGameDefinition).mockReturnValue();
+    vi.mocked(GameManager.getAvailableGameNames).mockResolvedValue([{name:"TestGame", id: 1}]);
 });
 
 /**
