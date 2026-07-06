@@ -7,7 +7,7 @@ import { Worker } from "node:worker_threads";
 
 import GameManager from "../GameManager.js";
 import { ClientID, LobbyID, PlayerID, PlayerType, RoomID, GameID } from "../schemas/types.js";
-import { sendClientGamestate, sendLobbyClosed } from "../index.js";
+import { sendClientGamestate, sendLobbyClosed, sendReaction } from "../index.js";
 import ClientView from "../Client/ClientView.js";
 
 
@@ -115,6 +115,14 @@ export default class Room {
         this.resetInactivityTimeout();
         this.worker.postMessage({type: "PLAYER_CLICK", label})
 
+    }
+
+    handleEmote(clientId: ClientID, username: string, emote: string) {
+        for (const client in this.clients) {
+            if (+client == clientId) continue;
+
+            sendReaction(+client, username, emote);
+        }
     }
 
     // This function should *only* be called by the parent lobby, and *only* during room creation, before the game begins

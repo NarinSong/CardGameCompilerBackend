@@ -492,6 +492,29 @@ export function clientRequestClickLabel(clientId: number, label: unknown, cardId
     callback(true);
 }
 
+export function clientRequestReactWithEmote(clientId: number, emote: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(succeeded: boolean) => void 
+
+    const emoteCheck = z
+        .string()
+        .safeParse(emote);
+
+    if (!emoteCheck.success)
+        return callback(false);
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client || !client.roomId || !client.username) return callback(false);
+
+    const room = GameManager.getRoomFromId(client.roomId);
+    if (!room) return callback(false);
+
+    room.handleEmote(clientId, client.username, emoteCheck.data);
+
+    callback(true);
+}
+
+
+
 export function clientRequestLeaveGame(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(succeess: boolean) => void
 

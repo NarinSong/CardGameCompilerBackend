@@ -139,5 +139,15 @@ function sendLobbyClosed(clientId: ClientID) {
     socket.emit('lobbyClosed');
 }
 
+function sendReaction(clientId: ClientID, from: string, reaction: string) {
+    const socket = SOCKETS[clientId];
+    if (!socket) {
+        failedSend(clientId, 'sendReaction()');
+        return;
+    }
+
+    socket.emit('reaction', from, reaction);
+}
+
 // Exports. Note: socket is not exported
-export { sendClientGamestate, sendGameEnded, sendLobbyStatus, sendLobbyClosed };
+export { sendClientGamestate, sendGameEnded, sendLobbyStatus, sendLobbyClosed, sendReaction };
