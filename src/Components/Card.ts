@@ -1,6 +1,6 @@
 import Pile from "../Game/Pile.js";
 import { CardArgs } from "../schemas/GameComponentArgs.js";
-import { DeckDefinition, DEFAULT_DECK_DEFINITION, PileState, RANK, rank, SUIT, suit } from "../schemas/types.js";
+import { DeckDefinition, DEFAULT_DECK_DEFINITION, PileState, RANK, rank, RankIndex, SUIT, suit } from "../schemas/types.js";
 import Logger from "./Logger.js";
 import { CardValueMap } from "./ValueMap.js";
 
@@ -132,5 +132,118 @@ export default class Card {
         Logger.debug(`${from.rank} is ${indexA} vs ${to.rank} is ${indexB}`);
 
         return indexA > indexB;
+    }
+
+    static numOfRank(pile: Card[], rank: rank) {
+        let num = 0;
+        for (const card of pile) {
+            if (card.rank === rank) num++;
+        }
+        return num;
+    }
+
+    static numOfSuit(pile: Card[], suit: suit) {
+        let num = 0;
+        for (const card of pile) {
+            if (card.suit === suit) num++;
+        }
+        return num;
+    }
+
+    static numOfCard(pile: Card[], rank: rank, suit: suit) {
+        let num = 0;
+        for (const card of pile) {
+            if (card.suit === suit && card.rank === rank) num++;
+        }
+        return num;
+    }
+
+    static largestSet(pile: Card[], suit?: suit | undefined) {
+        const ranks: Record<string, number> = {};
+
+        let max = 0;
+
+        for (const card of pile) {
+            ranks[card.rank] ??= 0;
+
+            if (!suit || card.suit === suit) {
+                (ranks[card.rank] as number)++; 
+                if (ranks[card.rank] as number > max) max = ranks[card.rank] as number;
+            }
+        }
+
+        return max;
+    }
+
+    static largestFlush(pile: Card[], rank?: rank | undefined) {
+        const suits: Record<string, number> = {};
+
+        let max = 0;
+
+        for (const card of pile) {
+            suits[card.suit] ??= 0;
+
+            if (!rank || card.rank === rank) {
+                (suits[card.suit] as number)++; 
+                if (suits[card.suit] as number > max) max = suits[card.suit] as number;
+            }
+        }
+
+        return max;
+    }
+
+    static largestRun(pile: Card[], suit?: suit | undefined) {
+        const ranks: Record<number, boolean> = {};
+
+        for (const card of pile) {
+            if (!suit || card.suit === suit) {
+                // TODO: switch to using game meta's value map
+                ranks[RankIndex[card.rank]] = true;
+            }
+        }
+
+        let longest = 0;
+        let current = 0;
+        for (const idx in ranks) {
+            if (ranks[idx]) current++;
+            else current = 0;
+
+            if (current > longest) longest = current;
+        }
+
+        // TODO: Ace high vs ace low
+
+        return longest;
+    }
+
+    static largestRunThatIncludes(pile: Card[], rank?: rank | undefined, suit?: suit | undefined) {
+        if (!rank) return Card.largestRun(pile, suit);
+        
+        const ranks: Record<number, boolean> = {};
+
+        for (const card of pile) {
+            if (!suit || card.suit === suit) {
+                // TODO: switch to using game meta's value map
+                ranks[RankIndex[card.rank]] = true;
+            }
+        }
+
+        if (!ranks[RankIndex[rank]]) return 0;
+
+        let current = 1;
+        // Up
+        for (let i = RankIndex[rank] + 1; RANK[i]; i++) {
+            if (!ranks[i]) break;
+            current++;
+        }
+        // Down
+        for (let i = RankIndex[rank] - 1; RANK[i]; i--) {
+            if (!ranks[i]) break;
+            current++;
+        }
+
+        // TODO: Ace high vs ace low
+
+        return current;
     }
 }

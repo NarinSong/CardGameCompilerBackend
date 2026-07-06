@@ -1,6 +1,6 @@
 import Game from "../Game/Game.js";
 import { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
-import { ButtonRange, ButtonType, LocationResolver, PileState, Visibility } from "../schemas/types.js";
+import { ButtonRange, ButtonType, LocationResolver, PileState, rank, suit, Visibility } from "../schemas/types.js";
 import Card from "./Card.js";
 
 // Using Zod schemas
@@ -448,6 +448,112 @@ function evaluateSmallerThan(g: Game, c: ActionContext, node: ValueNode): boolea
 }
 */
 
+function evaluatePileSet(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.PileSet) throw new Error("Called evaluatePileSet with invalid node");
+
+    const pileLabel = evaluate(g, c, node.primary) as string;
+    const rank = evaluate(g, c, node.secondary) as rank | undefined;
+    const suit = evaluate(g, c, node.tertiary) as suit | undefined;
+
+    const pile = g.gameLabels.getFromLabel(pileLabel) as Pile | undefined;
+    if (!pile) return 0;
+
+    if (rank && suit)
+        return Card.numOfCard(pile.cards, rank, suit);
+
+    if (rank)
+        return Card.numOfRank(pile.cards, rank);
+    
+    return Card.largestSet(pile.cards, suit);
+}
+
+function evaluatePileSetOfRank(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.PileSetOfRank) throw new Error("Called evaluatePileSetOfRank with invalid node");
+
+    const pileLabel = evaluate(g, c, node.primary) as string;
+    const number = (evaluate(g, c, node.secondary) ?? 1) as number;
+    const rank = evaluate(g, c, node.tertiary) as rank | undefined;
+    const suit = evaluate(g, c, node.fourth) as suit | undefined;
+
+    const pile = g.gameLabels.getFromLabel(pileLabel) as Pile | undefined;
+    if (!pile) return false;
+
+    if (rank && suit)
+        return Card.numOfCard(pile.cards, rank, suit) >= number;
+
+    if (rank)
+        return Card.numOfRank(pile.cards, rank) >= number;
+    
+    return Card.largestSet(pile.cards, suit) >= number;
+
+}
+
+function evaluatePileFlush(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.PileFlush) throw new Error("Called evaluatePileFlush with invalid node");
+
+    const pileLabel = evaluate(g, c, node.primary) as string;
+    const suit = evaluate(g, c, node.secondary) as suit | undefined;
+    const rank = evaluate(g, c, node.tertiary) as rank | undefined;
+
+    const pile = g.gameLabels.getFromLabel(pileLabel) as Pile | undefined;
+    if (!pile) return 0;
+
+    if (rank && suit)
+        return Card.numOfCard(pile.cards, rank, suit);
+
+    if (suit)
+        return Card.numOfSuit(pile.cards, suit);
+    
+    return Card.largestFlush(pile.cards, rank);
+}
+
+function evaluatePileFlushOfSuit(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.PileFlushOfSuit) throw new Error("Called evaluatePileFlushOfSuit with invalid node");
+
+    const pileLabel = evaluate(g, c, node.primary) as string;
+    const number = (evaluate(g, c, node.secondary) ?? 1) as number;
+    const suit = evaluate(g, c, node.tertiary) as suit | undefined;
+    const rank = evaluate(g, c, node.fourth) as rank | undefined;
+
+    const pile = g.gameLabels.getFromLabel(pileLabel) as Pile | undefined;
+    if (!pile) return false;
+
+    if (rank && suit)
+        return Card.numOfCard(pile.cards, rank, suit) >= number;
+
+    if (suit)
+        return Card.numOfSuit(pile.cards, suit) >= number;
+    
+    return Card.largestFlush(pile.cards, rank) >= number;
+}
+
+function evaluatePileRun(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.PileRun) throw new Error("Called evaluatePileRun with invalid node");
+
+    const pileLabel = evaluate(g, c, node.primary) as string;
+    const suit = evaluate(g, c, node.secondary) as suit | undefined;
+
+    const pile = g.gameLabels.getFromLabel(pileLabel) as Pile | undefined;
+    if (!pile) return 0;
+
+    return Card.largestRun(pile.cards, suit);
+
+}
+
+function evaluatePileRunFrom(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.PileRunFrom) throw new Error("Called evaluatePileRunFrom with invalid node");
+
+    const pileLabel = evaluate(g, c, node.primary) as string;
+    const number = (evaluate(g, c, node.secondary) ?? 1) as number;
+    const rank = evaluate(g, c, node.tertiary) as rank | undefined;
+    const suit = evaluate(g, c, node.fourth) as suit | undefined;
+
+    const pile = g.gameLabels.getFromLabel(pileLabel) as Pile | undefined;
+    if (!pile) return false;
+
+    return Card.largestRunThatIncludes(pile.cards, rank, suit) >= number;
+}
+
 /**
  * Executes a "ADD_VARIABLE" value node.
  * @param g - The current game instance.
@@ -611,6 +717,13 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.NumCardsInPile: return (evaluate(g, c, node.primary) as Pile).cards.length;
         case NODE_NAMES.ValueOf: return (evaluate(g, c, node.primary) as Counter).value;
         case NODE_NAMES.CardOfPile: return (evaluate(g, c, node.primary) as Pile).cards[evaluate(g, c, node.secondary) as number ?? 0];
+        // Pile Evaluation
+        case NODE_NAMES.PileSet: return evaluatePileSet(g, c, node);
+        case NODE_NAMES.PileSetOfRank: return evaluatePileSetOfRank(g, c, node);
+        case NODE_NAMES.PileFlush: return evaluatePileFlush(g, c, node);
+        case NODE_NAMES.PileFlushOfSuit: return evaluatePileFlushOfSuit(g, c, node);
+        case NODE_NAMES.PileRun: return evaluatePileRun(g, c, node);
+        case NODE_NAMES.PileRunFrom: return evaluatePileRunFrom(g, c, node);
         // Map usage
         case NODE_NAMES.Map: return (g.definition.gameMeta.maps[ evaluate(g, c, node.secondary) as string ]?.get( evaluate(g, c, node.primary) ));
         case NODE_NAMES.AddVariable: return executeAddVariable(g, c, node);

@@ -55,6 +55,7 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.RemoveCounter,
   NODE_NAMES.CounterOf,
   NODE_NAMES.ButtonOf,
+  NODE_NAMES.PileRun,
 ]);
 
 const TernaryOperatorsSchema = z.enum([
@@ -66,6 +67,14 @@ const TernaryOperatorsSchema = z.enum([
   NODE_NAMES.Win,
   NODE_NAMES.Lose,
   NODE_NAMES.ButtonRange,
+  NODE_NAMES.PileSet,
+  NODE_NAMES.PileFlush,
+]);
+
+const QuarnaryOperatorsSchema = z.enum([
+  NODE_NAMES.PileSetOfRank,
+  NODE_NAMES.PileFlushOfSuit,
+  NODE_NAMES.PileRunFrom,
 ]);
 
 const RoleOperatorsSchema = z.enum([
@@ -87,6 +96,7 @@ type UnaryOperatorsNames = z.infer<typeof UnaryOperatorsSchema>;
 type OperatorlessNames = z.infer<typeof OperatorlessSchema>;
 type BinaryOperatorsNames = z.infer<typeof BinaryOperatorsSchema>;
 type TernaryOperatorsNames = z.infer<typeof TernaryOperatorsSchema>;
+type QuarnaryOperatorsNames = z.infer<typeof QuarnaryOperatorsSchema>;
 type RoleOperatorsNames = z.infer<typeof RoleOperatorsSchema>;
 type VariableOperatorsNames = z.infer<typeof VariableOperatorsSchema>;
 
@@ -112,6 +122,12 @@ export type AST_Node =
   primary: AST_Node;
   secondary: AST_Node;
   tertiary: AST_Node;
+} | {
+  type: QuarnaryOperatorsNames;
+  primary: AST_Node;
+  secondary: AST_Node;
+  tertiary: AST_Node;
+  fourth: AST_Node;
 } | {
   type: RoleOperatorsNames;
   id: AST_Node;
@@ -204,6 +220,14 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
       primary: ValueNodeSchema,
       secondary: ValueNodeSchema,
       tertiary: ValueNodeSchema
+    }),
+
+    z.object({
+      type: QuarnaryOperatorsSchema,
+      primary: ValueNodeSchema,
+      secondary: ValueNodeSchema,
+      tertiary: ValueNodeSchema,
+      fourth: ValueNodeSchema,
     }),
 
     z.object({

@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { ButtonTypeSchema, CardSchema, LocationResolverSchema, PileStateSchema, VisibilitySchema } from "./types.js";
+import { ButtonTypeSchema, CardSchema, LocationResolverSchema, PileStateSchema, RankSchema, SuitSchema, VisibilitySchema } from "./types.js";
 import { NODE_NAMES } from "./Constants.js";
 
 // These are the values that can be used inside the blocks and their corresponding JS types
@@ -32,6 +32,8 @@ export const ValueTypes = {
   Location: LocationResolverSchema,
   ButtonRange: z.object({ min: z.number().or(z.undefined()), max: z.number().or(z.undefined()), increment: z.number().or(z.undefined())}),
   ButtonType: ButtonTypeSchema,
+  Rank: RankSchema,
+  Suit: SuitSchema,
 } as const;
 
 export const ValueTypeNameSchema = z.enum(
@@ -1272,6 +1274,174 @@ const BUTTON_OF = defineBlock({
     ]
 });
 
+const PILE_SET = defineBlock({
+    "name": NODE_NAMES.PileSet,
+    "displayName": "How Many in a Set of Cards",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Rank",
+            "type": "Rank",
+            "optional": true
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        }
+    ]
+});
+
+const PILE_SET_OF_RANK = defineBlock({
+    "name": NODE_NAMES.PileSetOfRank,
+    "displayName": "Contains Set of Cards",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Number",
+            "type": "Number",
+            "optional": true // defaults to if the pile has any (1)
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Rank",
+            "type": "Rank",
+            "optional": true
+        },
+        {
+            "name": "fourth",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        }
+    ]
+});
+
+const PILE_FLUSH = defineBlock({
+    "name": NODE_NAMES.PileFlush,
+    "displayName": "Pile Flush",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Rank",
+            "type": "Rank",
+            "optional": true
+        }
+    ]
+});
+
+const PILE_FLUSH_OF_SUIT = defineBlock({
+    "name": NODE_NAMES.PileFlushOfSuit,
+    "displayName": "Contains Flush of Cards",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Number",
+            "type": "Number",
+            "optional": true // defaults to if the pile has any (1)
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        },
+        {
+            "name": "fourth",
+            "displayName": "Rank",
+            "type": "Rank",
+            "optional": true
+        }
+    ]
+});
+
+const PILE_RUN = defineBlock({
+    "name": NODE_NAMES.PileRun,
+    "displayName": "Cards in a Row",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        }
+    ]
+});
+
+const PILE_RUN_FROM = defineBlock({
+    "name": NODE_NAMES.PileRunFrom,
+    "displayName": "Contains Run of Cards",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Number",
+            "type": "Number",
+            "optional": true // defaults to if the pile has any (1)
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Rank",
+            "type": "Rank",
+            "optional": true
+        },
+        {
+            "name": "fourth",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        }
+    ]
+});
+
 // Put the blocks together in a registry to export them
 export const BLOCKS = {
     UNDEFINED,
@@ -1333,6 +1503,12 @@ export const BLOCKS = {
     REMOVE_BUTTON,
     COUNTER_OF,
     BUTTON_OF,
+    PILE_SET,
+    PILE_SET_OF_RANK,
+    PILE_FLUSH,
+    PILE_FLUSH_OF_SUIT,
+    PILE_RUN,
+    PILE_RUN_FROM,
 } as const;
 
 export type BlockName = keyof typeof BLOCKS;

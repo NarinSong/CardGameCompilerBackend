@@ -61,4 +61,10 @@ export const NODE_NAMES = {
   RemoveButton: "REMOVE_BUTTON",
   CounterOf: "COUNTER_OF",
   ButtonOf: "BUTTON_OF",
+  PileSet: "PILE_SET",
+  PileSetOfRank: "PILE_SET_OF_RANK",
+  PileFlush: "PILE_FLUSH",
+  PileFlushOfSuit: "PILE_FLUSH_OF_SUIT",
+  PileRun: "PILE_RUN",
+  PileRunFrom: "PILE_RUN_FROM",
 } as const;
