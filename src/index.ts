@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
-import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestChangeProfileDescription, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestReactWithEmote, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 import { LobbyView } from './Components/Lobby.js';
 import { ClientID } from './schemas/types.js';
 
@@ -52,6 +52,8 @@ io.on('connection', (socket: Socket) => {
     socket.on('getColor', (callback) => {clientRequestGetColor(id, callback);});
     socket.on('setColor', (color, callback) => {clientRequestChangeColor(id, color, callback);});
     socket.on('setDisplayName', (displayName, callback) => {clientRequestChangeDisplayName(id, displayName, callback);});
+    socket.on('setDescription', (description, callback) => {clientRequestChangeProfileDescription(id, description, callback);});
+    socket.on('setProfilePicture', (profileUrl, callback) => {clientRequestChangeDisplayName(id, profileUrl, callback);});
 
 
     // Game Builder
@@ -70,6 +72,9 @@ io.on('connection', (socket: Socket) => {
 
     // Game play
     socket.on('playerClickEvent', (label, cardId, callback) => {clientRequestClickLabel(id, label, cardId, callback);});
+
+    // Emotes and chat
+    socket.on('emoteReaction', (emote, callback) => {clientRequestReactWithEmote(id, emote, callback);});
 
     // Game scene buttons
     socket.on('leaveGame', (callback) => {clientRequestLeaveGame(id, callback);});

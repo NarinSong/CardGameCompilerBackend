@@ -102,6 +102,38 @@ export default class Database {
         return true;
     }
 
+    static async saveUserDescription(username: string, description: string): Promise<boolean> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            await conn.query("UPDATE users SET profileDescription = ? WHERE username = ?", [description, username]);
+        } catch (error) {
+            console.error(error);
+            return false;
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return true;
+    }
+
+    static async saveUserProfilePicture(username: string, url: string): Promise<boolean> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            await conn.query("UPDATE users SET profileUrl = ? WHERE username = ?", [url, username]);
+        } catch (error) {
+            console.error(error);
+            return false;
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return true;
+    }
+
     /**
      * Save the game definition JSON.
      * @param game - The game JSON.

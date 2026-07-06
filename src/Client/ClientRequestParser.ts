@@ -206,6 +206,49 @@ export async function clientRequestChangeDisplayName(clientId: number, displayNa
     callback(success);
 }
 
+export async function clientRequestChangeProfileDescription(clientId: number, description: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean) => void
+
+    const descriptionCheck = z
+        .string()
+        .min(3)
+        .max(500)
+        .regex(/^[a-zA-Z0-9 ]+$/)
+        .safeParse(description);
+
+    if (!descriptionCheck.success)
+        return callback(false);
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(false);
+    if (!client.isAuthenticated) return callback(false);
+    if (!client.username) return callback(false);
+    
+    const success = await Database.saveUserDescription(client.username, descriptionCheck.data);
+
+    callback(success);
+}
+
+export async function clientRequestChangeProfilePicture(clientId: number, picture: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean) => void
+
+    const pictureCheck = z
+        .url()
+        .safeParse(picture);
+
+    if (!pictureCheck.success)
+        return callback(false);
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(false);
+    if (!client.isAuthenticated) return callback(false);
+    if (!client.username) return callback(false);
+    
+    const success = await Database.saveUserProfilePicture(client.username, pictureCheck.data);
+
+    callback(success);
+}
+
 /**
  * Sends the client all the games stored in the database.
  * 
