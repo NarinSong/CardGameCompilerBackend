@@ -321,7 +321,7 @@ export function clientRequestGetAvailableBlocks(clientId: number, callback: unkn
     if (!fCheck(callback)) return;//(blocks: typeof BLOCKS) => void
 
     // Send the available code blocks to the client
-    callback(BLOCKS);
+    callback(Object.values(BLOCKS));
 }
 
 export function clientRequestHostLobby(clientId: number, callback: unknown = noop) {

@@ -90,7 +90,8 @@ export default class Client {
      * @returns A token if authentication is successful, otherwise null.
      */
     async signIn(username: string, password: string) {
-        const success = await Auth.authenticateUser(username, password);
+        // TODO: DELETE AUTO SUCCESS ON SIGN IN (NOT SECURE)
+        const success = {username: username, token: '1234', displayName: username, color: '#ffffff' };//await Auth.authenticateUser(username, password);
         if (!success) return null;
 
 
