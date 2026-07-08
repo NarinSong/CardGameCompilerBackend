@@ -169,3 +169,5 @@ export const ClientBuiltBlocksSchema = z.object({
   boardDefinition: BoardSchema,
   phases: z.array(ClientPhaseSchema),
 });
+
+export type ClientBuiltBlocks = z.infer<typeof ClientBuiltBlocksSchema>;

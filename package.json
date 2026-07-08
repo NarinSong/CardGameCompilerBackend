@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@types/node": "^25.2.1",
+    "antlr4ts-cli": "^0.5.0-alpha.4",
     "nodemon": "^3.1.11",
     "typedoc": "^0.28.20",
     "typescript": "^5.9.3",
@@ -11,9 +12,11 @@
     "prod": "tsc && node dist/index.js",
     "compile-only": "tsc",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "antlr4ts": "antlr4ts -visitor --outputDir src/recycle/generated src/recycle/Recycle.g4"
   },
   "dependencies": {
+    "antlr4ts": "^0.5.0-alpha.4",
     "argon2": "^0.44.0",
     "dotenv": "^17.3.1",
     "mariadb": "^3.5.2",
