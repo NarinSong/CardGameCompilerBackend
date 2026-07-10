@@ -8,6 +8,7 @@ import { RecycleLexer } from "./generated/RecycleLexer.js";
 import { GameContext, RecycleParser } from "./generated/RecycleParser.js";
 
 import { ClientBuiltBlocks } from "../schemas/BuiltBlocks.js";
+import { ASTBuilder } from "./Visitor.js";
 
 // Full disclosure: This file was created using AI assistance
 
@@ -69,8 +70,7 @@ export class RecycleCompiler {
 
         const parseTree = parseResult.output;
 
-        // TODO: Implement ASTBuilder.
-        //const ast = new ASTBuilder().visit(parseTree);
+        const ast = new ASTBuilder().visitGame(parseTree);
 
         // TODO: Implement SemanticAnalyzer.
         //new SemanticAnalyzer().analyze(ast);
