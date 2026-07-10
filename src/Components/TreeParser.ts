@@ -566,7 +566,7 @@ function executeUpdateVariable(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.UpdateVariable) throw new Error("Called executeUpdateVariable with invalid node");
 
     const name = evaluate(g, c, node.name) as string;
-    const type = evaluate(g, c, node.variableType) as ValueTypeName;
+    const type = node.variableType as ValueTypeName;
 
     // TODO: Value's type can't be checked statically in the AST, so we have to check here that it matches 'type' given above
 
@@ -708,7 +708,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         // Map usage
         case NODE_NAMES.Map: return (g.definition.gameMeta.maps[ evaluate(g, c, node.secondary) as string ]?.get( evaluate(g, c, node.primary) ));
         case NODE_NAMES.UpdateVariable: return executeUpdateVariable(g, c, node);
-        case NODE_NAMES.GetVariable: return g.gameState.getVariable(evaluate(g, c, node.variableType) as ValueTypeName, evaluate(g, c, node.name) as string);
+        case NODE_NAMES.GetVariable: return g.gameState.getVariable(node.variableType as ValueTypeName, evaluate(g, c, node.name) as string);
         // Phase and Step Logic
         case NODE_NAMES.SetPhase: executeSetPhase(g, c, node); return;
         case NODE_NAMES.SetStep: executeSetStep(g, c, node); return;

@@ -2,7 +2,7 @@
 
 import { ValueNode } from "../schemas/AST.js";
 import { BLOCKS } from "../schemas/Blocks.js";
-import { ArrayNode, BlockNode, ClientBuiltBlocksSchema, ClientNode, SequenceNode, validateNode } from "../schemas/BuiltBlocks.js";
+import { ArrayNode, BlockNode, ClientBuiltBlocksSchema, ClientNode, SequenceNode, validateNode, VariableNode } from "../schemas/BuiltBlocks.js";
 import ClientGameDefinition from "../schemas/ClientGameDefinition.js";
 import { GameDefinitionNode, GameDefinitionPhase, GameDefinitionStep } from "../schemas/GameDefinitionArgs.js";
 
@@ -30,6 +30,20 @@ function nonLiteralBlockNodeToAst(blockNode: BlockNode): GameDefinitionNode {
         if (!node[name])
             node[name] = UndefinedAST;
     }
+
+    return node;
+}
+
+function variableNodeToAst(blockNode: VariableNode): GameDefinitionNode {
+    const node: any = {
+        type: blockNode.block
+    };
+
+    node.variableType = blockNode.variableType;
+    node.name = blockNodeToAst(blockNode.args.name) ?? UndefinedAST;
+
+    if (blockNode.block === 'UPDATE_VARIABLE')
+        node.value = blockNodeToAst(blockNode.args.value) ?? UndefinedAST;
 
     return node;
 }
@@ -74,6 +88,8 @@ function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDe
             return sequenceNodeToAst(blockNode);
         case 'array':
             return arrayNodeToAst(blockNode);
+        case 'variable':
+            return variableNodeToAst(blockNode);
         case 'literal':
             const literal: ValueNode = {
                 type: 'LITERAL',

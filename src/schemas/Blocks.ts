@@ -590,52 +590,6 @@ const MAP = defineBlock({
     ]
 });
 
-const UPDATE_VARIABLE = defineBlock({
-    "name": NODE_NAMES.UpdateVariable,
-    "displayName": "Update Variable",
-    "returnType": "Unknown",
-    "arguments": [
-        {
-            "name": "name",
-            "displayName": "Variable Name",
-            "type": "String",
-            "optional": false
-        },
-        {
-            "name": "variableType",
-            "displayName": "Type",
-            "type": "VariableType",
-            "optional": false
-        },
-        {
-            "name": "value",
-            "displayName": "Value",
-            "type": "Unknown",
-            "optional": false
-        },
-    ]
-});
-
-const GET_VARIABLE = defineBlock({
-    "name": NODE_NAMES.GetVariable,
-    "displayName": "Get Variable",
-    "returnType": "Unknown",
-    "arguments": [
-        {
-            "name": "name",
-            "displayName": "Variable Name",
-            "type": "String",
-            "optional": false
-        },
-        {
-            "name": "variableType",
-            "displayName": "Type",
-            "type": "VariableType",
-            "optional": false
-        },
-    ]
-});
-
 const SET_STEP = defineBlock({
     "name": NODE_NAMES.SetStep,
     "displayName": "Set Step",
@@ -1466,8 +1420,6 @@ export const BLOCKS = {
     RANK,
     SUIT,
     MAP,
-    UPDATE_VARIABLE,
-    GET_VARIABLE,
     SET_PHASE,
     SET_STEP,
     WHILE,

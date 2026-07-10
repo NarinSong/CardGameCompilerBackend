@@ -155,11 +155,11 @@ export type AST_Node =
   type: VariableOperatorsNames;
   name: AST_Node;
   value: AST_Node;
-  variableType: AST_Node;
+  variableType: string;
 } | {
   type: typeof NODE_NAMES.GetVariable;
   name: AST_Node;
-  variableType: AST_Node;
+  variableType: string;
 } | {
   type: typeof NODE_NAMES.Sequence;
   primary: AST_Node[];
@@ -295,13 +295,13 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
       type: VariableOperatorsSchema,
       name: ValueNodeSchema,
       value: ValueNodeSchema,
-      variableType: ValueNodeSchema,
+      variableType: z.string(),
     }),
 
     z.object({
       type: z.literal(NODE_NAMES.GetVariable),
       name: ValueNodeSchema,
-      variableType: ValueNodeSchema,
+      variableType: z.string(),
     }),
 
     /* Logic */
