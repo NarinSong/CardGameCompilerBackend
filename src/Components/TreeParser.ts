@@ -567,6 +567,9 @@ function executeUpdateVariable(g: Game, c: ActionContext, node: ValueNode) {
 
     const name = evaluate(g, c, node.name) as string;
     const type = evaluate(g, c, node.variableType) as ValueTypeName;
+
+    // TODO: Value's type can't be checked statically in the AST, so we have to check here that it matches 'type' given above
+
     const value = evaluate(g, c, node.value) as ValueTypeValues;
 
     g.gameState.setVariable(type, name, value)

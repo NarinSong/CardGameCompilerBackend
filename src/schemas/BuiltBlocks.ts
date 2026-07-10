@@ -144,7 +144,7 @@ export function validateNode(node: ClientNode): void {
 
     const actualType = inferNodeType(provided);
 
-    if (argDef.type === 'Void') {
+    if (argDef.type === 'Void' || argDef.type === 'Unknown') {
       // If the block doesn't care about the return type, neither should we
       continue;
     }

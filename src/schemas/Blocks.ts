@@ -610,7 +610,7 @@ const UPDATE_VARIABLE = defineBlock({
         {
             "name": "value",
             "displayName": "Value",
-            "type": "Number",
+            "type": "Unknown",
             "optional": false
         },
     ]
