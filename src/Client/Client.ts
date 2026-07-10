@@ -24,12 +24,14 @@ type AuthState =
       displayName: string;
       username: string;
       token: string;
+      databaseId: number;
     }
   | {
       isAuthenticated: false;
       displayName: null;
       username: null;
       token: null;
+      databaseId: 0;
     };
 
 
@@ -52,7 +54,8 @@ export default class Client {
         isAuthenticated: false,
         displayName: null,
         username: null,
-        token: null
+        token: null,
+        databaseId: 0,
     };
 
     /**
@@ -91,7 +94,7 @@ export default class Client {
      */
     async signIn(username: string, password: string) {
         // TODO: DELETE AUTO SUCCESS ON SIGN IN (NOT SECURE)
-        const success = {username: username, token: '1234', displayName: username, color: '#ffffff' };//await Auth.authenticateUser(username, password);
+        const success = {username: username, token: '1234', displayName: username, color: '#ffffff', databaseId: 1024 };//await Auth.authenticateUser(username, password);
         if (!success) return null;
 
 
@@ -100,6 +103,7 @@ export default class Client {
             token: success.token,
             displayName: success.displayName,
             isAuthenticated: true,
+            databaseId: success.databaseId,
         };
 
         this.color = success.color;
@@ -121,9 +125,10 @@ export default class Client {
 
         this.authState = {
             username: username,
-            token: success,
+            token: success.session,
             displayName: displayName,
             isAuthenticated: true,
+            databaseId: success.databaseId,
         };
 
         this.color = color;
@@ -144,7 +149,8 @@ export default class Client {
             isAuthenticated: false,
             displayName: null,
             username: null,
-            token: null
+            token: null,
+            databaseId: 0,
         };
 
         return success;
@@ -200,5 +206,9 @@ export default class Client {
 
     get username() {
         return this.authState.username;
+    }
+
+    get databaseId() {
+        return this.authState.databaseId;
     }
 }

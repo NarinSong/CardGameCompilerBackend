@@ -11,6 +11,7 @@ import GameDefinition from './Rules/GameDefinition.js';
 import PickupGame from './SampleGames/JsonReader.js';
 import { ClientID, GameID, LobbyID, RoomID } from './schemas/types.js';
 import pickupJson from "./SampleGames/Pickup.json" with { type: "json" };
+import { SelectAllGameSaves } from './schemas/DatabaseSchemas.js';
 
 export default class GameManager {
     // No constructor, since everything here is static. There is only one.
@@ -117,6 +118,15 @@ export default class GameManager {
     static registerGameDefinition(game: GameDefinition, id: GameID , json: string) {
         GameManager.availableGames[id] = game;
         GameManager.availableGamesJson[id] = json;
+    }
+
+    static async getEditorBlockSavesList(databaseId: number): Promise<SelectAllGameSaves[]> {
+        const list = await Database.getAllGameEditorBlocks();
+        if (!list) return [];
+
+        return list.filter((value) => {
+            return value.privateGame || value.creator === databaseId;
+        })
     }
 
     static async getAvailableGameNames() {

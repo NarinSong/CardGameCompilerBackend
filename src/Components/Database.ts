@@ -1,6 +1,10 @@
 import * as mariadb from 'mariadb';
 import { config } from 'dotenv';
 import Logger from './Logger.js';
+import ClientGameDefinition from '../schemas/ClientGameDefinition.js';
+import z from 'zod';
+import { InsertResult, InsertSchema, SelectAllGameSaves, SelectAllGameSavesSchema, SelectFullGameSavesById, SelectFullGameSavesByIdSchema, SelectGameSavesById, SelectGameSavesByIdSchema, SelectHashByUsername, SelectHashByUsernameSchema, UpdateResult, UpdateSchema } from '../schemas/DatabaseSchemas.js';
+import GameDefinition from '../Rules/GameDefinition.js';
 
 config(); // Set up environment variables
 
@@ -29,13 +33,14 @@ export default class Database {
      * @param username - username to get password hash from.
      * @returns Promise resolving to an array containing the password hash and display name, or null on failure. 
      */
-    static async getHashByUsername(username: string): Promise<{ passwordHash: string; displayName: string, color: string }[] | null> {
+    static async getHashByUsername(username: string): Promise<SelectHashByUsername[] | null> {
         let conn;
         let password = null;
 
         try {
             conn = await pool.getConnection();
-            password = await conn.query("SELECT passwordHash, displayName, color FROM users WHERE username = ?", [username]);
+            password = await conn.query("SELECT id, passwordHash, displayName, color FROM users WHERE username = ?", [username]);
+            SelectHashByUsernameSchema.array().parse(password);
         } catch (error) {
             console.error(error);
         } finally {
@@ -52,22 +57,21 @@ export default class Database {
      * @param displayName - display name to save.
      * @returns Promise for true if successfully saved, else false.
      */
-    static async saveUserCredentials(username: string, passwordHash: string, displayName: string, color: string): Promise<boolean> {
-        if (username === 'test') return true;
+    static async saveUserCredentials(username: string, passwordHash: string, displayName: string, color: string): Promise<InsertResult | null> {
+        if (username === 'test') return { affectedRows: 1, insertId: 2, warningStatus: 0 };
         
         let conn;
 
         try {
             conn = await pool.getConnection();
-            await conn.query("INSERT INTO users (username, passwordHash, displayName, color) VALUES (?, ?, ?, ?)", [username, passwordHash, displayName, color]);
+            const result = await conn.query("INSERT INTO users (username, passwordHash, displayName, color) VALUES (?, ?, ?, ?)", [username, passwordHash, displayName, color]);
+            return InsertSchema.parse(result);
         } catch (error) {
             console.error(error);
-            return false;
+            return null;
         } finally {
             if (conn) conn.release();
         }
-
-        return true;
     }
 
     static async saveUserColor(username: string, color: string): Promise<boolean> {
@@ -134,31 +138,130 @@ export default class Database {
         return true;
     }
 
-    /**
-     * Save the game definition JSON.
-     * @param game - The game JSON.
-     * @param name - Name of the game.
-     * @param owner - Owner of the game.
-     * @param parent - The id of the parent game this was derived from, if any.
-     * @param description - description of the game.
-     * @param isPrivate - Whether the game will be private or public.
-     * @returns Promise for true if successfully saved, else false.
-     */
-    static async saveGameJson(game: string, name: string, owner: string, parent: number | null, description: string | null, isPrivate: boolean) {
+    static async saveGameEditorBlocks(databaseId: number, game: ClientGameDefinition): Promise<null | number> {
         let conn;
+        let id: number;
 
         try {
             conn = await pool.getConnection();
-            await conn.query("INSERT INTO savedrules (gameRules, gameName, creator, parent, gameDescription, privateGame) VALUES (?, ?, ?, ?, ?, ?)", 
-                [game, name, owner, parent, description, isPrivate]);
+            const result = await conn.query(
+                "INSERT INTO blockeditorsaves (gamename, blockeditorstate, creator, parent, gameDescription, privateGame)", 
+                [
+                    game.gameMeta.name,
+                    JSON.stringify(game), 
+                    databaseId, 
+                    game.gameMeta.parentGameId ?? null, 
+                    game.gameMeta.description ?? game.gameMeta.name, 
+                    game.gameMeta.private ?? true
+                ]
+            );
+            id = InsertSchema.parse(result).insertId;
         } catch (error) {
             console.error(error);
-            return false;
+            return null;
         } finally {
             if (conn) conn.release();
         }
 
-        return true;
+        return id;
+    }
+
+    static async updateGameEditorBlocks(gameId: number, game: ClientGameDefinition): Promise<null | UpdateResult> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            const result = await conn.query(
+                "UPDATE blockeditorsaves SET gamename = ?, blockeditorstate = ?, gameDescription = ?, privateGame = ? WHERE id = ?", 
+                [
+                    game.gameMeta.name,
+                    JSON.stringify(game),
+                    game.gameMeta.description ?? game.gameMeta.name, 
+                    game.gameMeta.private ?? true,
+                    gameId,
+                ]
+            );
+            return UpdateSchema.parse(result);
+        } catch (error) {
+            console.error(error);
+            return null;
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async getSavedEditorBlocksById(gameId: number): Promise<SelectGameSavesById[] | null> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            const result = await conn.query("SELECT creator FROM blockeditorsaves WHERE id = ?", gameId);
+
+            return SelectGameSavesByIdSchema.array().parse(result);
+        } catch (error) {
+            console.error(error);
+            return null;
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async getFullSavedEditorBlocksById(gameId: number): Promise<SelectFullGameSavesById[] | null> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            const result = await conn.query("SELECT blockeditorstate, creator FROM blockeditorsaves WHERE id = ?", gameId);
+
+            return SelectFullGameSavesByIdSchema.array().parse(result);
+        } catch (error) {
+            console.error(error);
+            return null;
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async getAllGameEditorBlocks(): Promise<null | SelectAllGameSaves[]> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            const result = await conn.query("SELECT gamename, creator, parent, id, privateGame FROM blockeditorsaves");
+
+            return SelectAllGameSavesSchema.array().parse(result);
+        } catch (error) {
+            console.error(error);
+            return null;
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async saveGameJson(databaseId: number, game: GameDefinition): Promise<InsertResult | null> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            const result = await conn.query("INSERT INTO savedrules (id, gameRules, gameName, creator, parent, gameDescription, privateGame) VALUES (?, ?, ?, ?, ?, ?, ?)", 
+                [
+                    game.gameMeta.id,
+                    JSON.stringify(game),
+                    game.gameMeta.name,
+                    databaseId,
+                    game.gameMeta.parentGameId ?? null,
+                    game.gameMeta.description,
+                    game.gameMeta.private,
+                ]
+            );
+
+            return InsertSchema.parse(result);
+        } catch (error) {
+            console.error(error);
+            return null;
+        } finally {
+            if (conn) conn.release();
+        }
     }
 
     /**

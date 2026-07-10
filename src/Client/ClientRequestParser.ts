@@ -301,7 +301,7 @@ export async function clientRequestGetGameInfo(clientId: number, gameId: unknown
  * @todo connect actual id
  * @todo get save id from database
  */
-export async function clientRequestSaveGame(clientId: number, json: unknown, gameName: unknown, parentGameId: unknown, gameDescription: unknown, isPrivate: unknown, callback: unknown = noop) {
+export async function clientRequestSaveGame(clientId: number, json: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean, id?: number) => void
 
     // Auth check
@@ -309,49 +309,93 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, gam
     if (!client) return callback(false);
     const username = client.username;
     if (!username) return callback(false);
+    const databaseId = client.databaseId;
+    if (!databaseId) return callback(false);
 
     // Verify client input
     const jsonCheck = 
         ClientGameDefinitionSchema
         .safeParse(json);
 
-    const gameNameCheck = z
-        .string()
-        .min(3)
-        .max(16)
-        .regex(/^[a-z0-9_]+$/)
-        .safeParse(gameName);
-    
-    const parentIdCheck = z
-        .number()
-        .optional()
-        .safeParse(parentGameId);
+    if (!jsonCheck.success) return callback(false);
 
-    const gameDescriptionCheck = z
-        .string()
-        .regex(/^[a-zA-Z0-9!@#$%^&*(),.?]+$/)
-        .max(10000)
-        .safeParse(gameDescription); // can be blank ''
+    const game = jsonCheck.data;
+    let gameId = game.gameMeta.id;
 
-    const isPrivateCheck = z
-        .boolean()
-        .safeParse(isPrivate);
+    if (!gameId) {
+        const result = await Database.saveGameEditorBlocks(databaseId, game);
+        if (!result) return callback(false);
+        gameId = result;
+    } else {
+        // Try saving over the current one
+        const owner = await Database.getSavedEditorBlocksById(gameId);
+        if (!owner || !owner[0] || owner[0].creator != databaseId)
+            return callback(false);
 
-    if (!jsonCheck.success || !gameNameCheck.success || !parentIdCheck.success || !gameDescriptionCheck.success || !isPrivateCheck.success) return callback(false);
+        // Can overwrite the current one legally
+        const result = await Database.updateGameEditorBlocks(gameId, game);
+        if (!result) return callback(false);
+    }
 
     const def = buildGameFromJSON(jsonCheck.data);
     if (!def) return callback(false);
-
-    //TODO: connect actual id
-    const id = 1;
+    def.gameMeta.id = gameId;
 
     // Save game in database and available games
-    await Database.saveGameJson(JSON.stringify(jsonCheck.data), gameNameCheck.data, username, parentIdCheck.data ?? null, gameDescriptionCheck.data, isPrivateCheck.data);
+    const result = await Database.saveGameJson(databaseId, def);
+    if (!result) return callback(false);
     
-    // todo: get save id from database
-    GameManager.registerGameDefinition(def, id, JSON.stringify(jsonCheck.data)); 
+    GameManager.registerGameDefinition(def, gameId, JSON.stringify(jsonCheck.data)); 
 
-    callback(true, id);
+    callback(true, gameId);
+}
+
+export async function clientRequestGetSavedEditorGameList(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(list: {gamename: string;creator: number;parent: number;id: number;privateGame: number;}[]) => void
+    // Get list of game names and ids, and send it to client
+
+    const list = await GameManager.getEditorBlockSavesList(clientId);
+
+    callback(list);
+}
+
+export async function clientRequestGetSavedGameBlocks(clientId: number, gameId: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(data: false | ClientGameDefinition) => void
+    // Get game JSON and send it to client
+    
+    // Auth check
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(false);
+    const username = client.username;
+    if (!username) return callback(false);
+    const databaseId = client.databaseId;
+    if (!databaseId) return callback(false);
+
+    // GameID check
+    const gameIdCheck = z.number().safeParse(clientId);
+
+    if (!gameIdCheck.success) return callback(false);
+
+    const result = await Database.getFullSavedEditorBlocksById(gameIdCheck.data);
+
+    if (!result || !result[0]) return callback(false);
+
+    const gameJson = result[0].blockeditorstate;
+    const creator = result[0].creator;
+
+    const game = JSON.parse(gameJson);
+
+    const gameCheck = ClientGameDefinitionSchema
+        .safeParse(game);
+
+    if (!gameCheck.success) return callback(false);
+
+    const g = gameCheck.data;
+
+    // Private game that the player doesn't have permission to view
+    if (g.gameMeta.private && creator != databaseId) return callback(false);
+
+    return gameCheck.data;
 }
 
 /**

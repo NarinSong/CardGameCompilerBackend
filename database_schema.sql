@@ -19,32 +19,29 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS savedrules (
-    id MEDIUMINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id MEDIUMINT NOT NULL,
     gameRules JSON NOT NULL, -- The most important part. Could be very long
     gameName VARCHAR(16) NOT NULL, -- non-unique name, shouldn't be very long, maybe 16 characters
     creator MEDIUMINT NOT NULL, -- the user who created it
-    parent MEDIUMINT, -- can be null. It references another savedrules instance, which it was derived from
+    parent MEDIUMINT, -- can be null. It references a blockeditorsaves instance, which it was derived from
     gameDescription TEXT NOT NULL, -- player input, can be fairly long
     lastEditDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- should be automatic based on when this is updated
     privateGame BOOLEAN NOT NULL, -- either hidden or not hidden
-    blockeditorsaveid MEDIUMINT NOT NULL,
 
     FOREIGN KEY (creator) REFERENCES users(id),
-    FOREIGN KEY (parent) REFERENCES savedrules(id)
+    FOREIGN KEY (parent) REFERENCES blockeditorsaves(id)
 );
 
 CREATE TABLE IF NOT EXISTS blockeditorsaves (
-    id MEDIUMINT NOT NULL,
-    revision MEDIUMINT NOT NULL DEFAULT 0, -- incremements with each saved revision. Only the most recent X are saved (X TBD)
+    id MEDIUMINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    gamename VARCHAR(16) NOT NULL,
     blockeditorstate TEXT NOT NULL, -- Structured JSON of the block state. Sent back to client exactly as received
     creator MEDIUMINT NOT NULL, -- the user who created the game
-    parent MEDIUMINT, -- can be null. The savedrules that this was derived from
+    parent MEDIUMINT, -- can be null. The blockeditorsaves that this was derived from
     gameDescription TEXT NOT NULL, -- player input
     lastEditDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- should be automatic based on when this is updated
     privateGame BOOLEAN NOT NULL, -- either hidden or not hidden
     gameid MEDIUMINT, -- can be null. The game id of the game created from these blocks
-
-    PRIMARY KEY (id, revision),
 
     FOREIGN KEY (creator) REFERENCES users(id),
     FOREIGN KEY (parent) REFERENCES blockeditorsaves(id)

@@ -3,16 +3,23 @@ import { ValueNodeSchema } from "./AST.js";
 import { ActionRolesSchema, ButtonTypeSchema, DefaultLocationSchema, LocationResolverSchema, PileStateSchema, TriggerSchema, VisibilitySchema } from "./types.js";
 import { ValueTypeNameSchema } from "./Blocks.js";
 
+export const StandardStringSchema = z.string().max(16).min(1).regex(/^[a-zA-Z0-9]+$/);
+export const LongStringSchema = z.string().max(1000).min(1).regex(/^[a-zA-Z0-9 !@#$%^&*(),.?"'\n]+$/);
+
 // Arguments to definitions
 export const GameMetaArgsSchema = z.object({
     minPlayers: z.number().optional(),
     maxPlayers: z.number().optional(),
-    name: z.string().min(3).max(16).regex(/^[a-zA-Z0-9]+$/),
-    cardValueMap: z.record(z.string(), z.number()).optional(),
-    clientSuitMap: z.record(z.string(), z.number()).optional(),
-    clientRankMap: z.record(z.string(), z.number()).optional(),
-    variables: z.record(z.string(), ValueTypeNameSchema).optional(),
-    locations: z.record(z.string(), DefaultLocationSchema).optional(),
+    name: StandardStringSchema,
+    cardValueMap: z.record(StandardStringSchema, z.number()).optional(),
+    clientSuitMap: z.record(StandardStringSchema, z.number()).optional(),
+    clientRankMap: z.record(StandardStringSchema, z.number()).optional(),
+    variables: z.record(StandardStringSchema,ValueTypeNameSchema).optional(),
+    locations: z.record(StandardStringSchema, DefaultLocationSchema).optional(),
+    parentGameId: z.number().optional(),
+    description: LongStringSchema.optional(),
+    private: z.boolean().optional(),
+    id: z.number().optional(),
 })
 
 export const PileSchema = z.object({

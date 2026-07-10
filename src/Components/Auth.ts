@@ -2,6 +2,7 @@ import Database from "./Database.js";
 import argon2 from 'argon2';
 import { randomBytes } from "node:crypto";
 import Logger from "./Logger.js";
+import { success } from "zod";
 
 const ACTIVE_USERS: Record<string, string> = {}; // token, username
 
@@ -62,7 +63,7 @@ export default class Auth {
      * @param password - password that user inputs.
      * @returns an object with a token and display name of the user.
      */
-    static async authenticateUser(username: string, password: string): Promise<{token: string, displayName: string, color: string} | null> {
+    static async authenticateUser(username: string, password: string): Promise<{token: string, displayName: string, color: string, databaseId: number} | null> {
         const passwordHashArray = await Database.getHashByUsername(username);
         
         if (!passwordHashArray || !passwordHashArray[0]) return failureReason('authenticateUser() failed: no such user');
@@ -78,7 +79,7 @@ export default class Auth {
         const sessionId = buf.toString('hex');
         ACTIVE_USERS[sessionId] = username;
 
-        return { token: sessionId, displayName: passwordHashArray[0].displayName, color: passwordHashArray[0].color };
+        return { token: sessionId, displayName: passwordHashArray[0].displayName, color: passwordHashArray[0].color, databaseId: passwordHashArray[0].id };
     }
 
     /**
@@ -88,7 +89,7 @@ export default class Auth {
      * @param displayName - display name for the new user.
      * @returns a session id if successful else null if fails.
      */
-    static async createNewUser(username: string, password: string, displayName: string, color: string): Promise<string | null> {
+    static async createNewUser(username: string, password: string, displayName: string, color: string): Promise<{ session: string, databaseId: number } | null> {
         const passwordHashArray = await Database.getHashByUsername(username);
         
         if (passwordHashArray && passwordHashArray[0]) return failureReason('createNewUser() failed: account already exists'); // User account already exists
@@ -111,7 +112,10 @@ export default class Auth {
         const sessionId = buf.toString('hex');
         ACTIVE_USERS[sessionId] = username;
 
-        return sessionId;
+        return {
+            session: sessionId,
+            databaseId: saveSuccess.insertId
+        };
     }
 
     /**

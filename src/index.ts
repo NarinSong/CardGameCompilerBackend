@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
-import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestChangeProfileDescription, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestReactWithEmote, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestChangeProfileDescription, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestGetSavedEditorGameList, clientRequestGetSavedGameBlocks, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestReactWithEmote, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 import { LobbyView } from './Components/Lobby.js';
 import { ClientID } from './schemas/types.js';
 
@@ -58,7 +58,9 @@ io.on('connection', (socket: Socket) => {
 
     // Game Builder
     socket.on('getAvailableBlocks', (callback) => {clientRequestGetAvailableBlocks(id, callback);});
-    socket.on('saveGame', (json, gameName, parentGameId, gameDescription, isPrivate, callback) => {clientRequestSaveGame(id, json, gameName, parentGameId, gameDescription, isPrivate, callback);});
+    socket.on('saveGame', (json, callback) => {clientRequestSaveGame(id, json, callback);});
+    socket.on('getSavedGameList', (callback) => {clientRequestGetSavedEditorGameList(id, callback);});
+    socket.on('getSavedGameBlocks', (gameId, callback) => {clientRequestGetSavedGameBlocks(id, gameId, callback);});
 
     // Lobby handling
     socket.on('hostLobby', (callback) => {clientRequestHostLobby(id, callback);});

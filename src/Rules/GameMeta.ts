@@ -19,6 +19,10 @@ export default class GameMeta {
     clientRankMap: ValueMap<string, number>;
     variables: Record<string, ValueTypeName>;
     locations: Record<string, DefaultLocation>;
+    parentGameId?: number | undefined;
+    description: string;
+    private: boolean;
+    id?: number | undefined;
 
     /**
      * Creates a new GameMeta configuration.
@@ -33,6 +37,11 @@ export default class GameMeta {
         this.clientSuitMap = obj.clientSuitMap ? new ValueMap<string, number>(obj.clientSuitMap) : DEFAULT_CLIENT_VIEW_SUIT_MAP;
         this.clientRankMap = obj.clientRankMap ? new ValueMap<string, number>(obj.clientRankMap) : DEFAULT_CLIENT_VIEW_RANK_MAP;
         this.variables = obj.variables ?? {};
+        this.parentGameId = obj.parentGameId;
+        this.description = obj.description || obj.name;
+        this.private = obj.private ?? true;
+        this.id = obj.id;
+
         this.locations = {
             'DEFAULT_PILE': DEFAULT_PILE_LOCATION,
             'DEFAULT_BUTTON': DEFAULT_BUTTON_LOCATION,
