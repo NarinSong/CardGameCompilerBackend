@@ -1,4 +1,5 @@
 import ValueMap, { CardValueMap, DEFAULT_CARD_RANK_MAP, DEFAULT_CLIENT_VIEW_RANK_MAP, DEFAULT_CLIENT_VIEW_SUIT_MAP, DEFAULT_VALUE_MAP } from "../Components/ValueMap.js";
+import { ValueTypeName } from "../schemas/Blocks.js";
 import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
 import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DefaultLocation, Location } from "../schemas/types.js";
 
@@ -16,7 +17,7 @@ export default class GameMeta {
     cardValueMap: CardValueMap;
     clientSuitMap: ValueMap<string, number>;
     clientRankMap: ValueMap<string, number>;
-    variables: Record<string, number>;
+    variables: Record<string, ValueTypeName>;
     locations: Record<string, DefaultLocation>;
 
     /**

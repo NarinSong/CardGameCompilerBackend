@@ -11,6 +11,7 @@ import GameMeta from "../Rules/GameMeta.js";
 import { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
 import PileDefinition from "../Rules/PileDefinition.js";
 import StepDefinition from "../Rules/StepDefinition.js";
+import { ValueReturn, ValueTypeName, ValueTypeNameSchema, ValueTypeValues, ValueTypeValuesSchema } from "../schemas/Blocks.js";
 import { BoardID, ButtonRange, ButtonType, Location, LocationResolver, PileState, PlayerID, Visibility } from "../schemas/types.js";
 import Board from "./Board.js";
 import Button from "./Button.js";
@@ -19,6 +20,8 @@ import GameLabels from "./GameLabels.js";
 import Pile from "./Pile.js";
 import Player from "./Player.js";
 
+type EmptyVariableArrayType = Record<string, Record<string, ValueTypeValues>>;
+type VariableArrayType = Record<ValueTypeName, Record<string, ValueTypeValues>>;
 
 /**
  * Represents the game state during runtime.
@@ -37,6 +40,9 @@ export default class GameState {
     buttons: Record<Label, {button: Button, owner: PlayerID | BoardID}>;
     gameMeta: GameMeta;
 
+    variables: VariableArrayType;
+
+
     /**
      * Creates a new GameState instance.
      * @param definition - The game definition used to initialize the game labels and board.
@@ -50,7 +56,11 @@ export default class GameState {
         this.piles = {};
         this.counters = {};
         this.buttons = {};
-        this.gameMeta = definition.gameMeta; // Linked
+        this.variables = Object.keys(ValueTypeNameSchema).reduce<EmptyVariableArrayType>(
+            (prev: EmptyVariableArrayType, curr: string) => { return {...prev, [curr]: {} } }, {}
+        ) as VariableArrayType;
+
+        this.gameMeta = definition.gameMeta; // Linked. Game Meta should be *immutable*
         this.initializeBoard(definition.board);
     }
 
@@ -266,5 +276,13 @@ export default class GameState {
         if (!step) return;
 
         this.currentStep = step;
+    }
+
+    getVariable(type: ValueTypeName, name: string) {
+        return this.variables[type][name];
+    }
+
+    setVariable(type: ValueTypeName, name: string, value: ValueTypeValues) {
+        this.variables[type][name] = value;
     }
 }

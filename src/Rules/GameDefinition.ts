@@ -11,7 +11,7 @@ import LabelManager, { PhaseLabel, StepLabel } from "./LabelManager.js";
 import PileDefinition from "./PileDefinition.js";
 import PlayerDefinition from "./PlayerDefinition.js";
 import StepDefinition from "./StepDefinition.js";
-import { ButtonRange, ButtonType, Location, LocationResolver, PileState, Visibility } from "../schemas/types.js";
+import { ButtonRange, ButtonRangeArgument, ButtonType, Location, LocationResolver, PileState, Visibility } from "../schemas/types.js";
 import Game from "../Game/Game.js";
 import Logger from "../Components/Logger.js";
 import ButtonDefinition from "./ButtonDefinition.js";
@@ -168,7 +168,7 @@ export default class GameDefinition {
         displayName?: string | undefined,
         actionRoles?: string[] | undefined,
         type?: ButtonType | undefined,
-        range?: { min?: number | undefined, max?: number | undefined, increment?: number | undefined } | undefined,
+        range?: ButtonRangeArgument | undefined,
         location?: LocationResolver | undefined,
     }) {
 

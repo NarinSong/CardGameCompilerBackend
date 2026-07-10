@@ -5,7 +5,7 @@ import Card from "./Card.js";
 
 // Using Zod schemas
 import { ActionContext, ValueNode, AST } from "../schemas/AST.js";
-import { ValueReturn } from "../schemas/Blocks.js";
+import { ValueReturn, ValueTypeName, ValueTypeValues } from "../schemas/Blocks.js";
 import { NODE_NAMES } from "../schemas/Constants.js";
 import Pile from "../Game/Pile.js";
 import Counter from "../Game/Counter.js";
@@ -555,27 +555,6 @@ function evaluatePileRunFrom(g: Game, c: ActionContext, node: ValueNode) {
 }
 
 /**
- * Executes a "ADD_VARIABLE" value node.
- * @param g - The current game instance.
- * @param c - The current action context.
- * @param node - ADD_VARIABLE value node to execute.
- * @throws Error if the node is not a ADD_VARIABLE node.
- * @returns The value if successfully assigned.
- */
-function executeAddVariable(g: Game, c: ActionContext, node: ValueNode) {
-    if (node.type !== NODE_NAMES.AddVariable) throw new Error("Called executeAddVariable with invalid node");
-
-    const name = evaluate(g, c, node.name) as string;
-    const value = evaluate(g, c, node.value) as number;
-
-    if (name in g.definition.gameMeta.variables) return null;
-
-    g.definition.gameMeta.variables[name] = value;
-
-    return value;
-}
-
-/**
  * Executes a "UPDATE_VARIABLE" value node.
  * @param g - The current game instance.
  * @param c - The current action context.
@@ -587,11 +566,10 @@ function executeUpdateVariable(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.UpdateVariable) throw new Error("Called executeUpdateVariable with invalid node");
 
     const name = evaluate(g, c, node.name) as string;
-    const value = evaluate(g, c, node.value) as number;
+    const type = evaluate(g, c, node.variableType) as ValueTypeName;
+    const value = evaluate(g, c, node.value) as ValueTypeValues;
 
-    if (!(name in g.definition.gameMeta.variables)) return null;
-
-    g.definition.gameMeta.variables[name] = value;
+    g.gameState.setVariable(type, name, value)
 
     return value;
 }
@@ -726,9 +704,8 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.PileRunFrom: return evaluatePileRunFrom(g, c, node);
         // Map usage
         case NODE_NAMES.Map: return (g.definition.gameMeta.maps[ evaluate(g, c, node.secondary) as string ]?.get( evaluate(g, c, node.primary) ));
-        case NODE_NAMES.AddVariable: return executeAddVariable(g, c, node);
         case NODE_NAMES.UpdateVariable: return executeUpdateVariable(g, c, node);
-        case NODE_NAMES.GetVariable: return g.definition.gameMeta.variables[evaluate(g, c, node.name) as string];
+        case NODE_NAMES.GetVariable: return g.gameState.getVariable(evaluate(g, c, node.variableType) as ValueTypeName, evaluate(g, c, node.name) as string);
         // Phase and Step Logic
         case NODE_NAMES.SetPhase: executeSetPhase(g, c, node); return;
         case NODE_NAMES.SetStep: executeSetStep(g, c, node); return;

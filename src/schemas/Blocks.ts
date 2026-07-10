@@ -34,6 +34,7 @@ export const ValueTypes = {
   ButtonType: ButtonTypeSchema,
   Rank: RankSchema,
   Suit: SuitSchema,
+  VariableType: z.string(),
 } as const;
 
 export const ValueTypeNameSchema = z.enum(
@@ -42,6 +43,8 @@ export const ValueTypeNameSchema = z.enum(
     ...(keyof typeof ValueTypes)[]
   ]
 );
+
+export const ValueTypeValuesSchema = z.union(Object.values(ValueTypes));
 
 export const ValueReturnSchema = z.union([
   z.unknown(),
@@ -57,6 +60,7 @@ export const ValueReturnSchema = z.union([
 ]);
 
 export type ValueTypeName = z.infer<typeof ValueTypeNameSchema>;
+export type ValueTypeValues = z.infer<typeof ValueTypeValuesSchema>;
 export type ValueReturn = z.infer<typeof ValueReturnSchema>;
 
 // Helper types and functions to define blocks
@@ -586,35 +590,21 @@ const MAP = defineBlock({
     ]
 });
 
-const ADD_VARIABLE = defineBlock({
-    "name": NODE_NAMES.AddVariable,
-    "displayName": "Add Variable",
-    "returnType": "Number",
-    "arguments": [
-        {
-            "name": "name",
-            "displayName": "Variable Name",
-            "type": "String",
-            "optional": false
-        },
-        {
-            "name": "value",
-            "displayName": "Value",
-            "type": "Number",
-            "optional": false
-        },
-    ]
-});
-
 const UPDATE_VARIABLE = defineBlock({
     "name": NODE_NAMES.UpdateVariable,
     "displayName": "Update Variable",
-    "returnType": "Number",
+    "returnType": "Unknown",
     "arguments": [
         {
             "name": "name",
             "displayName": "Variable Name",
             "type": "String",
+            "optional": false
+        },
+        {
+            "name": "variableType",
+            "displayName": "Type",
+            "type": "VariableType",
             "optional": false
         },
         {
@@ -629,12 +619,18 @@ const UPDATE_VARIABLE = defineBlock({
 const GET_VARIABLE = defineBlock({
     "name": NODE_NAMES.GetVariable,
     "displayName": "Get Variable",
-    "returnType": "Number",
+    "returnType": "Unknown",
     "arguments": [
         {
             "name": "name",
             "displayName": "Variable Name",
             "type": "String",
+            "optional": false
+        },
+        {
+            "name": "variableType",
+            "displayName": "Type",
+            "type": "VariableType",
             "optional": false
         },
     ]
@@ -1470,7 +1466,6 @@ export const BLOCKS = {
     RANK,
     SUIT,
     MAP,
-    ADD_VARIABLE,
     UPDATE_VARIABLE,
     GET_VARIABLE,
     SET_PHASE,

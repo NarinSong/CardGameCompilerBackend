@@ -1,5 +1,5 @@
 import LabelManager, { Label } from "./LabelManager.js";
-import { ActionRole, DisplayName, ButtonType, Visibility, LocationResolver } from "../schemas/types.js";
+import { ActionRole, DisplayName, ButtonType, Visibility, LocationResolver, ButtonRange, ButtonRangeArgument } from "../schemas/types.js";
 
 /**
  * Defines the properties that make up a button in a game.
@@ -12,7 +12,7 @@ export default class ButtonDefinition {
     displayName: DisplayName;
     actionRoles: ActionRole[];
     type: ButtonType;
-    range: { min: number | undefined, max: number | undefined, increment: number } | undefined;
+    range: ButtonRange | undefined;
     location: LocationResolver;
     
     /**
@@ -26,7 +26,7 @@ export default class ButtonDefinition {
         displayName?: string | undefined,
         actionRoles?: string[] | undefined,
         type?: ButtonType | undefined,
-        range?: { min?: number | undefined, max?: number | undefined, increment?: number | undefined } | undefined,
+        range?: ButtonRangeArgument | undefined,
         location: LocationResolver,
     }) {
         this.label = definition.labelManager.createLabel(this, definition.label);

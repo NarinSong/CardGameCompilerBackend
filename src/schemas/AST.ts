@@ -85,7 +85,6 @@ const RoleOperatorsSchema = z.enum([
 ]);
 
 const VariableOperatorsSchema = z.enum([
-  NODE_NAMES.AddVariable,
   NODE_NAMES.UpdateVariable,
 ])
 
@@ -156,9 +155,11 @@ export type AST_Node =
   type: VariableOperatorsNames;
   name: AST_Node;
   value: AST_Node;
+  variableType: AST_Node;
 } | {
   type: typeof NODE_NAMES.GetVariable;
   name: AST_Node;
+  variableType: AST_Node;
 } | {
   type: typeof NODE_NAMES.Sequence;
   primary: AST_Node[];
@@ -294,11 +295,13 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
       type: VariableOperatorsSchema,
       name: ValueNodeSchema,
       value: ValueNodeSchema,
+      variableType: ValueNodeSchema,
     }),
 
     z.object({
-    type: z.literal(NODE_NAMES.GetVariable),
-    name: ValueNodeSchema,
+      type: z.literal(NODE_NAMES.GetVariable),
+      name: ValueNodeSchema,
+      variableType: ValueNodeSchema,
     }),
 
     /* Logic */

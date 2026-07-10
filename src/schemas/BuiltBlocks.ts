@@ -71,6 +71,11 @@ function inferNodeType(node: ClientNode): ValueTypeName {
   if (node.kind === "array") {
     return "Array";
   }
+  if (node.block === "GET_VARIABLE" || node.block === "UPDATE_VARIABLE") {
+    const variableTypeCheck = ValueTypeNameSchema.parse(node.args.variableType);
+
+    return variableTypeCheck;
+  }
 
   const block = BLOCKS[node.block as BlockName];
 
@@ -138,6 +143,11 @@ export function validateNode(node: ClientNode): void {
     validateNode(provided);
 
     const actualType = inferNodeType(provided);
+
+    if (argDef.type === 'Void') {
+      // If the block doesn't care about the return type, neither should we
+      continue;
+    }
 
     if (actualType !== argDef.type) {
       throw new Error(

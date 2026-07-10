@@ -112,6 +112,11 @@ export const ButtonRangeSchema = z.object({
   max: z.number().or(z.undefined()),
   increment: z.number().or(z.undefined()),
 });
+export const ButtonRangeArgumentSchema = z.object({
+  min: z.number().or(z.undefined()).optional(),
+  max: z.number().or(z.undefined()).optional(),
+  increment: z.number().or(z.undefined()).optional(),
+});
 
 /* BoardID must equal -1 */
 export const BoardIDSchema = z.literal(-1);
@@ -160,6 +165,7 @@ export type Location = z.infer<typeof LocationSchema>;
 export type DefaultLocation = z.infer<typeof DefaultLocationSchema>;
 export type LocationResolver = z.infer<typeof LocationResolverSchema>;
 export type ButtonRange = z.infer<typeof ButtonRangeSchema>;
+export type ButtonRangeArgument = z.infer<typeof ButtonRangeArgumentSchema>;
 export type DeckDefinition = z.infer<typeof DeckDefinitionSchema>;
 
 // IDs

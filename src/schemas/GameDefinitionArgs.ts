@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ValueNodeSchema } from "./AST.js";
 import { ActionRolesSchema, ButtonTypeSchema, DefaultLocationSchema, LocationResolverSchema, PileStateSchema, TriggerSchema, VisibilitySchema } from "./types.js";
+import { ValueTypeNameSchema } from "./Blocks.js";
 
 // Arguments to definitions
 export const GameMetaArgsSchema = z.object({
@@ -10,7 +11,7 @@ export const GameMetaArgsSchema = z.object({
     cardValueMap: z.record(z.string(), z.number()).optional(),
     clientSuitMap: z.record(z.string(), z.number()).optional(),
     clientRankMap: z.record(z.string(), z.number()).optional(),
-    variables: z.record(z.string(), z.number()).optional(),
+    variables: z.record(z.string(), ValueTypeNameSchema).optional(),
     locations: z.record(z.string(), DefaultLocationSchema).optional(),
 })
 
