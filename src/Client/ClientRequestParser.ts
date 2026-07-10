@@ -334,16 +334,16 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
 
         // Can overwrite the current one legally
         const result = await Database.updateGameEditorBlocks(gameId, game);
-        if (!result) return callback(false);
+        if (!result) return callback(false, gameId);
     }
 
     const def = buildGameFromJSON(jsonCheck.data);
-    if (!def) return callback(false);
+    if (!def) return callback(false, gameId);
     def.gameMeta.id = gameId;
 
     // Save game in database and available games
     const result = await Database.saveGameJson(databaseId, def);
-    if (!result) return callback(false);
+    if (!result) return callback(false, gameId);
     
     GameManager.registerGameDefinition(def, gameId, JSON.stringify(jsonCheck.data)); 
 
