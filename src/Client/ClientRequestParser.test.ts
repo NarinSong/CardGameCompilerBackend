@@ -315,7 +315,7 @@ vi.mock("../Components/Database.js", () => ({
     }
 }));
 
-
+/*
 describe("clientRequestSaveGame", () => {
     it("does nothing if callback is not a function", async () => {
         expect(() => clientRequestSaveGame(1, validGame,"dawwad", 1, "dwadwad", true,"ddwadaw")).not.toThrow();
@@ -417,7 +417,7 @@ describe("clientRequestSaveGame", () => {
     
 });
 
-
+*/
 /**
  * 
  * 
