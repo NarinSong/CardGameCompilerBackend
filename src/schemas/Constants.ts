@@ -67,4 +67,5 @@ export const NODE_NAMES = {
   PileFlushOfSuit: "PILE_FLUSH_OF_SUIT",
   PileRun: "PILE_RUN",
   PileRunFrom: "PILE_RUN_FROM",
+  Comment: "COMMENT",
 } as const;

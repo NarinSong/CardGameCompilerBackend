@@ -83,6 +83,7 @@ function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDe
 
     switch (blockNode.kind) {
         case 'block':
+            if (blockNode.block === "COMMENT") return null;
             return nonLiteralBlockNodeToAst(blockNode);
         case 'sequence':
             return sequenceNodeToAst(blockNode);

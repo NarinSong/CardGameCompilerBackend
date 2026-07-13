@@ -1392,6 +1392,20 @@ const PILE_RUN_FROM = defineBlock({
     ]
 });
 
+const COMMENT = defineBlock({
+    "name": NODE_NAMES.Comment,
+    "displayName": "Comment",
+    "returnType": "Void",
+    "arguments": [
+        {
+            "name": "Comment",
+            "displayName": "Comment",
+            "type": "Void",
+            "optional": true
+        }
+    ]
+})
+
 // Put the blocks together in a registry to export them
 export const BLOCKS = {
     UNDEFINED,
@@ -1456,6 +1470,7 @@ export const BLOCKS = {
     PILE_FLUSH_OF_SUIT,
     PILE_RUN,
     PILE_RUN_FROM,
+    COMMENT,
 } as const;
 
 export type BlockName = keyof typeof BLOCKS;
