@@ -55,7 +55,7 @@ export default class Database {
      * @param username - username to save.
      * @param passwordHash - password hash to save.
      * @param displayName - display name to save.
-     * @returns Promise for true if successfully saved, else false.
+     * @returns Promise resolving to the insert result if successful, or null on failure.
      */
     static async saveUserCredentials(username: string, passwordHash: string, displayName: string, color: string): Promise<InsertResult | null> {
         if (username === 'test') return { affectedRows: 1, insertId: 2, warningStatus: 0 };
@@ -74,6 +74,12 @@ export default class Database {
         }
     }
 
+    /**
+     * Updates the profile color of a user in the database.
+     * @param username - The username of the user to update.
+     * @param color - The new hex color string to save.
+     * @returns Promise resolving to true if successful, else false.
+     */
     static async saveUserColor(username: string, color: string): Promise<boolean> {
         let conn;
 
@@ -90,6 +96,12 @@ export default class Database {
         return true;
     }
 
+    /**
+     * Updates the display name of a user in the database.
+     * @param username - The username of the user to update.
+     * @param displayName - The new display name to save.
+     * @returns Promise resolving to true if successful, else false.
+     */
     static async saveUserDisplayName(username: string, displayName: string): Promise<boolean> {
         let conn;
 
@@ -106,6 +118,12 @@ export default class Database {
         return true;
     }
 
+    /**
+     * Updates the profile description of a user in the database.
+     * @param username - The username of the user to update.
+     * @param description - The new profile description to save.
+     * @returns Promise resolving to true if successful, else false.
+     */
     static async saveUserDescription(username: string, description: string): Promise<boolean> {
         let conn;
 
@@ -122,6 +140,12 @@ export default class Database {
         return true;
     }
 
+    /**
+     * Updates the profile picture URL of a user in the database.
+     * @param username - The username of the user to update.
+     * @param url - The URL of the new profile picture.
+     * @returns Promise resolving to true if successful, else false.
+     */
     static async saveUserProfilePicture(username: string, url: string): Promise<boolean> {
         let conn;
 
@@ -138,6 +162,12 @@ export default class Database {
         return true;
     }
 
+    /**
+     * Saves a new game block editor state to the database.
+     * @param databaseId - The database id of the client saving the game.
+     * @param game - The ClientGameDefinition containing the game info and block editor state.
+     * @returns Promise resolving to the new game id if successful, or null on failure.
+     */
     static async saveGameEditorBlocks(databaseId: number, game: ClientGameDefinition): Promise<null | number> {
         let conn;
         let id: number;
@@ -166,6 +196,12 @@ export default class Database {
         return id;
     }
 
+    /**
+     * Updates an existing game block editor state in the database.
+     * @param gameId - The id of the game to update.
+     * @param game - The updated ClientGameDefinition.
+     * @returns Promise resolving to the update result if successful, or null on failure.
+     */
     static async updateGameEditorBlocks(gameId: number, game: ClientGameDefinition): Promise<null | UpdateResult> {
         let conn;
 
@@ -190,6 +226,11 @@ export default class Database {
         }
     }
 
+    /**
+     * Retrieves the creator of a saved block editor game by its id.
+     * @param gameId - The id of the saved game.
+     * @returns Promise resolving to an array containing the creator field, or null on failure.
+     */
     static async getSavedEditorBlocksById(gameId: number): Promise<SelectGameSavesById[] | null> {
         let conn;
 
@@ -206,6 +247,11 @@ export default class Database {
         }
     }
 
+    /**
+     * Retrieves the full block editor state and creator of a saved game by its id.
+     * @param gameId - The id of the saved game.
+     * @returns Promise resolving to an array containing the block editor state and creator, or null on failure.
+     */
     static async getFullSavedEditorBlocksById(gameId: number): Promise<SelectFullGameSavesById[] | null> {
         let conn;
 
@@ -222,6 +268,10 @@ export default class Database {
         }
     }
 
+    /**
+     * Retrieves all saved block editor games from the database.
+     * @returns Promise resolving to an array of saved game entries, or null on failure.
+     */
     static async getAllGameEditorBlocks(): Promise<null | SelectAllGameSaves[]> {
         let conn;
 
@@ -238,6 +288,12 @@ export default class Database {
         }
     }
 
+    /**
+     * Saves a compiled game definition JSON to the database.
+     * @param databaseId - The database id of the client saving the game.
+     * @param game - The GameDefinition to save.
+     * @returns Promise resolving to the insert result if successful, or null on failure.
+     */
     static async saveGameJson(databaseId: number, game: GameDefinition): Promise<InsertResult | null> {
         let conn;
 

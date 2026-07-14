@@ -72,6 +72,10 @@ export default class Room {
         });
     }
 
+    /**
+     * Resets the inactivity timeout for the room.
+     * If the room is inactive for 30 minutes, it will be destroyed.
+     */
     resetInactivityTimeout() {
         const existing = this.timeouts.get("inactivity");
         if (existing) clearTimeout(existing);
@@ -84,9 +88,8 @@ export default class Room {
     }
 
     /**
-     *  
-     * Send the updated game state to all clients.
-     * 
+     * Sends the updated game state to all clients in the room.
+     * @param views - Array of player id and view pairs to send to each client.
      */
     emitGameState(views: {playerId: number, view: ClientView}[]) {
         
@@ -117,6 +120,12 @@ export default class Room {
 
     }
 
+    /**
+     * Broadcasts an emote reaction from a client to all other clients in the room.
+     * @param clientId - The id of the client sending the emote.
+     * @param username - The username of the client sending the emote.
+     * @param emote - The emote string to broadcast.
+     */
     handleEmote(clientId: ClientID, username: string, emote: string) {
         for (const client in this.clients) {
             if (+client == clientId) continue;
@@ -125,7 +134,12 @@ export default class Room {
         }
     }
 
-    // This function should *only* be called by the parent lobby, and *only* during room creation, before the game begins
+    /**
+     * Handles a client joining the room before the game starts.
+     * Should only be called by the parent lobby during room creation.
+     * @param clientId - The id of the client joining the room.
+     * @returns Promise resolving to true if the player successfully joined, else false.
+     */
     handleJoinRoom(clientId: ClientID) {
         if (this.started) return false;
         const client = GameManager.clientFromId(clientId);
@@ -158,14 +172,21 @@ export default class Room {
        
     }
 
+    /**
+     * Starts the game in the worker thread.
+     * @returns True if the game was started successfully, false if the game has already started.
+     */
     startGame() {
         if (this.started) return false;
         this.started = true;
         this.resetInactivityTimeout();
         this.worker.postMessage({type: "START_GAME"});
         return true;
-    }
+    }   
 
+    /**
+     * Clears all active timeouts for the room.
+     */
     clearTimeouts() {
         for (const t of this.timeouts.values()){
             clearTimeout(t);
@@ -173,6 +194,10 @@ export default class Room {
         this.timeouts.clear();
     }
 
+    /**
+     * Clears a specific timeout by name.
+     * @param name - The name of the timeout to clear.
+     */
     clearTimeoutByName(name: string){
         const exists = this.timeouts.get(name);
         if (exists){
@@ -181,7 +206,9 @@ export default class Room {
         }
     }
 
-    //Terminate the thread after the room is done
+    /**
+     * Destroys the room by clearing all timeouts and terminating the worker thread.
+     */
     destroy(){
         this.clearTimeouts();
         this.worker.terminate();

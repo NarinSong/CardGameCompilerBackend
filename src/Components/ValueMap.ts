@@ -21,6 +21,11 @@ export default class ValueMap<T extends string | number, N> implements ValueMap<
         this.#mapping = mapping;
     }
 
+    /**
+     * Looks up a value in the map by key.
+     * @param key - The key to look up.
+     * @returns The mapped value, or undefined if the key is not found.
+     */
     get(key: T) {
         // Note: ctx is assumed to include the target of type T
         return this.#mapping[key];
