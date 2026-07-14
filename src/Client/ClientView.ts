@@ -16,6 +16,15 @@ type ClientCounterType = { owner: number, visibility: Visibility, value: number,
 type ClientButtonType = { owner: number, visibility: Visibility, label: string, actionRoles: string[], displayName: string, type: ButtonType, range: { min: number | undefined, max: number | undefined, increment: number | undefined } | undefined, location: Location };
 type ClientPlayerType = { playerId: PlayerID, type: PlayerType };
 
+/**
+ * Resolves a LocationResolver to a concrete Location.
+ * For exact locations, returns the location directly.
+ * For non-exact locations, computes the next available position using the game meta.
+ * @param location - The location resolver to evaluate.
+ * @param locations - Record tracking the last used position for each location key.
+ * @param gameMeta - The game meta used to compute the next location.
+ * @returns The resolved concrete Location.
+ */
 function resolveLocation(location: LocationResolver, locations: Record<string, Location>, gameMeta: GameMeta): Location {
     if (location.locationType === 'exact') return location.location;
 
@@ -31,7 +40,7 @@ function resolveLocation(location: LocationResolver, locations: Record<string, L
 /**
  * The current gamestate from the perspective of the client.
  * 
- * The ClientView contains the piles, counters, players, and board information.
+ * The ClientView contains the piles, counters, buttons, and players.
  */
 export default class ClientView {
     // These are readonly so that they can be linked to the actual gamestate without having to worry about side-effects
@@ -44,6 +53,7 @@ export default class ClientView {
      * Creates the ClientView.
      * @param piles - Piles in the game.
      * @param counters - Counters in the game.
+     * @param buttons - Buttons in the game.
      * @param players - The players in the game.
      */
     private constructor(
@@ -65,6 +75,8 @@ export default class ClientView {
      * @param player - Player object of the client.
      * @param suitMap - Map between the suit and its value.
      * @param rankMap - Map between the rank and its value.
+     * @param locations - Record tracking the last used position for each location key.
+     * @param gameMeta - The game meta used to resolve locations.
      * @returns Created pileView object, else null if the pile is supposed to be invisible.
      */
     static pileView(pile: Pile, owner: number, player: Player, suitMap: ValueMap<string, number>, rankMap: ValueMap<string, number>, locations: Record<string, Location>, gameMeta: GameMeta) {
@@ -99,6 +111,8 @@ export default class ClientView {
      * @param counter - the counter to generate a view for.
      * @param owner - id of the owner of the counter.
      * @param player - Player object of the client.
+     * @param locations - Record tracking the last used position for each location key.
+     * @param gameMeta - The game meta used to resolve locations.
      * @returns Created counterView object, else null if the counter is supposed to be invisible.
      */
     static counterView(counter: Counter, owner: number, player: Player, locations: Record<string, Location>, gameMeta: GameMeta) {
@@ -119,6 +133,15 @@ export default class ClientView {
         return counterView;
     }
 
+    /**
+     * The view of the button from the perspective of the client.
+     * @param button - The button to generate a view for.
+     * @param owner - The id of the owner of the button.
+     * @param player - The Player object of the client.
+     * @param locations - Record tracking the last used position for each location key.
+     * @param gameMeta - The game meta used to resolve locations.
+     * @returns Created buttonView object, else null if the counter is supposed to be invisible.
+     */
     static buttonView(button: Button, owner: number, player: Player, locations: Record<string, Location>, gameMeta: GameMeta) {
         if (button.visibility == Visibility.INVISIBLE) return null;
 
