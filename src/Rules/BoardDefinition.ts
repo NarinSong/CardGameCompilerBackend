@@ -10,7 +10,7 @@ import PileDefinition from "./PileDefinition.js";
 /**
  * Defines the piles and counters that make up the game board.
  * 
- *  A BoardDefinition contains the piles and counters associated with the game board itself rather than with an individual player.
+ *  A BoardDefinition contains the piles, counters, and buttons associated with the game board itself rather than with an individual player.
  */
 export default class BoardDefinition {
     piles: PileDefinition[];

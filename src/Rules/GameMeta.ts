@@ -54,6 +54,14 @@ export default class GameMeta {
         }
     }
 
+    /**
+     * Calculates the next offset value and whether it wrapped around the threshold.
+     * @param current - The current position value.
+     * @param offset - The amount to offset by.
+     * @param threshold - The maximum value before wrapping.
+     * @param wrapTo - The value to wrap back to.
+     * @returns An object containing the new value and whether wrapping occurred.
+     */
     static locationOffset(current: number, offset: number, threshold: number, wrapTo: number): { value: number, wrapped: boolean } {
         current += offset;
         let wrapped = false;
@@ -64,6 +72,12 @@ export default class GameMeta {
         return { value: current, wrapped: wrapped };
     }
 
+    /**
+     * Computes the next location for a game component based on a named default layout.
+     * @param locationName - The name of the default location configuration to use.
+     * @param currentLocation - The current location to offset from, if any.
+     * @returns The next computed location.
+     */
     nextLocation(locationName: string, currentLocation?: Location | undefined): Location {
         const defaultLocation: DefaultLocation | undefined = this.locations[locationName];
         if (!defaultLocation) return {x:0, y:0};

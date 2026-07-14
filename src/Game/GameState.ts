@@ -26,7 +26,7 @@ type VariableArrayType = Record<ValueTypeName, Record<string, ValueTypeValues>>;
 /**
  * Represents the game state during runtime.
  * 
- * A GameState tracks the labels in the game, number of players, players, roles, board, current step, piles, and counters.
+ * A GameState tracks the labels in the game, number of players, players, roles, board, current step, piles, counters, buttons, and variables.
  */
 export default class GameState {
     gameLabels: GameLabels;
@@ -106,6 +106,11 @@ export default class GameState {
         this.counters[counter.label] = { counter: counter, owner: id };
     }
 
+    /**
+     * Creates a button from a button definition.
+     * @param buttonDefinition - Configuration for the button, including its label, display name, action roles, type, and range if applicable.
+     * @param id - The identifier for the owner of the button.
+     */
     createButtonFromDefinition(buttonDefinition: ButtonDefinition, id: number) {
         const button = Button.fromDefinition(buttonDefinition, this.gameLabels);
 
@@ -173,6 +178,11 @@ export default class GameState {
         delete this.piles[pile];
     }
 
+    /**
+     * Removes a button by label.
+     * @param button - The label of the button to remove.
+     * @returns undefined if no button with that label exists.
+     */
     removeButtonByLabel(button: Label) {
         const mainButton: Button | undefined = this.buttons[button]?.button;
 
@@ -183,6 +193,12 @@ export default class GameState {
         delete this.buttons[button];
     }
 
+    /**
+     * Removes a counter by label.
+     * @param counter - The label of the counter to remove.
+     * @param sendValueTo - Optional counter label to receive the removed counter's value.
+     * @returns undefined if no counter with that label exists.
+     */
     removeCounterByLabel(counter: Label, sendValueTo?: Label | undefined) {
         const mainCounter: Counter | undefined = this.counters[counter]?.counter;
         const to: Counter | undefined = sendValueTo ? this.counters[sendValueTo]?.counter : undefined;
@@ -198,6 +214,11 @@ export default class GameState {
         delete this.counters[counter];
     }
 
+    /**
+     * Creates a button using explicit parameters.
+     * @param obj - An object containing the button's configuration.
+     * @returns The button label.
+     */
     createButton(obj: { name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined, type?: ButtonType | undefined, range?: ButtonRange | undefined, location?: LocationResolver | undefined } = {}) {
         const name = obj.name        ?? this.gameLabels.nextId;
 
@@ -217,6 +238,11 @@ export default class GameState {
         return button.label;
     }
 
+    /**
+     * Creates a counter using explicit parameters.
+     * @param obj - An object containing the counter's configuration.
+     * @returns The counter label.
+     */
     createCounter(obj: { state?: number | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined, location?: LocationResolver | undefined } = {}) {
         const name = obj.name        ?? this.gameLabels.nextId;
 
@@ -249,6 +275,10 @@ export default class GameState {
         }
     }
 
+    /**
+     * Shuffles the cards in a pile.
+     * @param pile - The label of the pile to shuffle.
+     */
     shuffle(pile: Label) {
         const p1 = this.gameLabels.getFromLabel(pile) as Pile;
 
@@ -257,6 +287,11 @@ export default class GameState {
         }
     }
 
+    /**
+     * Moves the game state to the first step of a given phase.
+     * @param phaseName - The label of the phase to move to.
+     * @returns undefined if the phase does not exist or has no steps.
+     */
     moveToPhase(phaseName: PhaseLabel) {
         const phase = this.gameLabels.getPhaseFromLabel(phaseName);
 
@@ -278,10 +313,22 @@ export default class GameState {
         this.currentStep = step;
     }
 
+    /**
+     * Retrieves a variable value from the game state.
+     * @param type - The type of the variable.
+     * @param name - The name of the variable.
+     * @returns The value of the variable, or undefined if not found.
+     */
     getVariable(type: ValueTypeName, name: string) {
         return this.variables[type][name];
     }
 
+    /**
+     * Sets a variable value in the game state.
+     * @param type - The type of the variable.
+     * @param name - The name of the variable.
+     * @param value - The value to set.
+     */
     setVariable(type: ValueTypeName, name: string, value: ValueTypeValues) {
         this.variables[type][name] = value;
     }

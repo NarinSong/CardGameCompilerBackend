@@ -20,11 +20,13 @@ export default class Button {
     /**
      * Creates a new Button
      * @param label - Name associated with the button.
+     * @param visibility - The visibility of the button.
      * @param gameLabels - Manages all the in game labels.
      * @param actionRoles - The action roles associated with the button.
      * @param displayName - In game name of the button.
      * @param type - Type of the button.
      * @param range - The numeric range configuration for the button, if applicable.
+     * @param location - The location of the button on the board.
      */
     private constructor(
         label: Label,
@@ -69,11 +71,13 @@ export default class Button {
     /**
      * Creates a new Button with explicit parameters
      * @param label - Name associated with the button.
+     * @param visibility - The visibility of the button.
      * @param gameLabels - Manages all the in game labels.
      * @param actionRoles - The action roles associated with the button.
      * @param displayName - In game name of the button.
      * @param type - Type of the button.
      * @param range - The numeric range configuration for the button, if applicable.
+     * @param location - The location of the button on the board.
      * @returns the newly constructed button.
      */
     static create(

@@ -50,6 +50,11 @@ export default class GameLabels {
         this.gameObjectLabels[label] = counter;
     }
 
+    /**
+     * Stores a button and its label.
+     * @param button - The button object.
+     * @param label - The label of the button.
+     */
     registerButton(button: Button, label: Label) {
         this.gameObjectLabels[label] = button;
     }
@@ -71,6 +76,11 @@ export default class GameLabels {
         return this.gameObjectLabels[label];
     }
 
+    /**
+     * Returns the phase associated with a label.
+     * @param label - Label of the phase.
+     * @returns The phase associated with the label.
+     */
     getPhaseFromLabel(label: PhaseLabel) {
         return this.gamePhaseLabels[label];
     }
