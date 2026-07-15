@@ -298,8 +298,6 @@ export async function clientRequestGetGameInfo(clientId: number, gameId: unknown
  * @param isPrivate - Whether the game is viewable only to the client or everyone.
  * @param callback - Response handler. Called with true (boolean value) and its id.
  * @returns void if callback is not a function, returns callback(true, id) if save was successful, else callback(false).
- * @todo connect actual id
- * @todo get save id from database
  */
 export async function clientRequestSaveGame(clientId: number, json: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean, id?: number) => void
