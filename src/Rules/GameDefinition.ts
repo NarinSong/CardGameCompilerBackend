@@ -96,6 +96,10 @@ export default class GameDefinition {
         this.player.counters.push(counter);
     }
 
+    /**
+     * Adds a button definition to a player.
+     * @param definition - Configuration for the Button, including its label, display name, action roles, button type, and range if necessary.
+     */
     addPlayerButton(definition: {
             label?: string | undefined,
             displayName?: string | undefined,

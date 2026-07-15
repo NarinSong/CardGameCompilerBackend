@@ -16,7 +16,10 @@ import Auth from "../Components/Auth.js";
 import { PlayerID } from "../schemas/types.js";
 
 /**
- * Client's state of authentication 
+ * Client's state of authentication.
+ * 
+ * When authenticated, holds the username, display name, session token, and database id.
+ * When unauthenticated, all fields are null or 0.
  */
 type AuthState =
   | {
@@ -38,7 +41,8 @@ type AuthState =
 /**
  * Defines the properties of a client.
  * 
- * A Client consists of its id, room associated to (if any), and authState. 
+ * A Client consists of its identifier, auth state, lobby and room membership,
+ * player id (if in a game), and display color.
  */
 export default class Client {
     static #nextId : number = 1000;
@@ -65,6 +69,10 @@ export default class Client {
         this.identifier = Client.nextId;
     }
 
+    /**
+     * Returns a random pastel color hex string.
+     * @returns A randomly selected hex color string.
+     */
     randomColor() {
         let colors = [
             '#ffcccc',
@@ -85,15 +93,13 @@ export default class Client {
     }
 
     /**
-     * 
      * Signs a client into his/her account.
-     * 
      * @param username - The client's username.
-     * @param password - The clients password.
+     * @param password - The client's password.
      * @returns A token if authentication is successful, otherwise null.
+     * @todo DELETE AUTO SUCCESS ON SIGN IN (NOT SECURE) — replace with Auth.authenticateUser call.
      */
     async signIn(username: string, password: string) {
-        // TODO: DELETE AUTO SUCCESS ON SIGN IN (NOT SECURE)
         const success = {username: username, token: '1234', displayName: username, color: '#ffffff', databaseId: 1024 };//await Auth.authenticateUser(username, password);
         if (!success) return null;
 
@@ -174,8 +180,9 @@ export default class Client {
     }
 
     /**
-     * Send the updated game state to the client.
-     * @param game - Current game instance.
+     * Sends the updated game state to the client.
+     * Resolves the player from the game using the client's stored player id.
+     * @param game - The current game instance.
      */
     updateGamestate(game: Game) {
         if (this.player === null) return;
@@ -184,6 +191,10 @@ export default class Client {
         sendClientGamestate(this.identifier, ClientView.fromGamestate(game, player));
     }
 
+    /**
+     * Updates the client's display name in the auth state.
+     * @param name - The new display name.
+     */
     updateDisplayName(name: string) {
         this.authState.displayName = name;
     }
@@ -208,6 +219,9 @@ export default class Client {
         return this.authState.username;
     }
 
+    /**
+     * The database id of the authenticated user, or 0 if unauthenticated.
+     */
     get databaseId() {
         return this.authState.databaseId;
     }

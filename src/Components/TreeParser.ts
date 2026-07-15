@@ -31,6 +31,14 @@ function executeCreateArray(g: Game, c: ActionContext, node: ValueNode) {
     return arr;
 }
 
+/**
+ * Evaluates a "BUTTON_RANGE" value node and returns the range object.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - BUTTON_RANGE node to evaluate.
+ * @returns An object containing min, max, and increment values.
+ * @throws Error if the node is not a BUTTON_RANGE node.
+ */
 function evaluateButtonRange(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.ButtonRange) throw new Error("Called evaluateButtonRange with an invalid node");
 
@@ -41,6 +49,14 @@ function evaluateButtonRange(g: Game, c: ActionContext, node: ValueNode) {
     return { min, max, increment };
 }
 
+/**
+ * Evaluates an "IS_BETWEEN" value node and returns whether a value is between two others.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - IS_BETWEEN node to evaluate.
+ * @returns True if the first value is between the second and third, else false.
+ * @throws Error if the node is not an IS_BETWEEN node.
+ */
 function evaluateIsBetween(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.IsBetween) throw new Error("Called evaluateIsBetween with an invalid node");
 
@@ -88,6 +104,14 @@ function executeCreatePile(g: Game, c: ActionContext, node: ValueNode) {
             });
 }
 
+/**
+ * Executes a "CREATE_BUTTON" value node and returns the created button label.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - CREATE_BUTTON node to execute.
+ * @returns The label of the created button.
+ * @throws Error if the node is not a CREATE_BUTTON node.
+ */
 function executeCreateButton(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.CreateButton) throw new Error("Called executeCreateButton with an invalid node");
     
@@ -104,6 +128,14 @@ function executeCreateButton(g: Game, c: ActionContext, node: ValueNode) {
             });
 }
 
+/**
+ * Executes a "CREATE_COUNTER" value node and returns the created counter label.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - CREATE_COUNTER node to execute.
+ * @returns The label of the created counter.
+ * @throws Error if the node is not a CREATE_COUNTER node.
+ */
 function executeCreateCounter(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.CreateCounter) throw new Error("Called executeCreateCounter with an invalid node");
     
@@ -135,6 +167,13 @@ function executeRemovePile(g: Game, c: ActionContext, node: ValueNode) {
     )
 }
 
+/**
+ * Executes a "REMOVE_BUTTON" action node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - REMOVE_BUTTON action node to execute.
+ * @throws Error if the node is not a REMOVE_BUTTON node.
+ */
 function executeRemoveButton(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.RemoveButton) throw new Error("Called executeRemoveButton with an invalid node");
 
@@ -143,6 +182,13 @@ function executeRemoveButton(g: Game, c: ActionContext, node: ValueNode) {
     )
 }
 
+/**
+ * Executes a "REMOVE_COUNTER" action node.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - REMOVE_COUNTER action node to execute.
+ * @throws Error if the node is not a REMOVE_COUNTER node.
+ */
 function executeRemoveCounter(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.RemoveCounter) throw new Error("Called executeRemoveCounter with an invalid node");
 
@@ -152,6 +198,15 @@ function executeRemoveCounter(g: Game, c: ActionContext, node: ValueNode) {
     )
 }
 
+/**
+ * Executes a "SHUFFLE_INTO" action node.
+ * Moves all cards from one pile into another and shuffles the destination pile.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - SHUFFLE_INTO node to execute.
+ * @returns The label of the destination pile.
+ * @throws Error if the node is not a SHUFFLE_INTO node.
+ */
 function executeShuffleInto(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.ShuffleInto) throw new Error("Called executeShuffleInto with an invalid node");
 
@@ -164,6 +219,14 @@ function executeShuffleInto(g: Game, c: ActionContext, node: ValueNode) {
     return toPileLabel;
 }
 
+/**
+ * Executes a "MOVE_COUNTER_VALUE" action node.
+ * Moves a numeric amount from one counter to another.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - MOVE_COUNTER_VALUE node to execute.
+ * @throws Error if the node is not a MOVE_COUNTER_VALUE node.
+ */
 function executeMoveCounterValue(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.MoveCounterValue) throw new Error("Called executeMoveCounterValue with an invalid node");
 
@@ -182,6 +245,15 @@ function executeMoveCounterValue(g: Game, c: ActionContext, node: ValueNode) {
     toCounter.counter.value += move;
 }
 
+/**
+ * Executes a "SET_COUNTER_VALUE" action node.
+ * Sets the value of a counter to a given number.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - SET_COUNTER_VALUE node to execute.
+ * @returns The label of the updated counter.
+ * @throws Error if the node is not a SET_COUNTER_VALUE node.
+ */
 function executeSetCounterValue(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetCounterValue) throw new Error("Called executeSetCounterValue with an invalid node");
 
@@ -195,6 +267,15 @@ function executeSetCounterValue(g: Game, c: ActionContext, node: ValueNode) {
     return counterLabel;
 }
 
+/**
+ * Executes a "SET_RANGE" action node.
+ * Sets the range of a button.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - SET_RANGE node to execute.
+ * @returns The label of the updated button.
+ * @throws Error if the node is not a SET_RANGE node.
+ */
 function executeSetRange(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetRange) throw new Error("Called executeSetRange with an invalid node");
 
@@ -208,7 +289,15 @@ function executeSetRange(g: Game, c: ActionContext, node: ValueNode) {
     return buttonLabel;
 }
 
-
+/**
+ * Executes a "SET_COUNTER_VISIBILITY" action node.
+ * Sets the visibility of a counter.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - SET_COUNTER_VISIBILITY node to execute.
+ * @returns The label of the updated counter.
+ * @throws Error if the node is not a SET_COUNTER_VISIBILITY node.
+ */
 function executeSetCounterVisibility(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetCounterVisibility) throw new Error("Called executeSetCounterVisibility with an invalid node");
 
@@ -222,6 +311,15 @@ function executeSetCounterVisibility(g: Game, c: ActionContext, node: ValueNode)
     return counterLabel;
 }
 
+/**
+ * Executes a "SET_BUTTON_VISIBILITY" action node.
+ * Sets the visibility of a button.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - SET_BUTTON_VISIBILITY node to execute.
+ * @returns The label of the updated button.
+ * @throws Error if the node is not a SET_BUTTON_VISIBILITY node.
+ */
 function executeSetButtonVisibility(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetButtonVisisibility) throw new Error("Called executeSetButtonVisibility with an invalid node");
 
@@ -235,6 +333,15 @@ function executeSetButtonVisibility(g: Game, c: ActionContext, node: ValueNode) 
     return buttonLabel;
 }
 
+/**
+ * Executes a "SET_PILE_VISIBILITY" action node.
+ * Sets the visibility of a pile.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - SET_PILE_VISIBILITY node to execute.
+ * @returns The label of the updated pile.
+ * @throws Error if the node is not a SET_PILE_VISIBILITY node.
+ */
 function executeSetPileVisibility(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetPileVisibility) throw new Error("Called executeSetPileVisibility with an invalid node");
 
@@ -286,6 +393,15 @@ function evaluatePileOf(g: Game, c: ActionContext, node: ValueNode) {
     return null;
 }
 
+/**
+ * Evaluates a "COUNTER_OF" value node.
+ * Finds the label of a counter owned by a player with a given action role.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - COUNTER_OF node to evaluate.
+ * @returns The label of the matching counter, or null if none is found.
+ * @throws Error if the node is not a COUNTER_OF node.
+ */
 function evaluateCounterOf(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.CounterOf) throw new Error("Called evaluateCounterOf with an invalid node");
 
@@ -301,6 +417,16 @@ function evaluateCounterOf(g: Game, c: ActionContext, node: ValueNode) {
 
     return null;
 }
+
+/**
+ * Evaluates a "BUTTON_OF" value node.
+ * Finds the label of a button owned by a player with a given action role.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - BUTTON_OF node to evaluate.
+ * @returns The label of the matching button, or null if none is found.
+ * @throws Error if the node is not a BUTTON_OF node.
+ */
 
 function evaluateButtonOf(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.ButtonOf) throw new Error("Called evaluateButtonOf with an invalid node");
@@ -404,6 +530,15 @@ function evaluateAssignRoleSingular(g: Game, c: ActionContext, node: ValueNode) 
     return false;
 }
 
+/**
+ * Evaluates a "NEXT_PLAYER" value node.
+ * Advances the role to the next player in turn order and returns their id.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - NEXT_PLAYER node to evaluate.
+ * @returns The id of the next player.
+ * @throws Error if the node is not a NEXT_PLAYER node.
+ */
 function evaluateNextPlayer(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.NextPlayer) throw new Error("Called evaluateNextPlayer with invalid node");
 
@@ -426,6 +561,15 @@ function evaluateNextPlayer(g: Game, c: ActionContext, node: ValueNode) {
     return newPlayer;
 }
 
+/**
+ * Evaluates a "FIRST_PLAYER" value node.
+ * Returns the id of the first player.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - FIRST_PLAYER node to evaluate.
+ * @returns The id of the first player (always 0).
+ * @throws Error if the node is not a FIRST_PLAYER node.
+ */
 function evaluateFirstPlayer(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.FirstPlayer) throw new Error("Called evaluateFirstPlayer with invalid node");
 
@@ -448,6 +592,15 @@ function evaluateSmallerThan(g: Game, c: ActionContext, node: ValueNode): boolea
 }
 */
 
+/**
+ * Evaluates a "PILE_SET" value node.
+ * Returns the size of the largest set of matching cards in a pile.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - PILE_SET node to evaluate.
+ * @returns The size of the largest matching set found.
+ * @throws Error if the node is not a PILE_SET node.
+ */
 function evaluatePileSet(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.PileSet) throw new Error("Called evaluatePileSet with invalid node");
 
@@ -467,6 +620,15 @@ function evaluatePileSet(g: Game, c: ActionContext, node: ValueNode) {
     return Card.largestSet(pile.cards, suit);
 }
 
+/**
+ * Evaluates a "PILE_SET_OF_RANK" value node.
+ * Returns whether a pile contains at least a given number of matching cards.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - PILE_SET_OF_RANK node to evaluate.
+ * @returns True if the pile contains enough matching cards, else false.
+ * @throws Error if the node is not a PILE_SET_OF_RANK node.
+ */
 function evaluatePileSetOfRank(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.PileSetOfRank) throw new Error("Called evaluatePileSetOfRank with invalid node");
 
@@ -488,6 +650,15 @@ function evaluatePileSetOfRank(g: Game, c: ActionContext, node: ValueNode) {
 
 }
 
+/**
+ * Evaluates a "PILE_FLUSH" value node.
+ * Returns the size of the largest flush of matching cards in a pile.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - PILE_FLUSH node to evaluate.
+ * @returns The size of the largest matching flush found.
+ * @throws Error if the node is not a PILE_FLUSH node.
+ */
 function evaluatePileFlush(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.PileFlush) throw new Error("Called evaluatePileFlush with invalid node");
 
@@ -507,6 +678,15 @@ function evaluatePileFlush(g: Game, c: ActionContext, node: ValueNode) {
     return Card.largestFlush(pile.cards, rank);
 }
 
+/**
+ * Evaluates a "PILE_FLUSH_OF_SUIT" value node.
+ * Returns whether a pile contains at least a given number of matching suited cards.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - PILE_FLUSH_OF_SUIT node to evaluate.
+ * @returns True if the pile contains enough matching suited cards, else false.
+ * @throws Error if the node is not a PILE_FLUSH_OF_SUIT node.
+ */
 function evaluatePileFlushOfSuit(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.PileFlushOfSuit) throw new Error("Called evaluatePileFlushOfSuit with invalid node");
 
@@ -527,6 +707,15 @@ function evaluatePileFlushOfSuit(g: Game, c: ActionContext, node: ValueNode) {
     return Card.largestFlush(pile.cards, rank) >= number;
 }
 
+/**
+ * Evaluates a "PILE_RUN" value node.
+ * Returns the length of the longest consecutive run of ranks in a pile.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - PILE_RUN node to evaluate.
+ * @returns The length of the longest run found.
+ * @throws Error if the node is not a PILE_RUN node.
+ */
 function evaluatePileRun(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.PileRun) throw new Error("Called evaluatePileRun with invalid node");
 
@@ -540,6 +729,15 @@ function evaluatePileRun(g: Game, c: ActionContext, node: ValueNode) {
 
 }
 
+/**
+ * Evaluates a "PILE_RUN_FROM" value node.
+ * Returns whether a pile contains a consecutive run of at least a given length including a specific rank.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - PILE_RUN_FROM node to evaluate.
+ * @returns True if a long enough run including the given rank exists, else false.
+ * @throws Error if the node is not a PILE_RUN_FROM node.
+ */
 function evaluatePileRunFrom(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.PileRunFrom) throw new Error("Called evaluatePileRunFrom with invalid node");
 
@@ -577,6 +775,14 @@ function executeUpdateVariable(g: Game, c: ActionContext, node: ValueNode) {
     return value;
 }
 
+/**
+ * Executes a "SET_PHASE" action node.
+ * Moves the game state to the specified phase.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - SET_PHASE node to execute.
+ * @throws Error if the node is not a SET_PHASE node.
+ */
 function executeSetPhase(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetPhase) throw new Error("Called executeSetPhase with invalid node");
     
@@ -585,7 +791,14 @@ function executeSetPhase(g: Game, c: ActionContext, node: ValueNode) {
     g.gameState.moveToPhase(phaseLabel);
 }
 
-
+/**
+ * Executes a "SET_STEP" action node.
+ * Moves the game state to the specified step.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - SET_STEP node to execute.
+ * @throws Error if the node is not a SET_STEP node.
+ */
 function executeSetStep(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetStep) throw new Error("Called executeSetStep with invalid node");
     
@@ -594,7 +807,15 @@ function executeSetStep(g: Game, c: ActionContext, node: ValueNode) {
     g.gameState.moveToStep(stepLabel);
 }
 
-
+/**
+ * Executes a "WIN" action node.
+ * Marks a player as having won the game.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - WIN node to execute.
+ * @throws Error if the node is not a WIN node.
+ * @todo implement game ending logic.
+ */
 function executeWin(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.Win) throw new Error("Called executeWin with invalid node");
 
@@ -605,6 +826,15 @@ function executeWin(g: Game, c: ActionContext, node: ValueNode) {
     // TODO: end the game
 }
 
+/**
+ * Executes a "LOSE" action node.
+ * Marks a player as having lost the game.
+ * @param g - The current game instance.
+ * @param c - The current action context.
+ * @param node - LOSE node to execute.
+ * @throws Error if the node is not a LOSE node.
+ * @todo implement game ending logic.
+ */
 function executeLose(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.Lose) throw new Error("Called executeLose with invalid node");
 

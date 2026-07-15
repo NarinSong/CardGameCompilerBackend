@@ -8,7 +8,7 @@ import PileDefinition from "./PileDefinition.js";
 /**
  * Defines the piles and counters associated with a player.
  * 
- * A PlayerDefinition contains the list of piles and counters associated with the player. 
+ * A PlayerDefinition contains the list of piles, counters, and buttons associated with the player. 
  */
 export default class PlayerDefinition {
     piles: PileDefinition[];
@@ -19,6 +19,7 @@ export default class PlayerDefinition {
      * Creates a new player definition.
      * @param piles - Optional list of piles belonging to the player.
      * @param counters - Optional list of counters belonging to the player.
+     * @param buttons - Optional list of buttons belonging to the player.
      */
     constructor(piles?: PileDefinition[], counters?: CounterDefinition[], buttons?: ButtonDefinition[]) {
         this.piles = piles || [];

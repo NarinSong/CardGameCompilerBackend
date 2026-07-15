@@ -107,6 +107,11 @@ export default class Game {
         return false;
     }
 
+    /**
+     * Returns the player associated with a given player id.
+     * @param id - The id of the player to retrieve.
+     * @returns The player associated with the id, or undefined if not found.
+     */
     getPlayer(id: PlayerID) {
         return this.gameState.players[id];
     }

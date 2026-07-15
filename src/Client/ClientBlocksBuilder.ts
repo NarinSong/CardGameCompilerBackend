@@ -6,8 +6,18 @@ import { ArrayNode, BlockNode, ClientBuiltBlocksSchema, ClientNode, SequenceNode
 import ClientGameDefinition from "../schemas/ClientGameDefinition.js";
 import { GameDefinitionNode, GameDefinitionPhase, GameDefinitionStep } from "../schemas/GameDefinitionArgs.js";
 
+/**
+ * Default AST node used as a placeholder for missing or undefined arguments.
+ */
 const UndefinedAST: GameDefinitionNode = { type: 'UNDEFINED' };
 
+/**
+ * Converts a BlockNode to a GameDefinitionNode AST node.
+ * Maps each argument in the block to its AST equivalent, and fills in
+ * UNDEFINED nodes for any missing optional arguments.
+ * @param blockNode - The block node to convert.
+ * @returns The resulting AST node.
+ */
 function nonLiteralBlockNodeToAst(blockNode: BlockNode): GameDefinitionNode {
     const node: any = {
         type: blockNode.block
@@ -34,6 +44,12 @@ function nonLiteralBlockNodeToAst(blockNode: BlockNode): GameDefinitionNode {
     return node;
 }
 
+/**
+ * Converts a VariableNode to a GameDefinitionNode AST node.
+ * Handles both GET_VARIABLE and UPDATE_VARIABLE block types.
+ * @param blockNode - The variable node to convert.
+ * @returns The resulting AST node.
+ */
 function variableNodeToAst(blockNode: VariableNode): GameDefinitionNode {
     const node: any = {
         type: blockNode.block
@@ -48,6 +64,12 @@ function variableNodeToAst(blockNode: VariableNode): GameDefinitionNode {
     return node;
 }
 
+/**
+ * Converts a SequenceNode into a SEQUENCE AST node.
+ * Each child block in the sequence is recursively converted.
+ * @param blockNode - The sequence node to convert.
+ * @returns A SEQUENCE AST node containing the converted child nodes.
+ */
 function sequenceNodeToAst(blockNode: SequenceNode): GameDefinitionNode {
     const node: ValueNode = {
         type: 'SEQUENCE',
@@ -63,6 +85,12 @@ function sequenceNodeToAst(blockNode: SequenceNode): GameDefinitionNode {
     return node;
 }
 
+/**
+ * Converts an ArrayNode into an ARRAY AST node.
+ * Each element in the array is recursively converted.
+ * @param blockNode - The array node to convert.
+ * @returns An ARRAY AST node containing the converted elements.
+ */
 function arrayNodeToAst(blockNode: ArrayNode): GameDefinitionNode {
     const node: ValueNode = {
         type: "ARRAY",
@@ -78,6 +106,13 @@ function arrayNodeToAst(blockNode: ArrayNode): GameDefinitionNode {
     return node;
 }
 
+/**
+ * Main dispatcher that converts any ClientNode to its AST equivalent.
+ * Routes to the appropriate helper based on the node's kind.
+ * COMMENT blocks are ignored and return null.
+ * @param blockNode - The client node to convert, or null/undefined.
+ * @returns The resulting AST node, or null if the node is null, undefined, or a COMMENT.
+ */
 function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDefinitionNode {
     if (!blockNode) return null;
 
@@ -100,6 +135,13 @@ function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDe
     }
 }
 
+/**
+ * Safely builds a ClientGameDefinition from a client block editor payload.
+ * Wraps buildClientGameDefinitionFromBlocks in a try-catch.
+ * @param json - The raw JSON payload from the client.
+ * @returns The built ClientGameDefinition, or null if parsing or conversion fails.
+ * @todo fix typo in function name: "Form" should be "From"
+ */
 export function safeBuildClientGameDefinitionFormBlocks(json: unknown): ClientGameDefinition | null {
     try {
         return buildClientGameDefinitionFromblocks(json);
@@ -108,6 +150,15 @@ export function safeBuildClientGameDefinitionFormBlocks(json: unknown): ClientGa
     return null;
 }
 
+/**
+ * Builds a ClientGameDefinition from a client block editor payload.
+ * Validates the JSON, converts each action's filter and result blocks to AST nodes,
+ * and assembles the full phase/step/action structure.
+ * @param json - The raw JSON payload from the client.
+ * @returns The built ClientGameDefinition.
+ * @throws ZodError if the JSON fails schema validation.
+ * @todo fix inconsistent casing in function name: "blocks" should be "Blocks"
+ */
 export function buildClientGameDefinitionFromblocks(json: unknown): ClientGameDefinition {
     const checkJson = ClientBuiltBlocksSchema.safeParse(json);
     if (!checkJson.success) throw checkJson.error;

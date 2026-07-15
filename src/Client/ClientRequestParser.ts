@@ -143,6 +143,12 @@ export async function clientRequestSignOut(clientId: number, callback: unknown =
     return callback(true);
 }
 
+/**
+ * Sends the client their profile color.
+ * @param clientId - The id of the client initiating the request.
+ * @param callback - Response handler. Called with the client's hex color string, defaults to '#ffffff' on failure.
+ * @returns void if callback is not a function, else returns callback(color).
+ */
 export async function clientRequestGetColor(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(color: hex string, defaults to '#ffffff' on failure) => void
 
@@ -154,6 +160,13 @@ export async function clientRequestGetColor(clientId: number, callback: unknown 
     callback(client.color);
 }
 
+/**
+ * Handles the client's request to change their profile color.
+ * @param clientId - The id of the client initiating the request.
+ * @param color - The new hex color string to set.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export async function clientRequestChangeColor(clientId: number, color: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean) => void
 
@@ -180,6 +193,13 @@ export async function clientRequestChangeColor(clientId: number, color: unknown,
     callback(success);
 }
 
+/**
+ * Handles the client's request to change their display name.
+ * @param clientId - The id of the client initiating the request.
+ * @param displayName - The new display name to set.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export async function clientRequestChangeDisplayName(clientId: number, displayName: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean) => void
 
@@ -206,6 +226,13 @@ export async function clientRequestChangeDisplayName(clientId: number, displayNa
     callback(success);
 }
 
+/**
+ * Handles the client's request to change their profile description.
+ * @param clientId - The id of the client initiating the request.
+ * @param description - The new profile description to set.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export async function clientRequestChangeProfileDescription(clientId: number, description: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean) => void
 
@@ -229,6 +256,13 @@ export async function clientRequestChangeProfileDescription(clientId: number, de
     callback(success);
 }
 
+/**
+ * Handles the client's request to change their profile picture.
+ * @param clientId - The id of the client initiating the request.
+ * @param picture - The URL of the new profile picture.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export async function clientRequestChangeProfilePicture(clientId: number, picture: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean) => void
 
@@ -265,6 +299,13 @@ export async function clientRequestGetAvailableGames(clientId: number, callback:
     callback(games);
 }
 
+/**
+ * Sends the client info about a specific game.
+ * @param clientId - The id of the client initiating the request.
+ * @param gameId - The id of the game to retrieve info for.
+ * @param callback - Response handler. Called with an object containing the game name and description, or null if not found.
+ * @returns void if callback is not a function, returns callback(gameInfo) if found, else callback(null).
+ */
 export async function clientRequestGetGameInfo(clientId: number, gameId: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(game: null | { name: string; description: string }) => void
 
@@ -289,15 +330,11 @@ export async function clientRequestGetGameInfo(clientId: number, gameId: unknown
 
 /**
  * Handles the request of saving a game and verifies the inputs.
- * 
+ * If the game has no id, it creates a new save. If it does, it overwrites the existing one if the client is the owner.
  * @param clientId - The id of the client initiating the request.
- * @param json - The json containg the game info and rules.
- * @param gameName - The name of the game.
- * @param parentGameId - The id of the parent game in which it was derived from, if any.
- * @param gameDescription - description for the game.
- * @param isPrivate - Whether the game is viewable only to the client or everyone.
- * @param callback - Response handler. Called with true (boolean value) and its id.
- * @returns void if callback is not a function, returns callback(true, id) if save was successful, else callback(false).
+ * @param json - The JSON containing the game info and rules.
+ * @param callback - Response handler. Called with true and the game id if successful, else false.
+ * @returns void if callback is not a function, returns callback(true, gameId) if save was successful, else callback(false).
  */
 export async function clientRequestSaveGame(clientId: number, json: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean, id?: number) => void
@@ -348,6 +385,12 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
     callback(true, gameId);
 }
 
+/**
+ * Sends the client the list of games they have saved in the editor.
+ * @param clientId - The id of the client initiating the request.
+ * @param callback - Response handler. Called with the list of saved games.
+ * @returns void if callback is not a function, else returns callback(list).
+ */
 export async function clientRequestGetSavedEditorGameList(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(list: {gamename: string;creator: number;parent: number;id: number;privateGame: number;}[]) => void
     // Get list of game names and ids, and send it to client
@@ -357,6 +400,14 @@ export async function clientRequestGetSavedEditorGameList(clientId: number, call
     callback(list);
 }
 
+/**
+ * Sends the client the block editor state of a saved game.
+ * Only returns the game if the client is the owner, or the game is public.
+ * @param clientId - The id of the client initiating the request.
+ * @param gameId - The id of the saved game to retrieve.
+ * @param callback - Response handler. Called with the ClientGameDefinition if successful, else false.
+ * @returns void if callback is not a function, returns callback(gameDefinition) if successful, else callback(false).
+ */
 export async function clientRequestGetSavedGameBlocks(clientId: number, gameId: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(data: false | ClientGameDefinition) => void
     // Get game JSON and send it to client
@@ -409,6 +460,13 @@ export function clientRequestGetAvailableBlocks(clientId: number, callback: unkn
     callback(Object.values(BLOCKS));
 }
 
+/**
+ * Handles the client's request to host a new lobby.
+ * The client must be authenticated and not already in a lobby or game.
+ * @param clientId - The id of the client initiating the request.
+ * @param callback - Response handler. Called with the lobby code if successful, else null.
+ * @returns void if callback is not a function, returns callback(code) if successful, else callback(null).
+ */
 export function clientRequestHostLobby(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(code: string | null) => void
 
@@ -421,6 +479,14 @@ export function clientRequestHostLobby(clientId: number, callback: unknown = noo
     callback(code);
 }
 
+/**
+ * Handles the client's request to join an existing lobby.
+ * The client must be authenticated and not already in a lobby or game.
+ * @param clientId - The id of the client initiating the request.
+ * @param code - The 6-character alphanumeric lobby code.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export function clientRequestJoinLobby(clientId: number, code: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean) => void
 
@@ -445,6 +511,14 @@ export function clientRequestJoinLobby(clientId: number, code: unknown, callback
     callback(success);
 }
 
+/**
+ * Handles the host's request to remove a player from the lobby.
+ * Only the host of the lobby can remove players.
+ * @param clientId - The id of the client initiating the request.
+ * @param username - The username of the player to remove.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export function clientRequestRemoveFromLobby(clientId: number, username: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean) => void
 
@@ -470,6 +544,12 @@ export function clientRequestRemoveFromLobby(clientId: number, username: unknown
     callback(success);
 }
 
+/**
+ * Handles the client's request to leave their current lobby.
+ * @param clientId - The id of the client initiating the request.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export function clientRequestLeaveLobby(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean) => void
 
@@ -485,6 +565,14 @@ export function clientRequestLeaveLobby(clientId: number, callback: unknown = no
     callback(success);
 }
 
+/**
+ * Handles the host's request to select a game for the lobby.
+ * Only the host of the lobby can select a game.
+ * @param clientId - The id of the client initiating the request.
+ * @param gameId - The id of the game to select.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export async function clientRequestSelectGame(clientId: number, gameId: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(succeess: boolean) => void
 
@@ -519,10 +607,10 @@ export async function clientRequestSelectGame(clientId: number, gameId: unknown,
 }
 
 /**
- * Handles client request to start a new game.
+ * Handles client request to start a new game in their lobby.
  * 
  * @param clientId - The id of the client initiating the request. 
- * @param callback - Response handler. Called with the name of room.
+ * @param callback - Response handler. Called true if successful, else false.
  * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
  */
 export async function clientRequestStartNewGame(clientId: number, callback: unknown = noop) {
@@ -546,7 +634,8 @@ export async function clientRequestStartNewGame(clientId: number, callback: unkn
  * Handles the client clicking an object.
  * @param clientId - The id of the client initiating the request. 
  * @param label - The label of the pile or game object being clicked.
- * @param callback - Response handler. Called with the boolean true.
+ * @param cardId - The id of the card being clicked, if any.
+ * @param callback - Response handler. Called with true if successful, else false.
  * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
  */
 export function clientRequestClickLabel(clientId: number, label: unknown, cardId: unknown, callback: unknown = noop) {
@@ -577,6 +666,13 @@ export function clientRequestClickLabel(clientId: number, label: unknown, cardId
     callback(true);
 }
 
+/**
+ * Handles the client's request to react with an emote in the game room.
+ * @param clientId - The id of the client initiating the request.
+ * @param emote - The emote string to react with.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export function clientRequestReactWithEmote(clientId: number, emote: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(succeeded: boolean) => void 
 
@@ -599,7 +695,12 @@ export function clientRequestReactWithEmote(clientId: number, emote: unknown, ca
 }
 
 
-
+/**
+ * Handles the client's request to leave the current game.
+ * @param clientId - The id of the client initiating the request.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export function clientRequestLeaveGame(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(succeess: boolean) => void
 
@@ -615,6 +716,13 @@ export function clientRequestLeaveGame(clientId: number, callback: unknown = noo
     callback(success);
 }
 
+/**
+ * Handles the host's request to end the current game.
+ * Only the host of the lobby can end the game.
+ * @param clientId - The id of the client initiating the request.
+ * @param callback - Response handler. Called with true if successful, else false.
+ * @returns void if callback is not a function, returns callback(true) if successful, else callback(false).
+ */
 export function clientRequestEndGame(clientId: number, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(succeess: boolean) => void
 
