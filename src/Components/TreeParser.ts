@@ -881,6 +881,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.StringEq: return (evaluate(g, c, node.primary) as string) == (evaluate(g, c, node.secondary) as string);
         // Location
         case NODE_NAMES.Location: return { type: 'exact', location: { x: evaluate(g, c, node.primary) as number, y: evaluate(g, c, node.secondary) as number } };
+        case NODE_NAMES.RelativeLocation: return { type: 'relative', location: evaluate(g, c, node.primary) as string };
         // Button Range
         case NODE_NAMES.ButtonRange: return evaluateButtonRange(g, c, node);
         // Ternary

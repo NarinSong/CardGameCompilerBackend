@@ -2,7 +2,20 @@
     "gameMeta": {
         "minPlayers": 1,
         "maxPlayers": 10,
-        "name": "Pickup"
+        "name": "Pickup",
+        "locations": {
+            "pile-location": {
+                "anchor": {
+                    "x": -800,
+                    "y": 450
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -200,
+                "horizontalOffset": 130,
+                "wraptAt": 800,
+                "wrapTo": -800
+            }
+        }
     },
     "playerDefinition": {
         "piles": []
@@ -47,7 +60,7 @@
                                             "name": { "type": "UNDEFINED" },
                                             "displayName": { "type": "UNDEFINED" },
                                             "owner": {"type": "LITERAL", "primary": -1},
-                                            "location": { "type": "UNDEFINED" }
+                                            "location": { "type": "RELATIVE_LOCATION", "primary": "pile-location" }
                                         },
                                         "tertiary": {"type": "LITERAL", "primary": 1}
                                     }

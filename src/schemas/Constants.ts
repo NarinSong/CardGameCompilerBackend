@@ -45,6 +45,7 @@ export const NODE_NAMES = {
   IsBetween: "IS_BETWEEN",
   FirstPlayer: "FIRST_PLAYER",
   Location: "LOCATION",
+  RelativeLocation: "RELATIVE_LOCATION",
   CreateCounter: "CREATE_COUNTER",
   CreateButton: "CREATE_BUTTON",
   Win: "WIN",
