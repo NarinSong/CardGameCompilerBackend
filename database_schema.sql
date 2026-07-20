@@ -18,20 +18,6 @@ CREATE TABLE IF NOT EXISTS users (
     createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- should be automatic based on date of creation
 );
 
-CREATE TABLE IF NOT EXISTS savedrules (
-    id MEDIUMINT NOT NULL,
-    gameRules JSON NOT NULL, -- The most important part. Could be very long
-    gameName VARCHAR(16) NOT NULL, -- non-unique name, shouldn't be very long, maybe 16 characters
-    creator MEDIUMINT NOT NULL, -- the user who created it
-    parent MEDIUMINT, -- can be null. It references a blockeditorsaves instance, which it was derived from
-    gameDescription TEXT NOT NULL, -- player input, can be fairly long
-    lastEditDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- should be automatic based on when this is updated
-    privateGame BOOLEAN NOT NULL, -- either hidden or not hidden
-
-    FOREIGN KEY (creator) REFERENCES users(id),
-    FOREIGN KEY (parent) REFERENCES blockeditorsaves(id)
-);
-
 CREATE TABLE IF NOT EXISTS blockeditorsaves (
     id MEDIUMINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     gamename VARCHAR(16) NOT NULL,
@@ -47,9 +33,23 @@ CREATE TABLE IF NOT EXISTS blockeditorsaves (
     FOREIGN KEY (parent) REFERENCES blockeditorsaves(id)
 );
 
+CREATE TABLE IF NOT EXISTS savedrules (
+    id MEDIUMINT NOT NULL PRIMARY KEY,
+    gameRules JSON NOT NULL, -- The most important part. Could be very long
+    gameName VARCHAR(16) NOT NULL, -- non-unique name, shouldn't be very long, maybe 16 characters
+    creator MEDIUMINT NOT NULL, -- the user who created it
+    parent MEDIUMINT, -- can be null. It references a blockeditorsaves instance, which it was derived from
+    gameDescription TEXT NOT NULL, -- player input, can be fairly long
+    lastEditDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- should be automatic based on when this is updated
+    privateGame BOOLEAN NOT NULL, -- either hidden or not hidden
+
+    FOREIGN KEY (creator) REFERENCES users(id),
+    FOREIGN KEY (parent) REFERENCES blockeditorsaves(id)
+);
+
 -- These are used to set the starting user ID's to large numbers, so that they don't conflict with true/false checks at 0
--- ALTER TABLE savedrules AUTO_INCREMENT=1001;
--- ALTER TABLE users AUTO_INCREMENT=1001;
+ALTER TABLE savedrules AUTO_INCREMENT=1001;
+ALTER TABLE users AUTO_INCREMENT=1001;
 
 CREATE TABLE IF NOT EXISTS favorites (
     user MEDIUMINT NOT NULL,
