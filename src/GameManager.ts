@@ -8,9 +8,7 @@ import Lobby from './Components/Lobby.js';
 import Room from './Components/Room.js';
 import { sendGameEnded } from './index.js';
 import GameDefinition from './Rules/GameDefinition.js';
-import PickupGame from './SampleGames/JsonReader.js';
 import { ClientID, GameID, LobbyID, RoomID } from './schemas/types.js';
-import pickupJson from "./SampleGames/Pickup.json" with { type: "json" };
 import { SelectAllGameSaves } from './schemas/DatabaseSchemas.js';
 
 /**
@@ -24,8 +22,8 @@ export default class GameManager {
     static lobbies: Record<LobbyID,Lobby> = {};
     static clients: Record<ClientID,Client> = {};
     static rooms: Record<RoomID,Room> = {};
-    static availableGames: Record<GameID, GameDefinition> = {1000: PickupGame};
-    static availableGamesJson: Record<GameID, string> = { 1000: JSON.stringify(pickupJson)};
+    static availableGames: Record<GameID, GameDefinition> = {};
+    static availableGamesJson: Record<GameID, string> = {};
     static roomName: number = 1;
 
 
@@ -200,7 +198,7 @@ export default class GameManager {
     static async getAvailableGameNames() {
         // Potential: caching
         const list = await Database.getGamesList();
-        return list?.concat({name: 'Pickup', id: 1000});
+        return list?.concat({name: 'Pickup', id: 1000}, {name:'Button Counter', id: 999});
     }
 
     /**

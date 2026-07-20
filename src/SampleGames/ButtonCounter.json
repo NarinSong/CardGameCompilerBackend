@@ -1,0 +1,64 @@
+{
+    "gameMeta": {
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "name": "ButtonCounter"
+    },
+    "playerDefinition": {
+        "piles": [
+            {
+                "label": "Hand",
+                "initialState": "EMPTY",
+                "visibility": "FACE_DOWN"
+            }
+        ],
+        "buttons": [
+            {
+                "label": "Clicker"
+            },
+            {
+                "label": "AlsoClicker"
+            },
+            {
+                "label": "NumberButton",
+                "type": "NUMBER",
+                "range": {
+                    "min": 0,
+                    "max": 10
+                }
+            }
+        ],
+        "counters": [
+            {
+                "label": "NumberHaver",
+                "initialValue": 67
+            },
+            {
+                "label": "SecondCounter",
+                "initialValue": 2
+            }
+        ]
+    },
+    "boardDefinition": {
+        "piles": [
+            {
+                "label": "Deck",
+                "initialState": "SHUFFLED",
+                "visibility": "FACE_DOWN"
+            }
+        ]
+    },
+    "phases": [
+        {
+            "name": "Main",
+            "steps": [
+                {
+                    "name": "step1",
+                    "actions": [
+                        
+                    ]
+                }
+            ]
+        }
+    ]
+}
