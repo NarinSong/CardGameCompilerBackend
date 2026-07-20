@@ -185,7 +185,7 @@ export const DEFAULT_PILE_LOCATION: DefaultLocation = {
     },
     direction: "HORIZONTAL",
     verticalOffset: -120,
-    horizontalOffset: 80,
+    horizontalOffset: 150,
     wraptAt: 900,
     wrapTo: -900,
 };
@@ -195,8 +195,8 @@ export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
         y: 500,
     },
     direction: "HORIZONTAL",
-    verticalOffset: -80,
-    horizontalOffset: 80,
+    verticalOffset: -150,
+    horizontalOffset: 150,
     wraptAt: 900,
     wrapTo: -900,
 };
@@ -206,8 +206,8 @@ export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
         y: -500,
     },
     direction: "HORIZONTAL",
-    verticalOffset: 80,
-    horizontalOffset: 80,
+    verticalOffset: 100,
+    horizontalOffset: 250,
     wraptAt: 900,
     wrapTo: -900,
 };
