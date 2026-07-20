@@ -184,10 +184,10 @@ export const DEFAULT_PILE_LOCATION: DefaultLocation = {
         y: 0,
     },
     direction: "HORIZONTAL",
-    verticalOffset: -120,
-    horizontalOffset: 150,
-    wraptAt: 900,
-    wrapTo: -900,
+    verticalOffset: -220,
+    horizontalOffset: 140,
+    wraptAt: 800,
+    wrapTo: -800,
 };
 export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
     anchor: {
