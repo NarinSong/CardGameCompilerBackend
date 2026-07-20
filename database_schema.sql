@@ -62,3 +62,4 @@ CREATE TABLE IF NOT EXISTS favorites (
 
 -- Set up permissions. Read, write, update, delete for records on all three tables
 GRANT SELECT, INSERT, UPDATE, DELETE ON cardgamecompiler.* TO 'cardgamecompiler'@'localhost';
+FLUSH PRIVILEGES;
