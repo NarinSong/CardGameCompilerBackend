@@ -92,6 +92,8 @@ export default class GameMeta {
             return currentLocation;
         }
 
+        currentLocation = JSON.parse(JSON.stringify(currentLocation)) as Location;
+
         if (defaultLocation.direction === 'HORIZONTAL') {
             const base = GameMeta.locationOffset(currentLocation.x, defaultLocation.horizontalOffset, defaultLocation.wraptAt, defaultLocation.wrapTo);
             if (base.wrapped) {
