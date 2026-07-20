@@ -30,6 +30,12 @@ mariadb -u root -p
 SOURCE database_schema.sql;
 exit;
 ```
+
+Set up a .env file in the project root with the password
+```env
+PASSWORD=password
+```
+
 ```terminal
 # install the project depenedencies and run
 npm i
