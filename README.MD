@@ -13,15 +13,25 @@ npm run dev
 
 ### Step 1: Install dependencies
 
-Dependiencies: NodJS, NPM
+Dependiencies: NodeJS, NPM, MariaDB
 
 For production deployment, it is recommended that you use a webserver such as Apache or Nginx to handle SSL certificates
 
 ### Step 2: Install the project code
 
-Clone the source code, then run these commands from inside the directory:
-
 ```terminal
+# Clone the source code
+git clone 
+# Set up the database
+# NOTE: Edit the password in database_schema.sql - DO NOT USE 'password'
+mariadb -u root -p
+```
+```SQL
+SOURCE database_schema.sql;
+exit;
+```
+```terminal
+# install the project depenedencies and run
 npm i
 npm run prod
 ```
