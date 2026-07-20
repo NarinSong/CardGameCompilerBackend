@@ -88,6 +88,8 @@ export default class GameMeta {
                 x: defaultLocation.anchor.x,
                 y: defaultLocation.anchor.y
             }
+
+            return currentLocation;
         }
 
         if (defaultLocation.direction === 'HORIZONTAL') {
