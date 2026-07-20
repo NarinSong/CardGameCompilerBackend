@@ -4,7 +4,7 @@
         "maxPlayers": 10,
         "name": "Pickup",
         "locations": {
-            "pile-location": {
+            "pilelocation": {
                 "anchor": {
                     "x": -800,
                     "y": 450
@@ -60,7 +60,7 @@
                                             "name": { "type": "UNDEFINED" },
                                             "displayName": { "type": "UNDEFINED" },
                                             "owner": {"type": "LITERAL", "primary": -1},
-                                            "location": { "type": "RELATIVE_LOCATION", "primary": "pile-location" }
+                                            "location": { "type": "RELATIVE_LOCATION", "primary": {"type": "LITERAL", "primary": "pilelocation" } }
                                         },
                                         "tertiary": {"type": "LITERAL", "primary": 1}
                                     }
