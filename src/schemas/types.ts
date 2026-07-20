@@ -180,12 +180,12 @@ export type LobbyID = string;
 // Screen is 1920 x 1080
 export const DEFAULT_PILE_LOCATION: DefaultLocation = {
     anchor: {
-        x: 0,
+        x: -800,
         y: 0,
     },
     direction: "HORIZONTAL",
-    verticalOffset: -220,
-    horizontalOffset: 140,
+    verticalOffset: -200,
+    horizontalOffset: 130,
     wraptAt: 800,
     wrapTo: -800,
 };
