@@ -13,7 +13,7 @@ npm run dev
 
 ### Step 1: Install dependencies
 
-Dependiencies: NodeJS, NPM, MariaDB
+Dependencies: NodeJS, NPM, MariaDB
 
 For production deployment, it is recommended that you use a webserver such as Apache or Nginx to handle SSL certificates
 
