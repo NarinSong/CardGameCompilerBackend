@@ -30,6 +30,7 @@ export const ValueTypes = {
   Step: z.string(),
   Phase: z.string(),
   Location: LocationResolverSchema,
+  LocationName: z.string(),
   ButtonRange: z.object({ min: z.number().or(z.undefined()), max: z.number().or(z.undefined()), increment: z.number().or(z.undefined())}),
   ButtonType: ButtonTypeSchema,
   Rank: RankSchema,
@@ -839,6 +840,20 @@ const LOCATION = defineBlock({
     ]
 });
 
+const RELATIVE_LOCATION = defineBlock({
+    "name": NODE_NAMES.RelativeLocation,
+    "displayName": "Location",
+    "returnType": "Location",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Resolver",
+            "type": "LocationName",
+            "optional": false,
+        }
+    ]
+})
+
 const CREATE_COUNTER = defineBlock({
     name: NODE_NAMES.CreateCounter,
     displayName: "Create Counter",
@@ -1448,6 +1463,7 @@ export const BLOCKS = {
     IS_BETWEEN,
     FIRST_PLAYER,
     LOCATION,
+    RELATIVE_LOCATION,
     CREATE_COUNTER,
     CREATE_BUTTON,
     WIN,

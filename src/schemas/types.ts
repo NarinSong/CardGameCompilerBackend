@@ -177,38 +177,39 @@ export type LobbyID = string;
 
 // Default locations
 
+// Screen is 1920 x 1080
 export const DEFAULT_PILE_LOCATION: DefaultLocation = {
     anchor: {
-        x: 0,
-        y: 50,
-    },
-    direction: "HORIZONTAL",
-    verticalOffset: 10,
-    horizontalOffset: 10,
-    wraptAt: 100,
-    wrapTo: -100,
-};
-export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
-    anchor: {
-        x: 0,
+        x: -800,
         y: 0,
     },
     direction: "HORIZONTAL",
-    verticalOffset: 10,
-    horizontalOffset: 10,
-    wraptAt: 100,
-    wrapTo: -100,
+    verticalOffset: -200,
+    horizontalOffset: 130,
+    wraptAt: 800,
+    wrapTo: -800,
+};
+export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
+    anchor: {
+        x: -900,
+        y: 500,
+    },
+    direction: "HORIZONTAL",
+    verticalOffset: -150,
+    horizontalOffset: 150,
+    wraptAt: 900,
+    wrapTo: -900,
 };
 export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
     anchor: {
-        x: 0,
-        y: -50,
+        x: -900,
+        y: -500,
     },
     direction: "HORIZONTAL",
-    verticalOffset: 10,
-    horizontalOffset: 10,
-    wraptAt: 100,
-    wrapTo: -100,
+    verticalOffset: 100,
+    horizontalOffset: 250,
+    wraptAt: 900,
+    wrapTo: -900,
 };
 
 // Default deck. TODO: Switch to RANKENUM.ACE, etc. so that it's more readable

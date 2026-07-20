@@ -30,6 +30,7 @@ const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.NumCardsInPile,
   NODE_NAMES.ValueOf,
   NODE_NAMES.RemoveButton,
+  NODE_NAMES.RelativeLocation,
 ]);
 const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.And,
