@@ -47,7 +47,7 @@
                                             "name": { "type": "UNDEFINED" },
                                             "displayName": { "type": "UNDEFINED" },
                                             "owner": {"type": "LITERAL", "primary": -1},
-                                            "location": { "type": "LITERAL", "primary": { "locationType": "exact", "location": { "x": 10, "y": 0 } } }
+                                            "location": { "type": "UNDEFINED" }
                                         },
                                         "tertiary": {"type": "LITERAL", "primary": 1}
                                     }
