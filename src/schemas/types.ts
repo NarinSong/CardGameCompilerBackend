@@ -180,35 +180,35 @@ export type LobbyID = string;
 export const DEFAULT_PILE_LOCATION: DefaultLocation = {
     anchor: {
         x: 0,
-        y: 50,
-    },
-    direction: "HORIZONTAL",
-    verticalOffset: 10,
-    horizontalOffset: 10,
-    wraptAt: 100,
-    wrapTo: -100,
-};
-export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
-    anchor: {
-        x: 0,
         y: 0,
     },
     direction: "HORIZONTAL",
-    verticalOffset: 10,
-    horizontalOffset: 10,
-    wraptAt: 100,
-    wrapTo: -100,
+    verticalOffset: -120,
+    horizontalOffset: 80,
+    wraptAt: 750,
+    wrapTo: -750,
+};
+export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
+    anchor: {
+        x: -750,
+        y: 400,
+    },
+    direction: "HORIZONTAL",
+    verticalOffset: -80,
+    horizontalOffset: 80,
+    wraptAt: 750,
+    wrapTo: -750,
 };
 export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
     anchor: {
-        x: 0,
-        y: -50,
+        x: -750,
+        y: -400,
     },
     direction: "HORIZONTAL",
-    verticalOffset: 10,
-    horizontalOffset: 10,
-    wraptAt: 100,
-    wrapTo: -100,
+    verticalOffset: 80,
+    horizontalOffset: 80,
+    wraptAt: 750,
+    wrapTo: -750,
 };
 
 // Default deck. TODO: Switch to RANKENUM.ACE, etc. so that it's more readable
