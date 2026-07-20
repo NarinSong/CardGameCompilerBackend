@@ -21,7 +21,7 @@ For production deployment, it is recommended that you use a webserver such as Ap
 
 ```terminal
 # Clone the source code
-git clone 
+git clone https://github.com/NarinSong/CardGameCompilerBackend.git
 # Set up the database
 # NOTE: Edit the password in database_schema.sql - DO NOT USE 'password'
 mariadb -u root -p
