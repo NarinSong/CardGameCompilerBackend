@@ -1,4 +1,4 @@
-import { check, z } from "zod";
+import { z } from "zod";
 import GameManager from "../GameManager.js";
 import { BLOCKS } from "../schemas/Blocks.js";
 import { buildGameFromJSON } from "./GameBuilder.js";

@@ -2,7 +2,6 @@ import Database from "./Database.js";
 import argon2 from 'argon2';
 import { randomBytes } from "node:crypto";
 import Logger from "./Logger.js";
-import { success } from "zod";
 
 const ACTIVE_USERS: Record<string, string> = {}; // token, username
 
@@ -29,7 +28,7 @@ export default class Auth {
      */
     // all usernames are in lowercase before arriving here. Those are sanitized in the ClientRequestParser
     // verifyUser is for a client who is already signed in and just wants to reconnect
-    static verifyUser(username: string, token: string) {
+    static verifyUser(username: string, token: string): boolean | null {
         const account = ACTIVE_USERS[token];
 
         if (!account)

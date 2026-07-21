@@ -3,7 +3,6 @@
 
 import ValueMap from "../Components/ValueMap.js";
 import { ButtonType, Location, LocationResolver, PlayerID, PlayerType, Visibility } from "../schemas/types.js";
-import Board from "../Game/Board.js";
 import Counter from "../Game/Counter.js";
 import Game from "../Game/Game.js";
 import Pile from "../Game/Pile.js";

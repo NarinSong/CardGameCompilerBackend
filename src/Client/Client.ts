@@ -6,11 +6,7 @@
 // Clients have a method of sending information to the user (sockets for prototype, whatever Unity uses for that)
 
 import Game from "../Game/Game.js";
-import Player from "../Game/Player.js";
-import Room from "../Components/Room.js";
-import GameDefinition from "../Rules/GameDefinition.js";
 import ClientView from "./ClientView.js";
-import { buildGameFromJSON } from "./GameBuilder.js";
 import { sendClientGamestate } from "../index.js";
 import Auth from "../Components/Auth.js";
 import { PlayerID } from "../schemas/types.js";
@@ -73,7 +69,7 @@ export default class Client {
      * Returns a random pastel color hex string.
      * @returns A randomly selected hex color string.
      */
-    randomColor() {
+    randomColor(): string {
         let colors = [
             '#ffcccc',
             '#ffd9cc',
@@ -98,7 +94,7 @@ export default class Client {
      * @param password - The client's password.
      * @returns A token if authentication is successful, otherwise null.
      */
-    async signIn(username: string, password: string) {
+    async signIn(username: string, password: string): Promise<string | null> {
         const success = await Auth.authenticateUser(username, password); //{username: username, token: '1234', displayName: username, color: '#ffffff', databaseId: 1024 };
         if (!success) return null;
 
@@ -123,7 +119,7 @@ export default class Client {
      * @param displayName - The clients name which is displayed to other users.
      * @returns If successful it returns a sessionId, otherwise null.
      */
-    async signUp(username: string, password: string, displayName: string) {
+    async signUp(username: string, password: string, displayName: string): Promise< { session: string, databaseId: number } | null> {
         let color = this.randomColor();
         const success = await Auth.createNewUser(username, password, displayName, color);
         if (!success) return null;
@@ -145,7 +141,7 @@ export default class Client {
      * Signs a client out of his/her account and clears the clients authState.
      * @returns True if sign out is successful, otherwise false.
      */
-    async signOut() {
+    async signOut(): Promise<boolean> {
         if (!this.isAuthenticated || !this.authState.token) return false;
 
         const success = await Auth.signOut(this.authState.token);
