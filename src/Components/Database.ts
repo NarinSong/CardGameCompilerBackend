@@ -185,7 +185,7 @@ export default class Database {
                     game.gameMeta.private ?? true
                 ]
             );
-            id = InsertSchema.parse(result).insertId;
+            id = Number(InsertSchema.parse(result).insertId);
         } catch (error) {
             console.error(error);
             return null;

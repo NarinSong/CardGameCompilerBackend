@@ -1,5 +1,5 @@
 import z from "zod";
-import { NumericSchema } from "./types";
+import { NumericSchema } from "./types.js";
 
 export const InsertSchema = z.object({
   affectedRows: NumericSchema,

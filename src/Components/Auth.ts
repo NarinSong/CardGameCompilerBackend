@@ -114,7 +114,7 @@ export default class Auth {
 
         return {
             session: sessionId,
-            databaseId: saveSuccess.insertId
+            databaseId: Number(saveSuccess.insertId)
         };
     }
 
