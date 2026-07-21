@@ -162,23 +162,6 @@ export default class Client {
     }
 
     /**
-     * Submiting the game rules that the client creates.
-     * @param rules - JSON containing game information and rules.
-     * @returns void, as the resulting game definition isnt used yet.
-     * @todo use the game definition somewhere
-     */
-    submitRulesFromEditor(rules: unknown) {
-        try {
-            const game: GameDefinition | null = buildGameFromJSON(rules);
-            if (game == null) return;
-
-            // TODO: use the game definition somewhere
-        } catch (error) {
-            console.debug(error);
-        }
-    }
-
-    /**
      * Sends the updated game state to the client.
      * Resolves the player from the game using the client's stored player id.
      * @param game - The current game instance.
