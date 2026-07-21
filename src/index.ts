@@ -6,6 +6,11 @@ import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequest
 import { LobbyView } from './Components/Lobby.js';
 import { ClientID } from './schemas/types.js';
 
+// import pickup so that it loads. Temporary until we put it in the live DB
+import PickupGame from './SampleGames/JsonReader.js';
+console.log('Pickup game id? ' + PickupGame.gameMeta.id);
+
+
 // Execution begins here
 // All socket connections come through here. Incoming AND outgoing.
 const VERSION = '0.1.9';

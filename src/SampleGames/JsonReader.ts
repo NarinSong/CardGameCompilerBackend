@@ -16,3 +16,5 @@ export default PickupGame as GameDefinition;
 
 GameManager.registerGameDefinition(ButtonCounterGame, 999, JSON.stringify(buttonCounterJson));
 GameManager.registerGameDefinition(PickupGame, 1000, JSON.stringify(pickupJson));
+
+console.log('Games registered');
