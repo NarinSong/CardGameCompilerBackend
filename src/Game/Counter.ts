@@ -53,7 +53,7 @@ export default class Counter {
      * @param gameLabels - The game's label manager.
      * @returns A newly constructed counter.
      */
-    static fromDefinition(definition: CounterDefinition, gameLabels: GameLabels) {
+    static fromDefinition(definition: CounterDefinition, gameLabels: GameLabels): Counter {
         return new Counter(
             definition.number,
             definition.label,
@@ -83,7 +83,7 @@ export default class Counter {
         actionRoles: ActionRole[],
         displayName: DisplayName,
         location: LocationResolver,
-    ) {
+    ): Counter {
         return new Counter(initialState, label, visibility, gameLabels, actionRoles, displayName, location);
     }
 }

@@ -17,7 +17,7 @@ const game = definition.createGame();
  * @param game - The current game instance.
  * @returns An array of objects containing each player's id and their corresponding ClientView.
  */
-function buildViews(game: Game) {
+function buildViews(game: Game): { playerId: number; view: ClientView; }[] {
     return Object.entries(game.gameState.players).map(([_, player]) => ({
         playerId: player.id,
         view: ClientView.fromGamestate(game, player)

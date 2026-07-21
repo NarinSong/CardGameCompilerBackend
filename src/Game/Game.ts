@@ -40,7 +40,7 @@ export default class Game {
      * @param type - Type of player to add.
      * @returns The created player, or null if the game is already full.
      */
-    handlePlayerJoin(type: PlayerType) {
+    handlePlayerJoin(type: PlayerType): Player | null {
         Logger.debug('Player joined');
         if (this.numPlayers < this.definition.maxPlayers) {
             // Assign the new player's id
@@ -68,7 +68,7 @@ export default class Game {
     /**
      * Fills any required empty player spots with bots and starts the game.
      */
-    startGame() {
+    startGame(): void {
         while (this.numPlayers < this.definition.minPlayers) {
             // Add bots
             this.handlePlayerJoin(PlayerType.ROBOT);
@@ -112,7 +112,7 @@ export default class Game {
      * @param id - The id of the player to retrieve.
      * @returns The player associated with the id, or undefined if not found.
      */
-    getPlayer(id: PlayerID) {
+    getPlayer(id: PlayerID): Player | undefined {
         return this.gameState.players[id];
     }
 

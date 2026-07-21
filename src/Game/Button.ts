@@ -1,6 +1,6 @@
 import { Label } from "../Rules/LabelManager.js";
 import ButtonDefinition from "../Rules/ButtonDefinition.js";
-import { ActionRole, ButtonRange, ButtonType, DisplayName, Location, LocationResolver, PileState, Visibility } from "../schemas/types.js";
+import { ActionRole, ButtonRange, ButtonType, DisplayName, LocationResolver, Visibility } from "../schemas/types.js";
 import GameLabels from "./GameLabels.js";
 
 /**
@@ -55,7 +55,7 @@ export default class Button {
      * @param gameLabels - The game's label manager.
      * @returns A newly constructed button.
      */
-    static fromDefinition(definition: ButtonDefinition, gameLabels: GameLabels) {
+    static fromDefinition(definition: ButtonDefinition, gameLabels: GameLabels): Button {
         return new Button(
             definition.label,
             definition.visibility,
@@ -89,7 +89,7 @@ export default class Button {
         type: ButtonType,
         range: ButtonRange | undefined,
         location: LocationResolver
-    ) {
+    ): Button {
         return new Button(label, visibility, gameLabels, actionRoles, displayName, type, range, location);
     }
 }

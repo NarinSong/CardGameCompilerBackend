@@ -63,6 +63,7 @@ export const PlayerSchema = z.object({
 export const BoardSchema = z.object({
     piles: z.array(PileSchema).optional(),
     counters: z.array(CounterSchema).optional(),
+    buttons: z.array(ButtonSchema).optional(),
 })
 
 // Building up to phase definition

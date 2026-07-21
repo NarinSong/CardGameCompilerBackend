@@ -44,6 +44,13 @@ export function buildGameFromJSON(clientJson: unknown) {
 
             game.addPlayerCounter(counter); // TODO: verify labels, actionRoles, etc.
         }
+
+    if (typeof data.playerDefinition.buttons !== 'undefined')
+        for (let button of data.playerDefinition.buttons) {
+            if (!button) continue;
+
+            game.addPlayerButton(button);
+        }
     
     // Define the board
     if (typeof data.boardDefinition.piles !== 'undefined')
@@ -58,6 +65,13 @@ export function buildGameFromJSON(clientJson: unknown) {
             if (!counter) continue;
 
             game.addBoardCounter(counter); // TODO: verify labels, actionRoles, etc.
+        }
+
+    if (typeof data.boardDefinition.buttons !== 'undefined')
+        for (let button of data.boardDefinition.buttons) {
+            if (!button) continue;
+
+            game.addBoardButton(button);
         }
     
     // Create the game phases

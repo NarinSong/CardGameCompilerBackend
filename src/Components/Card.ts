@@ -31,7 +31,7 @@ export default class Card {
      * @param card - A card whose rank should be evaluated.
      * @returns The numeric rank index of the card or -1 if rank is not found. 
      */
-    static numberRank(card: Card) {
+    static numberRank(card: Card): number {
         for (let i in RANK) {
             if (card.rank == RANK[i]) return +i;
         }
@@ -43,7 +43,7 @@ export default class Card {
      * @param deckDefinition - Optional deck definition to use. Defaults to the standard 52 card deck.
      * @returns A list of cards.
      */
-    static defaultDeck(deckDefinition?: DeckDefinition) {
+    static defaultDeck(deckDefinition?: DeckDefinition): Card[] {
         deckDefinition ??= DEFAULT_DECK_DEFINITION;
         const cards: Card[] = [];
 
@@ -64,7 +64,7 @@ export default class Card {
      * @param cards - The list of unshuffled cards.
      * @returns A shuffled list of cards.
      */
-    static shuffle(cards: Card[]) {
+    static shuffle(cards: Card[]): Card[] {
         // Fully random array shuffle
         // Unbiased Fisher-Yates shuffle
         let currentIndex = cards.length;
@@ -89,7 +89,7 @@ export default class Card {
      * @param state - The state the pile is in.
      * @returns A shuffled deck if its state is "SHUFFLED". Else it returns an empty card array.
      */
-    static fromInitialState(state: PileState) {
+    static fromInitialState(state: PileState): Card[] {
         // TODO: Pile states
 
         if (state == PileState.SHUFFLED) {
@@ -106,7 +106,7 @@ export default class Card {
      * @param to - The pile that will receive the dealt cards.
      * @param number - The number of cards you would like to deal.
      */
-    static dealCards(from: Pile, to: Pile, number: number) {
+    static dealCards(from: Pile, to: Pile, number: number): void {
         let i = 0;
         while (i < number && from.cards.length) {
             const card = from.cards.pop();
@@ -122,7 +122,7 @@ export default class Card {
      * @param to - The second card.
      * @returns True if the first card has a higher rank, otherwise false.
      */
-    static isBigger(from: Card | undefined, to: Card | undefined) {
+    static isBigger(from: Card | undefined, to: Card | undefined): boolean {
         Logger.debug('Checking which card is bigger');
         
         if (!from || !to) return false;
@@ -141,7 +141,7 @@ export default class Card {
      * @param rank - The rank to count.
      * @returns The number of cards with the given rank.
      */
-    static numOfRank(pile: Card[], rank: rank) {
+    static numOfRank(pile: Card[], rank: rank): number {
         let num = 0;
         for (const card of pile) {
             if (card.rank === rank) num++;
@@ -155,7 +155,7 @@ export default class Card {
      * @param suit - The suit to count.
      * @returns The number of cards with the given suit.
      */
-    static numOfSuit(pile: Card[], suit: suit) {
+    static numOfSuit(pile: Card[], suit: suit): number {
         let num = 0;
         for (const card of pile) {
             if (card.suit === suit) num++;
@@ -170,7 +170,7 @@ export default class Card {
      * @param suit - The suit to match.
      * @returns The number of cards matching both rank and suit.
      */
-    static numOfCard(pile: Card[], rank: rank, suit: suit) {
+    static numOfCard(pile: Card[], rank: rank, suit: suit): number {
         let num = 0;
         for (const card of pile) {
             if (card.suit === suit && card.rank === rank) num++;
@@ -184,7 +184,7 @@ export default class Card {
      * @param suit - Optional suit filter. If provided, only cards of that suit are counted.
      * @returns The size of the largest set found.
      */
-    static largestSet(pile: Card[], suit?: suit | undefined) {
+    static largestSet(pile: Card[], suit?: suit | undefined): number {
         const ranks: Record<string, number> = {};
 
         let max = 0;
@@ -207,7 +207,7 @@ export default class Card {
      * @param rank - Optional rank filter. If provided, only cards of that rank are counted.
      * @returns The size of the largest flush found.
      */
-    static largestFlush(pile: Card[], rank?: rank | undefined) {
+    static largestFlush(pile: Card[], rank?: rank | undefined): number {
         const suits: Record<string, number> = {};
 
         let max = 0;
@@ -230,7 +230,7 @@ export default class Card {
      * @param suit - Optional suit filter. If provided, only cards of that suit are considered.
      * @returns The length of the longest consecutive run.
      */
-    static largestRun(pile: Card[], suit?: suit | undefined) {
+    static largestRun(pile: Card[], suit?: suit | undefined): number {
         const ranks: Record<number, boolean> = {};
 
         for (const card of pile) {
@@ -261,7 +261,7 @@ export default class Card {
      * @param suit - Optional suit filter. If provided, only cards of that suit are considered.
      * @returns The length of the longest run that includes the given rank, or 0 if the rank is not present.
      */
-    static largestRunThatIncludes(pile: Card[], rank?: rank | undefined, suit?: suit | undefined) {
+    static largestRunThatIncludes(pile: Card[], rank?: rank | undefined, suit?: suit | undefined): number {
         if (!rank) return Card.largestRun(pile, suit);
         
         const ranks: Record<number, boolean> = {};

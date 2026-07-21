@@ -107,7 +107,7 @@ export default class GameDefinition {
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
             type?: ButtonType | undefined,
-            range?: ButtonRange | undefined,
+            range?: ButtonRangeArgument | undefined,
         }) {
 
         const dfn = {

@@ -7,7 +7,7 @@ import { Worker } from "node:worker_threads";
 
 import GameManager from "../GameManager.js";
 import { ClientID, LobbyID, PlayerID, PlayerType, RoomID, GameID } from "../schemas/types.js";
-import { sendClientGamestate, sendLobbyClosed, sendReaction } from "../index.js";
+import { sendClientGamestate, sendReaction } from "../index.js";
 import ClientView from "../Client/ClientView.js";
 
 
@@ -76,7 +76,7 @@ export default class Room {
      * Resets the inactivity timeout for the room.
      * If the room is inactive for 30 minutes, it will be destroyed.
      */
-    resetInactivityTimeout() {
+    resetInactivityTimeout(): void {
         const existing = this.timeouts.get("inactivity");
         if (existing) clearTimeout(existing);
         
@@ -91,7 +91,7 @@ export default class Room {
      * Sends the updated game state to all clients in the room.
      * @param views - Array of player id and view pairs to send to each client.
      */
-    emitGameState(views: {playerId: number, view: ClientView}[]) {
+    emitGameState(views: {playerId: number, view: ClientView}[]): void {
         
         for(const clientId in this.clients)
         {
@@ -113,7 +113,7 @@ export default class Room {
      * @param label - The object that the user clicked.
      * @todo use cardId and player number to build action context
      */
-    handlePlayerClick(label: string, cardId: number) {
+    handlePlayerClick(label: string, cardId: number): void {
         if (!this.started) return;
         this.resetInactivityTimeout();
         this.worker.postMessage({type: "PLAYER_CLICK", label})
@@ -126,7 +126,7 @@ export default class Room {
      * @param username - The username of the client sending the emote.
      * @param emote - The emote string to broadcast.
      */
-    handleEmote(clientId: ClientID, username: string, emote: string) {
+    handleEmote(clientId: ClientID, username: string, emote: string): void {
         for (const client in this.clients) {
             if (+client == clientId) continue;
 
@@ -140,7 +140,7 @@ export default class Room {
      * @param clientId - The id of the client joining the room.
      * @returns Promise resolving to true if the player successfully joined, else false.
      */
-    handleJoinRoom(clientId: ClientID) {
+    handleJoinRoom(clientId: ClientID): false | Promise<boolean> {
         if (this.started) return false;
         const client = GameManager.clientFromId(clientId);
         if (!client) return false;
@@ -176,7 +176,7 @@ export default class Room {
      * Starts the game in the worker thread.
      * @returns True if the game was started successfully, false if the game has already started.
      */
-    startGame() {
+    startGame(): boolean {
         if (this.started) return false;
         this.started = true;
         this.resetInactivityTimeout();
@@ -187,7 +187,7 @@ export default class Room {
     /**
      * Clears all active timeouts for the room.
      */
-    clearTimeouts() {
+    clearTimeouts(): void {
         for (const t of this.timeouts.values()){
             clearTimeout(t);
         }
@@ -198,7 +198,7 @@ export default class Room {
      * Clears a specific timeout by name.
      * @param name - The name of the timeout to clear.
      */
-    clearTimeoutByName(name: string){
+    clearTimeoutByName(name: string): void {
         const exists = this.timeouts.get(name);
         if (exists){
             clearTimeout(exists);
@@ -209,7 +209,7 @@ export default class Room {
     /**
      * Destroys the room by clearing all timeouts and terminating the worker thread.
      */
-    destroy(){
+    destroy(): void {
         this.clearTimeouts();
         this.worker.terminate();
     }
