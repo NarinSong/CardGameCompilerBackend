@@ -174,6 +174,9 @@ export type GameID = number;
 export type RoomID = string;
 export type LobbyID = string;
 
+// Helper value
+export const NumericSchema = z.number().or(z.bigint());
+
 
 // Default locations
 

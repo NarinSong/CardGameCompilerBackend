@@ -1,14 +1,15 @@
 import z from "zod";
+import { NumericSchema } from "./types";
 
 export const InsertSchema = z.object({
-  affectedRows: z.number(),
-  insertId: z.number(),
-  warningStatus: z.number(),
+  affectedRows: NumericSchema,
+  insertId: NumericSchema,
+  warningStatus: NumericSchema,
 });
 
 export const UpdateSchema = z.object({
-  affectedRows: z.number(),
-  warningStatus: z.number(),
+  affectedRows:  NumericSchema,
+  warningStatus: NumericSchema,
 });
 
 export const SelectHashByUsernameSchema = z.object({
@@ -29,10 +30,10 @@ export const SelectFullGameSavesByIdSchema = z.object({
 
 export const SelectAllGameSavesSchema = z.object({
     gamename: z.string(),
-    creator: z.number(),
-    parent: z.number(),
-    id: z.number(),
-    privateGame: z.number(),
+    creator: NumericSchema,
+    parent:  NumericSchema,
+    id: NumericSchema,
+    privateGame: NumericSchema,
 });
 
 export type InsertResult = z.infer<typeof InsertSchema>;
