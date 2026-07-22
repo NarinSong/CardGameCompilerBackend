@@ -185,6 +185,7 @@ export default class GameDefinition {
             type?: ButtonType | undefined,
             range?: ButtonRangeArgument | undefined,
             location?: LocationResolver | undefined,
+            visibility?: Visibility | undefined,
         }
     ): void {
 

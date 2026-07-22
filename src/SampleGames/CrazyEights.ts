@@ -6,10 +6,6 @@ import { PileState, TriggerType, Visibility } from "../schemas/types.js";
 const CrazyEights = new GameDefinition();
 
 // Step 1: Define the players
-
-// Nothing here, since the players have nothing
-
-// It would look like 
 CrazyEights.addPlayerPile({ label: 'Hand', actionRole: 'Hand', initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
 
 // Step 2: Set the game meta
@@ -17,17 +13,27 @@ CrazyEights.addPlayerPile({ label: 'Hand', actionRole: 'Hand', initialValue: Pil
 CrazyEights.minPlayers = 2,
 CrazyEights.maxPlayers = 4;
 
+// Register game variable with type 'Suit'
+const currentSuitVariable = 'CurrentSuit';
+CrazyEights.gameMeta.variables[currentSuitVariable] = 'Suit';
+
 // Step 3: Define the Board
 
 CrazyEights.addBoardPile({label: 'Deck', initialValue: PileState.SHUFFLED, visibility: Visibility.FACE_DOWN });
 CrazyEights.addBoardPile({label: 'Discard', initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
 CrazyEights.addBoardButton({label: 'Pass', type: 'CLICK'});
 
-// Step 4: Create the Actions
+// Suit selection buttons
+CrazyEights.addBoardButton({label: 'Hearts',   actionRoles: ['suitSelection'], type: 'CLICK', visibility: Visibility.INVISIBLE});
+CrazyEights.addBoardButton({label: 'Spades',   actionRoles: ['suitSelection'], type: 'CLICK', visibility: Visibility.INVISIBLE});
+CrazyEights.addBoardButton({label: 'Clubs',    actionRoles: ['suitSelection'], type: 'CLICK', visibility: Visibility.INVISIBLE});
+CrazyEights.addBoardButton({label: 'Diamonds', actionRoles: ['suitSelection'], type: 'CLICK', visibility: Visibility.INVISIBLE});
 
+// Step 4: Create the Actions
 const main = CrazyEights.addPhase('Main');
 const setup = CrazyEights.addStepToPhase(main, 'setup')
 const play = CrazyEights.addStepToPhase(main, 'play');
+const chooseSuit = CrazyEights.addStepToPhase(main, 'wild');
 
 function L(v: any): ValueNode {
     return {type: 'LITERAL', primary: v};
@@ -78,6 +84,19 @@ const deal = new Action(
                 secondary: L('Discard'),
                 tertiary: L(1)
             },
+            {
+                type: 'UPDATE_VARIABLE',
+                name: L(currentSuitVariable),
+                variableType: 'Suit',
+                value: {
+                    type: 'SUIT',
+                    primary: {
+                        type: 'CARD_OF_PILE',
+                        primary: L('Discard'),
+                        secondary: L(1)
+                    }
+                }
+            },
 
             // Set step to play
             {
@@ -104,7 +123,7 @@ const playCard = new Action(
             },
             role: L('active')
         },
-        // Card suit or value matches with the top card of the discard pile [TODO: or is an 8]
+        // Card suit or value matches with the top card of the discard pile or chosen suit if it's an 8
         secondary: {
             type: 'OR',
             primary: {
@@ -127,12 +146,9 @@ const playCard = new Action(
             secondary: {
                 type: 'EQUAL',
                 primary: {
-                    type: 'SUIT',
-                    primary: {
-                        type: 'CARD_OF_PILE',
-                        primary: L('Discard'),
-                        secondary: L(1)
-                    }
+                    type: 'GET_VARIABLE',
+                    name: L(currentSuitVariable),
+                    variableType: 'Suit'
                 },
                 secondary: {
                     type: 'SUIT',
@@ -146,6 +162,17 @@ const playCard = new Action(
     {
         type: 'SEQUENCE',
         primary: [
+            {
+                type: 'UPDATE_VARIABLE',
+                variableType: 'Suit',
+                name: L(currentSuitVariable),
+                value: {
+                    type: 'SUIT',
+                    primary: {
+                        type: 'CTX_CARD'
+                    }
+                }
+            },
             {
                 type: 'DEAL_CARDS',
                 primary: {
@@ -177,7 +204,110 @@ const playCard = new Action(
                 },
                 tertiary: UNDEFINED_NODE
             },
-            // Pass turn
+            // Pass turn or go to eights step to allow suit choice
+            {
+                type: 'IF',
+                primary: {
+                    type: 'STRING_EQ',
+                    primary: {
+                        type: 'RANK',
+                        primary: {
+                            type: 'CTX_CARD'
+                        }
+                    },
+                    secondary: L('Eight')
+                },
+                secondary: {
+                    type: 'SEQUENCE',
+                    primary: [
+                        {
+                            type: 'SET_STEP',
+                            primary: L(chooseSuit)
+                        },
+                        {
+                            type: 'SET_BUTTON_VISIBILITY',
+                            primary: L('Hearts'),
+                            secondary: L(Visibility.FACE_UP)
+                        },
+                        {
+                            type: 'SET_BUTTON_VISIBILITY',
+                            primary: L('Spades'),
+                            secondary: L(Visibility.FACE_UP)
+                        },
+                        {
+                            type: 'SET_BUTTON_VISIBILITY',
+                            primary: L('Clubs'),
+                            secondary: L(Visibility.FACE_UP)
+                        },
+                        {
+                            type: 'SET_BUTTON_VISIBILITY',
+                            primary: L('Diamonds'),
+                            secondary: L(Visibility.FACE_UP)
+                        }
+                    ]
+                },
+                tertiary: {
+                    type: 'NEXT_PLAYER',
+                    primary: L('active')
+                }
+            }
+        ]
+    }
+);
+
+CrazyEights.addActionToStep(play, playCard);
+
+const wild = new Action(
+    {
+        type: 'CLICK',
+        target: 'suitSelection'
+    },
+    {
+        type: 'HAS_ROLE',
+        id: {
+            type: 'CTX_PLAYER'
+        },
+        role: L('active')
+    },
+    {
+        type: 'SEQUENCE',
+        primary: [
+            // Select the suit
+            {
+                type: 'UPDATE_VARIABLE',
+                variableType: 'Suit',
+                name: L(currentSuitVariable),
+                value: {
+                    type: 'CLICKED_LABEL' // Labels are 'Hearts', 'Spades', 'Clubs', and 'Diamonds'
+                }
+            },
+            // Hide the buttons
+            {
+                type: 'SET_BUTTON_VISIBILITY',
+                primary: L('Hearts'),
+                secondary: L(Visibility.INVISIBLE)
+            },
+            {
+                type: 'SET_BUTTON_VISIBILITY',
+                primary: L('Spades'),
+                secondary: L(Visibility.INVISIBLE)
+            },
+            {
+                type: 'SET_BUTTON_VISIBILITY',
+                primary: L('Clubs'),
+                secondary: L(Visibility.INVISIBLE)
+            },
+            {
+                type: 'SET_BUTTON_VISIBILITY',
+                primary: L('Diamonds'),
+                secondary: L(Visibility.INVISIBLE)
+            },
+            // Change step
+            {
+                type: 'SET_STEP',
+                primary: L(play)
+            },
+            // Next player
             {
                 type: 'NEXT_PLAYER',
                 primary: L('active')
@@ -186,7 +316,7 @@ const playCard = new Action(
     }
 );
 
-CrazyEights.addActionToStep(play, playCard);
+CrazyEights.addActionToStep(chooseSuit, wild);
 
 const pass = new Action(
     {
