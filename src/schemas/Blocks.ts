@@ -411,15 +411,15 @@ const TERNARY = defineBlock({
 
 const CTX_CARD = defineBlock({
     "name": NODE_NAMES.CtxCard,
-    "displayName": "Passed Card",
+    "displayName": "Clicked Card",
     "returnType": "Card",
     "arguments": []
 });
 
-const CTX_ID = defineBlock({
-    "name": NODE_NAMES.CtxId,
-    "displayName": "Clicked Card",
-    "returnType": "ID",
+const CTX_PLAYER = defineBlock({
+    "name": NODE_NAMES.CtxPlayer,
+    "displayName": "Current Player",
+    "returnType": "Player",
     "arguments": []
 });
 
@@ -1439,7 +1439,7 @@ export const BLOCKS = {
     STRING_EQ,
     TERNARY,
     CTX_CARD,
-    CTX_ID,
+    CTX_PLAYER,
     GET_ID_FROM_ROLE,
     PILE_OF,
     HAS_ROLE,

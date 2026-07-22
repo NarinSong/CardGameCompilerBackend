@@ -15,7 +15,7 @@ const UndefinedSchema = z.literal(NODE_NAMES.Undefined);
 
 const OperatorlessSchema = z.enum([
   NODE_NAMES.ClickedLabel,
-  NODE_NAMES.CtxId,
+  NODE_NAMES.CtxPlayer,
   NODE_NAMES.CtxCard,
   NODE_NAMES.FirstPlayer,
   NODE_NAMES.ButtonValue,
@@ -325,7 +325,7 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
 
 export const ActionContextSchema = z.object({
   trigger: TriggerSchema,
-  id: z.number().optional(),
+  player: z.number(),
   label: LabelSchema.optional(),
   card: CardSchema.optional(),
   buttonValue: z.number().optional(),

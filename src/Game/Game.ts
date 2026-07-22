@@ -99,7 +99,7 @@ export default class Game {
         let actionRoles: ActionRole[] = gameObject.actionRoles;
 
         for (let action of actions) {
-            const ctx: ActionContext = { label: label, trigger: action.trigger, id: 0 }; // TODO add the actual user id
+            const ctx: ActionContext = { label: label, trigger: action.trigger, player: 0, card: { suit: 'Clubs', rank: 'Ace', id: 0 } }; // TODO add the actual player and card. Note: card is optional
             if (action.trigger.type === TriggerType.CLICK && actionRoles.includes(action.trigger.target) && evaluate(this, ctx, action.filter)) {
                 
                 console.log(`Player took action by clicking on label ${label}`);

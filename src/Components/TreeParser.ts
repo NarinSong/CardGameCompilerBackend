@@ -909,7 +909,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         // Action context
         case NODE_NAMES.ClickedLabel: return c.label;
         case NODE_NAMES.CtxCard: return c.card;
-        case NODE_NAMES.CtxId: return c.id;
+        case NODE_NAMES.CtxPlayer: return c.player;
         case NODE_NAMES.ButtonValue: return c.buttonValue;
         // Users and roles
         case NODE_NAMES.GetIdFromRole: return evaluateIdFromRole(g, c, node);
