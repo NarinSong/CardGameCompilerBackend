@@ -55,9 +55,11 @@ export default class Button {
      * @param gameLabels - The game's label manager.
      * @returns A newly constructed button.
      */
-    static fromDefinition(definition: ButtonDefinition, gameLabels: GameLabels): Button {
+    static fromDefinition(definition: ButtonDefinition, gameLabels: GameLabels, playerId?: number): Button {
+        const label = typeof playerId !== 'undefined' ? definition.label + playerId : definition.label;
+
         return new Button(
-            definition.label,
+            label,
             definition.visibility,
             gameLabels,
             definition.actionRoles,

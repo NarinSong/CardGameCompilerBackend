@@ -90,7 +90,7 @@ export default class GameState {
      * @param id - The identifier for the owner of the pile.
      */
     createPileFromDefinition(pileDefinition: PileDefinition, id: number): void {
-        const pile = Pile.fromDefinition(pileDefinition, this.gameLabels);
+        const pile = Pile.fromDefinition(pileDefinition, this.gameLabels, id);
 
         this.piles[pile.label] = { pile: pile, owner: id };
     }
@@ -101,7 +101,7 @@ export default class GameState {
      * @param id - The identifier for the owner of the counter.
      */
     createCounterFromDefinition(counterDefinition: CounterDefinition, id: number): void {
-        const counter = Counter.fromDefinition(counterDefinition, this.gameLabels);
+        const counter = Counter.fromDefinition(counterDefinition, this.gameLabels, id);
 
         this.counters[counter.label] = { counter: counter, owner: id };
     }
@@ -112,7 +112,7 @@ export default class GameState {
      * @param id - The identifier for the owner of the button.
      */
     createButtonFromDefinition(buttonDefinition: ButtonDefinition, id: number): void {
-        const button = Button.fromDefinition(buttonDefinition, this.gameLabels);
+        const button = Button.fromDefinition(buttonDefinition, this.gameLabels, id);
 
         this.buttons[button.label] = { button: button, owner: id };
     }
