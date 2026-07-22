@@ -48,9 +48,13 @@ export default class GameMeta {
             'DEFAULT_COUNTER': DEFAULT_COUNTER_LOCATION,
         };
 
-        for (let i in obj.locations) {
-            if (!obj.locations[i]) continue;
-            this.locations[i] = obj.locations[i];
+        this.addLocations(obj.locations ?? {});
+    }
+
+    addLocations(locations: Record<string, DefaultLocation>): void {
+        for (let i in locations) {
+            if (!locations[i]) continue;
+            this.locations[i] = locations[i];
         }
     }
 

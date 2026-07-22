@@ -24,11 +24,11 @@ Between.addBoardPile({label: 'Discard', initialValue: PileState.EMPTY, visibilit
 Between.addBoardPile({label: 'Play', initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
 Between.addBoardPile({label: 'Hit', initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
 
-Between.addBoardCounter({ label: 'Pot', initialValue: 50 });
+Between.addBoardCounter({ label: 'Pot', number: 50 });
 
 Between.addBoardButton({ label: 'Bet', type: ButtonType.NUMBER, range: { min: 0, increment: 1 } });
 
-Between.addPlayerCounter({ actionRole: 'Chips', initialValue: 50 });
+Between.addPlayerCounter({ actionRole: 'Chips', number: 50 });
 
 // Step 4: Create the Actions
 

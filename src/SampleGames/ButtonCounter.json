@@ -31,11 +31,11 @@
         "counters": [
             {
                 "label": "NumberHaver",
-                "initialValue": 67
+                "number": 67
             },
             {
                 "label": "SecondCounter",
-                "initialValue": 2
+                "number": 2
             }
         ]
     },

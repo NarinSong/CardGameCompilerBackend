@@ -85,7 +85,7 @@ export default class GameDefinition {
             label?: string | undefined,
             displayName?: string | undefined,
             actionRole?: string | undefined,
-            initialValue?: number | undefined,
+            number?: number | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
         }
@@ -158,7 +158,7 @@ export default class GameDefinition {
             label?: string | undefined,
             displayName?: string | undefined,
             actionRole?: string | undefined,
-            initialValue?: number | undefined,
+            number?: number | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
         }

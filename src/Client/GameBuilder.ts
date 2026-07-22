@@ -26,6 +26,8 @@ export function buildGameFromJSON(clientJson: unknown) {
         game.minPlayers = data.gameMeta.minPlayers;
     if (typeof data.gameMeta.maxPlayers !== 'undefined')
         game.maxPlayers = data.gameMeta.maxPlayers;
+    if (typeof data.gameMeta.locations !== 'undefined')
+        game.gameMeta.addLocations(data.gameMeta.locations);
 
     // TODO: the remaining game meta :)
     // It isn't implemented in GameDefinition yet, so we'll have to make getters for it
