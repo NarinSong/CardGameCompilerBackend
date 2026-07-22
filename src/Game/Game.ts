@@ -50,13 +50,17 @@ export default class Game {
             this.players[id] = p;
             this.numPlayers++;
 
-            // Create piles and counters
+            // Create piles, counters, and buttons
             for (let pd of this.definition.player.piles) {
                 this.gameState.createPileFromDefinition(pd, id);
             }
 
             for (let cd of this.definition.player.counters) {
                 this.gameState.createCounterFromDefinition(cd, id);
+            }
+
+            for (let bd of this.definition.player.buttons) {
+                this.gameState.createButtonFromDefinition(bd, id);
             }
 
             return p;
