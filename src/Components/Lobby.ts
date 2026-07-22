@@ -39,7 +39,7 @@ export class LobbyView {
         this.players = lobby.playerDetails;
         this.code = lobby.joinCode;
         this.game = lobby.gameName; // defaults to "No Game Selected"
-        this.gameDescription = 'Game description';
+        this.gameDescription = lobby.gameDescription;
     }
 }
 
@@ -339,6 +339,13 @@ export default class Lobby {
         const game = GameManager.getRegisteredGameDefinition(this.#game);
 
         return game ? game.gameMeta.name : 'No Game Selected';
+    }
+
+    get gameDescription() {
+        if (!this.#game) return 'No Game Selected';
+        const game = GameManager.getRegisteredGameDefinition(this.#game);
+
+        return game ? game.gameMeta.description : 'No Game Selected';
     }
 
     get numAvailablePlayers() {

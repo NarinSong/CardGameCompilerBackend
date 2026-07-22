@@ -3,6 +3,7 @@
         "minPlayers": 1,
         "maxPlayers": 10,
         "name": "Pickup",
+        "description": "Play the cards, and stack them up!",
         "locations": {
             "pilelocation": {
                 "anchor": {

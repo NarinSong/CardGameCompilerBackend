@@ -16,6 +16,7 @@ import Game from "../Game/Game.js";
 import Logger from "../Components/Logger.js";
 import ButtonDefinition from "./ButtonDefinition.js";
 import { coerceLocation } from "../Components/LocationUtils.js";
+import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
 
 
 /**
@@ -34,12 +35,12 @@ export default class GameDefinition {
     /**
      * Creates a new game definition.
      */
-    constructor() {
+    constructor(obj?: GameMetaArgs) {
         this.phases = [];
         this.player = new PlayerDefinition();
         this.board = new BoardDefinition();
         this.labelManger = new LabelManager();
-        this.gameMeta = new GameMeta();
+        this.gameMeta = new GameMeta(obj);
         this.roles = [];
     }
 

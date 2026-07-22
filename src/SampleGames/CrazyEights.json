@@ -3,6 +3,7 @@
         "minPlayers": 2,
         "maxPlayers": 4,
         "name": "CrazyEights",
+        "description": "The OG Uno. First to play all their cards, wins!",
         "variables": {
             "CurrentSuit": "Suit"
         }

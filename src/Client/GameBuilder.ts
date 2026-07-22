@@ -19,9 +19,11 @@ export function buildGameFromJSON(clientJson: unknown) {
 
     // JSON is verified, let's build a game
 
-    const game = new GameDefinition();
+    const game = new GameDefinition(data.gameMeta);
 
+    /*
     // Define the game meta (it's already built, so we just override if we have any changes to make)
+
     if (typeof data.gameMeta.minPlayers !== 'undefined')
         game.minPlayers = data.gameMeta.minPlayers;
     if (typeof data.gameMeta.maxPlayers !== 'undefined')
@@ -31,6 +33,7 @@ export function buildGameFromJSON(clientJson: unknown) {
 
     // TODO: the remaining game meta :)
     // It isn't implemented in GameDefinition yet, so we'll have to make getters for it
+    */
 
     // Define the players
     if (typeof data.playerDefinition.piles !== 'undefined')

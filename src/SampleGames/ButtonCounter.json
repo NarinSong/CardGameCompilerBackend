@@ -2,7 +2,8 @@
     "gameMeta": {
         "minPlayers": 1,
         "maxPlayers": 10,
-        "name": "ButtonCounter"
+        "name": "ButtonCounter",
+        "description": "There are buttons, and there are counters. What more could you need?"
     },
     "playerDefinition": {
         "piles": [
