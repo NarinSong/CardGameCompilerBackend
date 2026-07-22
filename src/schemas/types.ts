@@ -205,14 +205,14 @@ export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
 };
 export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
     anchor: {
-        x: -800,
+        x: -780,
         y: -450,
     },
     direction: "HORIZONTAL",
     verticalOffset: 100,
     horizontalOffset: 250,
-    wraptAt: 800,
-    wrapTo: -800,
+    wraptAt: 780,
+    wrapTo: -780,
 };
 
 // Default deck. TODO: Switch to RANKENUM.ACE, etc. so that it's more readable
