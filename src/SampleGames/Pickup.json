@@ -25,7 +25,8 @@
             {
                 "label": "Deck",
                 "initialState": "SHUFFLED",
-                "visibility": "FACE_DOWN"
+                "visibility": "FACE_DOWN",
+                "location": { "locationType": "relative", "location": "pilelocation" }
             }
         ]
     },
