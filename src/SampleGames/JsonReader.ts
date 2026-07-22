@@ -3,7 +3,6 @@ import GameDefinition from "../Rules/GameDefinition.js";
 import pickupJson from "./Pickup.json" with { type: "json" };
 import buttonCounterJson from "./ButtonCounter.json" with { type: "json" };
 import GameManager from "../GameManager.js";
-import { PlayerType } from "../schemas/types.js";
 
 const PickupGame = buildGameFromJSON(pickupJson);
 
