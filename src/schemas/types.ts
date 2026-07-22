@@ -194,25 +194,25 @@ export const DEFAULT_PILE_LOCATION: DefaultLocation = {
 };
 export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
     anchor: {
-        x: -900,
-        y: 500,
+        x: -800,
+        y: 450,
     },
     direction: "HORIZONTAL",
     verticalOffset: -150,
     horizontalOffset: 150,
-    wraptAt: 900,
-    wrapTo: -900,
+    wraptAt: 800,
+    wrapTo: -800,
 };
 export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
     anchor: {
-        x: -900,
-        y: -500,
+        x: -800,
+        y: -450,
     },
     direction: "HORIZONTAL",
     verticalOffset: 100,
     horizontalOffset: 250,
-    wraptAt: 900,
-    wrapTo: -900,
+    wraptAt: 800,
+    wrapTo: -800,
 };
 
 // Default deck. TODO: Switch to RANKENUM.ACE, etc. so that it's more readable
