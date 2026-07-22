@@ -7,10 +7,10 @@
             "pilelocation": {
                 "anchor": {
                     "x": -800,
-                    "y": 450
+                    "y": 420
                 },
                 "direction": "HORIZONTAL",
-                "verticalOffset": -200,
+                "verticalOffset": -180,
                 "horizontalOffset": 130,
                 "wraptAt": 800,
                 "wrapTo": -800
