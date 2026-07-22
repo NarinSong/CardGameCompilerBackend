@@ -190,7 +190,6 @@ export default class GameState {
      * Removes a pile by label.
      * @param pile - The label of the pile to remove.
      * @param sendCardsTo - Optional pile label to receive the removed pile's cards.
-     * @returns undefined if no pile with that label exists.
      */
     removePileByLabel(pile: Label, sendCardsTo?: Label | undefined): void {
         const mainPile: Pile | undefined = this.piles[pile]?.pile;
@@ -210,7 +209,6 @@ export default class GameState {
     /**
      * Removes a button by label.
      * @param button - The label of the button to remove.
-     * @returns undefined if no button with that label exists.
      */
     removeButtonByLabel(button: Label): void {
         const mainButton: Button | undefined = this.buttons[button]?.button;
