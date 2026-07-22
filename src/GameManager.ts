@@ -31,7 +31,7 @@ export default class GameManager {
      * Creates a new client and registers it.
      * @returns The newly created client.
      */
-    static createClient() {
+    static createClient(): Client {
         const client = new Client();
 
         GameManager.clients[client.identifier] = client;
@@ -44,7 +44,7 @@ export default class GameManager {
      * @param clientId - The id of the client to retrieve.
      * @returns The client, or null if not found.
      */
-    static clientFromId(clientId: ClientID) {
+    static clientFromId(clientId: ClientID): Client | null {
         const client = GameManager.clients[clientId];
         if (!client) return null;
         return client;
@@ -55,7 +55,7 @@ export default class GameManager {
      * @param client - The client hosting the lobby.
      * @returns The unique join code for the new lobby.
      */
-    static hostLobby(client: Client) {
+    static hostLobby(client: Client): LobbyID {
         const code = GameManager.uniqueLobbyJoinCode;
         const lobby = new Lobby(client, code);
         GameManager.lobbies[code] = lobby;
@@ -67,7 +67,7 @@ export default class GameManager {
      * @param code - The join code of the lobby.
      * @returns The lobby, or null if not found.
      */
-    static lobbyFromCode(code: LobbyID) {
+    static lobbyFromCode(code: LobbyID): Lobby | null {
         const lobby = GameManager.lobbies[code];
         if (!lobby) return null;
         return lobby;
@@ -79,9 +79,9 @@ export default class GameManager {
      * @returns null if the lobby does not exist.
      * @todo kick all players from lobby and notify them.
      */
-    static deleteLobby(code: LobbyID) {
+    static deleteLobby(code: LobbyID): void {
         const lobby = GameManager.lobbyFromCode(code);
-        if (!lobby) return null;
+        if (!lobby) return;
         
 
         delete GameManager.lobbies[code];
@@ -92,7 +92,7 @@ export default class GameManager {
      * @param room - The room to register.
      * @returns The registered room.
      */
-    static registerRoom(room: Room) {
+    static registerRoom(room: Room): Room {
         GameManager.rooms[room.name] = room;
         return room;
     }

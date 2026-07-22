@@ -54,7 +54,7 @@ export default class Pile {
      * @param gameLabels - The game's label manager.
      * @returns A newly constructed pile.
      */
-    static fromDefinition(definition: PileDefinition, gameLabels: GameLabels) {
+    static fromDefinition(definition: PileDefinition, gameLabels: GameLabels): Pile {
         return new Pile(
             definition.initialState,
             definition.label,
@@ -84,7 +84,7 @@ export default class Pile {
         actionRoles: ActionRole[],
         displayName: DisplayName,
         location: LocationResolver,
-    ) {
+    ): Pile {
         return new Pile(initialState, label, visibility, gameLabels, actionRoles, displayName, location);
     }
 }

@@ -50,7 +50,7 @@ export default class LabelManager {
      * @param name - Optional name of this label.
      * @returns The assigned label.
      */
-    createLabel(object: GameObject, name?: string) {
+    createLabel(object: GameObject, name?: string): Label {
         if (!name || this.getFromLabel(name)) {name = this.nextId;}
         this.labels[name] = object;
         return name;
@@ -62,7 +62,7 @@ export default class LabelManager {
      * @param name - Optional name of this label.
      * @returns The name of this label.
      */
-    createPhaseLabel(phase: GamePhaseDefinition, name?: string) {
+    createPhaseLabel(phase: GamePhaseDefinition, name?: string): PhaseLabel {
         if (!name || this.getPhaseFromLabel(name)) {name = this.nextId;}
         this.phaseLabels[name] = phase;
         return name;
@@ -74,7 +74,7 @@ export default class LabelManager {
      * @param name - Optional name of this label.
      * @returns The name of this label.
      */
-    createStepLabel(step: StepDefinition, name?: string) {
+    createStepLabel(step: StepDefinition, name?: string): StepLabel {
         if (!name || this.getStepFromLabel(name)) {name = this.nextId;}
         this.stepLabels[name] = step;
         return name;
@@ -85,7 +85,7 @@ export default class LabelManager {
      * @param l - The label of the game object.
      * @returns The game object.
      */
-    getFromLabel(l: Label) {
+    getFromLabel(l: Label): GameObject | undefined {
         return this.labels[l];
     }
 
@@ -94,7 +94,7 @@ export default class LabelManager {
      * @param l - The label of the phase.
      * @returns The phase.
      */
-    getPhaseFromLabel(l: PhaseLabel) {
+    getPhaseFromLabel(l: PhaseLabel): GamePhaseDefinition | undefined {
         return this.phaseLabels[l];
     }
 
@@ -103,7 +103,7 @@ export default class LabelManager {
      * @param l - The label of the step.
      * @returns The step.
      */
-    getStepFromLabel(l: StepLabel) {
+    getStepFromLabel(l: StepLabel): StepDefinition | undefined {
         return this.stepLabels[l];
     }
 
@@ -111,7 +111,7 @@ export default class LabelManager {
      * Generates the next unique label identifier.
      * @returns The next label id.
      */
-    get nextId() {
+    get nextId(): string {
         return '' + (++this.#nextId);
     }
 }

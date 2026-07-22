@@ -30,7 +30,7 @@ export default class GamePhaseDefinition {
      * Adds a step to the phase.
      * @param step - The step to add to the phase.
      */
-    addStep(step: StepDefinition) {
+    addStep(step: StepDefinition): void {
         this.steps.push(step);
     }
 }

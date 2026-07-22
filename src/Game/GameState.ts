@@ -154,7 +154,16 @@ export default class GameState {
      * @param obj - An object containing the pile's configuration.
      * @returns The pile label.
      */
-    createPileOnBoard(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, location?: LocationResolver | undefined } = {}): string {
+    createPileOnBoard(
+        obj: { 
+            state?: PileState | undefined, 
+            name?: string | undefined, 
+            visibility?: Visibility | undefined, 
+            actionRoles?: string[] | undefined, 
+            displayName?: string | undefined, 
+            location?: LocationResolver | undefined 
+        } = {}
+    ): string {
         return this.createPile({ ...obj, owner: -1 });
     }
 
@@ -163,7 +172,17 @@ export default class GameState {
      * @param obj - An object containing the pile's configuration.
      * @returns The pile label.
      */
-    createPileForPlayer(obj: { state?: PileState | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | undefined, location?: LocationResolver | undefined } = {}): string {
+    createPileForPlayer(
+        obj: { 
+            state?: PileState | undefined, 
+            name?: string | undefined, 
+            visibility?: Visibility | undefined, 
+            actionRoles?: string[] | undefined, 
+            displayName?: string | undefined, 
+            owner?: PlayerID | undefined, 
+            location?: LocationResolver | undefined 
+        } = {}
+    ): string {
         return this.createPile(obj);
     }
 
@@ -173,7 +192,7 @@ export default class GameState {
      * @param sendCardsTo - Optional pile label to receive the removed pile's cards.
      * @returns undefined if no pile with that label exists.
      */
-    removePileByLabel(pile: Label, sendCardsTo?: Label | undefined) {
+    removePileByLabel(pile: Label, sendCardsTo?: Label | undefined): void {
         const mainPile: Pile | undefined = this.piles[pile]?.pile;
         const to: Pile | undefined = sendCardsTo ? this.piles[sendCardsTo]?.pile : undefined;
 
@@ -193,7 +212,7 @@ export default class GameState {
      * @param button - The label of the button to remove.
      * @returns undefined if no button with that label exists.
      */
-    removeButtonByLabel(button: Label) {
+    removeButtonByLabel(button: Label): void {
         const mainButton: Button | undefined = this.buttons[button]?.button;
 
         if (!mainButton)
@@ -209,7 +228,7 @@ export default class GameState {
      * @param sendValueTo - Optional counter label to receive the removed counter's value.
      * @returns undefined if no counter with that label exists.
      */
-    removeCounterByLabel(counter: Label, sendValueTo?: Label | undefined) {
+    removeCounterByLabel(counter: Label, sendValueTo?: Label | undefined): void {
         const mainCounter: Counter | undefined = this.counters[counter]?.counter;
         const to: Counter | undefined = sendValueTo ? this.counters[sendValueTo]?.counter : undefined;
 
@@ -229,7 +248,18 @@ export default class GameState {
      * @param obj - An object containing the button's configuration.
      * @returns The button label.
      */
-    createButton(obj: { name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined, type?: ButtonType | undefined, range?: ButtonRange | undefined, location?: LocationResolver | undefined } = {}) {
+    createButton(
+        obj: { 
+            name?: string | undefined, 
+            visibility?: Visibility | undefined, 
+            actionRoles?: string[] | undefined, 
+            displayName?: string | undefined, 
+            owner?: PlayerID | BoardID | undefined, 
+            type?: ButtonType | undefined, 
+            range?: ButtonRange | undefined, 
+            location?: LocationResolver | undefined 
+        } = {}
+    ): string {
         const name = obj.name        ?? this.gameLabels.nextId;
 
         const button = Button.create(
@@ -253,7 +283,17 @@ export default class GameState {
      * @param obj - An object containing the counter's configuration.
      * @returns The counter label.
      */
-    createCounter(obj: { state?: number | undefined, name?: string | undefined, visibility?: Visibility | undefined, actionRoles?: string[] | undefined, displayName?: string | undefined, owner?: PlayerID | BoardID | undefined, location?: LocationResolver | undefined } = {}) {
+    createCounter(
+        obj: { 
+            state?: number | undefined, 
+            name?: string | undefined, 
+            visibility?: Visibility | undefined, 
+            actionRoles?: string[] | undefined, 
+            displayName?: string | undefined, 
+            owner?: PlayerID | BoardID | undefined, 
+            location?: LocationResolver | undefined 
+        } = {}
+    ): string {
         const name = obj.name        ?? this.gameLabels.nextId;
 
         const counter = Counter.create(
@@ -276,7 +316,7 @@ export default class GameState {
      * @param to - The pile that will receive the dealt cards.
      * @param number - The number of cards you would like to deal.
      */
-    dealCards(from: Label, to: Label, number: number) {
+    dealCards(from: Label, to: Label, number: number): void {
         const p1 = this.gameLabels.getFromLabel(from) as Pile;
         const p2 = this.gameLabels.getFromLabel(to) as Pile;
 
@@ -289,7 +329,7 @@ export default class GameState {
      * Shuffles the cards in a pile.
      * @param pile - The label of the pile to shuffle.
      */
-    shuffle(pile: Label) {
+    shuffle(pile: Label): void {
         const p1 = this.gameLabels.getFromLabel(pile) as Pile;
 
         if (p1) {
@@ -302,7 +342,7 @@ export default class GameState {
      * @param phaseName - The label of the phase to move to.
      * @returns undefined if the phase does not exist or has no steps.
      */
-    moveToPhase(phaseName: PhaseLabel) {
+    moveToPhase(phaseName: PhaseLabel): void {
         const phase = this.gameLabels.getPhaseFromLabel(phaseName);
 
         if (!phase || !phase.steps[0]) return;
@@ -315,7 +355,7 @@ export default class GameState {
      * @param stepName - The label of the next step.
      * @returns undefined if the step does not exist.
      */
-    moveToStep(stepName: StepLabel) {
+    moveToStep(stepName: StepLabel): void {
         const step = this.gameLabels.getStepFromLabel(stepName);
 
         if (!step) return;
@@ -339,7 +379,7 @@ export default class GameState {
      * @param name - The name of the variable.
      * @param value - The value to set.
      */
-    setVariable(type: ValueTypeName, name: string, value: ValueTypeValues) {
+    setVariable(type: ValueTypeName, name: string, value: ValueTypeValues): void {
         this.variables[type][name] = value;
     }
 }
