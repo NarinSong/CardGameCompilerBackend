@@ -198,7 +198,7 @@ export default class GameManager {
     static async getAvailableGameNames(): Promise<{name: string, id: number}[]> {
         // Potential: caching
         const list = await Database.getGamesList();
-        return [{name: 'Pickup', id: 1000}, {name:'Button Counter', id: 999}].concat(list ?? []);
+        return [{name: 'Pickup', id: 1000}, {name:'Button Counter', id: 999}, {name:'Crazy Eights', id: 998}].concat(list ?? []);
     }
 
     /**
