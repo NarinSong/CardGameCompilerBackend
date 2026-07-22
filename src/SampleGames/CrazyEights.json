@@ -1,0 +1,365 @@
+{
+    "gameMeta": {
+        "minPlayers": 2,
+        "maxPlayers": 4,
+        "name": "CrazyEights",
+        "variables": {
+            "CurrentSuit": "Suit"
+        }
+    },
+    "playerDefinition": {
+        "piles": [
+            {
+                "label": "Hand",
+                "actionRoles": ["Hand"],
+                "initialState": "EMPTY",
+                "visibility": "FACE_UP"
+            }
+        ]
+    },
+    "boardDefinition": {
+        "piles": [
+            {
+                "label": "Deck",
+                "initialState": "SHUFFLED",
+                "visibility": "FACE_DOWN"
+            },
+            {
+                "label": "Discard",
+                "initialState": "EMPTY",
+                "visibility": "FACE_UP"
+            }
+        ],
+        "buttons": [
+            {
+                "label": "Pass", 
+                "type": "CLICK"
+            },
+            {
+                "label": "Hearts",   
+                "actionRoles": ["suitSelection"], 
+                "type": "CLICK", 
+                "visibility": "INVISIBLE"
+            },
+            {
+                "label": "Clubs",   
+                "actionRoles": ["suitSelection"], 
+                "type": "CLICK", 
+                "visibility": "INVISIBLE"
+            },
+            {
+                "label": "Spades",   
+                "actionRoles": ["suitSelection"], 
+                "type": "CLICK", 
+                "visibility": "INVISIBLE"
+            },
+            {
+                "label": "Diamonds",   
+                "actionRoles": ["suitSelection"], 
+                "type": "CLICK", 
+                "visibility": "INVISIBLE"
+            }
+        ]
+    },
+    "phases": [
+        {
+            "name": "Main",
+            "steps": [
+                {
+                    "name": "setup",
+                    "actions": [
+                        {
+                            "trigger": { "type": "AUTO" },
+                            "filter": null,
+                            "result": {
+                                "type": "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "WHILE",
+                                        "primary": {
+                                            "type": "NOT",
+                                            "primary": {
+                                                "type": "HAS_ROLE",
+                                                "id": {
+                                                    "type": "FIRST_PLAYER"
+                                                },
+                                                "role": { "type": "LITERAL", "primary": "active" }
+                                            }
+                                        },
+                                        "secondary": {
+                                            "type": "DEAL_CARDS",
+                                            "primary": { "type": "LITERAL", "primary": "Deck" },
+                                            "secondary": {
+                                                "type": "PILE_OF",
+                                                "id": {
+                                                    "type": "NEXT_PLAYER",
+                                                    "primary": { "type": "LITERAL", "primary": "active" }
+                                                },
+                                                "actionRole": { "type": "LITERAL", "primary": "Hand" }
+                                            },
+                                            "tertiary": { "type": "LITERAL", "primary": 7 }
+                                        }
+                                    },
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": { "type": "LITERAL", "primary": "Discard" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "UPDATE_VARIABLE",
+                                        "name": { "type": "LITERAL", "primary": "CurrentSuit" },
+                                        "variableType": "Suit",
+                                        "value": {
+                                            "type": "SUIT",
+                                            "primary": {
+                                                "type": "CARD_OF_PILE",
+                                                "primary": { "type": "LITERAL", "primary": "Discard" },
+                                                "secondary": { "type": "LITERAL", "primary": 1 }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "play" }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "play",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "Hand" },
+                            "filter": {
+                                "type":  "AND",
+                                "primary": {
+                                    "type":  "HAS_ROLE",
+                                    "id": {
+                                        "type":  "CTX_PLAYER"
+                                    },
+                                    "role":  { "type": "LITERAL", "primary":  "active" }
+                                },
+                                "secondary": {
+                                    "type":  "OR",
+                                    "primary": {
+                                        "type":  "EQUAL",
+                                        "primary": {
+                                            "type":  "RANK",
+                                            "primary": {
+                                                "type":  "CARD_OF_PILE",
+                                                "primary":  { "type": "LITERAL", "primary":  "Discard" },
+                                                "secondary":  { "type": "LITERAL", "primary": 1 }
+                                            }
+                                        },
+                                        "secondary": {
+                                            "type":  "RANK",
+                                            "primary": {
+                                                "type":  "CTX_CARD"
+                                            }
+                                        }
+                                    },
+                                    "secondary": {
+                                        "type":  "EQUAL",
+                                        "primary": {
+                                            "type":  "GET_VARIABLE",
+                                            "name":  { "type": "LITERAL", "primary": "CurrentSuit" },
+                                            "variableType":  "Suit"
+                                        },
+                                        "secondary": {
+                                            "type":  "SUIT",
+                                            "primary": {
+                                                "type":  "CTX_CARD"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type":  "UPDATE_VARIABLE",
+                                        "variableType":  "Suit",
+                                        "name":  { "type": "LITERAL", "primary": "CurrentSuit" },
+                                        "value": {
+                                            "type":  "SUIT",
+                                            "primary": {
+                                                "type":  "CTX_CARD"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type":  "DEAL_CARDS",
+                                        "primary": {
+                                            "type":  "CLICKED_LABEL"
+                                        },
+                                        "secondary":  { "type": "LITERAL", "primary":  "Discard" },
+                                        "tertiary":  { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type":  "IF",
+                                        "primary": {
+                                            "type":  "EQUAL",
+                                            "primary": {
+                                                "type":  "NUM_CARDS_IN_PILE",
+                                                "primary": {
+                                                    "type":  "CLICKED_LABEL"
+                                                }
+                                            },
+                                            "secondary":  { "type": "LITERAL", "primary": 0 }
+                                        },
+                                        "secondary": {
+                                            "type":  "WIN",
+                                            "primary": {
+                                                "type":  "CTX_PLAYER"
+                                            },
+                                            "secondary": { "type": "UNDEFINED" },
+                                            "tertiary":  { "type": "LITERAL", "primary": true }
+                                        },
+                                        "tertiary": { "type": "UNDEFINED" }
+                                    },
+                                    {
+                                        "type":  "IF",
+                                        "primary": {
+                                            "type":  "STRING_EQ",
+                                            "primary": {
+                                                "type":  "RANK",
+                                                "primary": {
+                                                    "type":  "CTX_CARD"
+                                                }
+                                            },
+                                            "secondary":  { "type": "LITERAL", "primary":  "Eight" }
+                                        },
+                                        "secondary": {
+                                            "type":  "SEQUENCE",
+                                            "primary": [
+                                                {
+                                                    "type":  "SET_STEP",
+                                                    "primary":  { "type": "LITERAL", "primary": "wild" }
+                                                },
+                                                {
+                                                    "type":  "SET_BUTTON_VISIBILITY",
+                                                    "primary":  { "type": "LITERAL", "primary":  "Hearts" },
+                                                    "secondary":  { "type": "LITERAL", "primary": "FACE_UP" }
+                                                },
+                                                {
+                                                    "type":  "SET_BUTTON_VISIBILITY",
+                                                    "primary":  { "type": "LITERAL", "primary":  "Spades" },
+                                                    "secondary":  { "type": "LITERAL", "primary": "FACE_UP" }
+                                                },
+                                                {
+                                                    "type":  "SET_BUTTON_VISIBILITY",
+                                                    "primary":  { "type": "LITERAL", "primary":  "Clubs" },
+                                                    "secondary":  { "type": "LITERAL", "primary": "FACE_UP" }
+                                                },
+                                                {
+                                                    "type":  "SET_BUTTON_VISIBILITY",
+                                                    "primary":  { "type": "LITERAL", "primary":  "Diamonds" },
+                                                    "secondary":  { "type": "LITERAL", "primary": "FACE_UP" }
+                                                }
+                                            ]
+                                        },
+                                        "tertiary": {
+                                            "type":  "NEXT_PLAYER",
+                                            "primary":  { "type": "LITERAL", "primary":  "active" }
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "trigger": { "type": "CLICK", "target": "Pass" },
+                            "filter": {
+                                "type":  "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type":  "DEAL_CARDS",
+                                        "primary":  { "type": "LITERAL", "primary":  "Deck" },
+                                        "secondary": {
+                                            "type":  "PILE_OF",
+                                            "id": {
+                                                "type":  "CTX_PLAYER"
+                                            },
+                                            "actionRole":  { "type": "LITERAL", "primary":  "Hand" }
+                                        },
+                                        "tertiary":  { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type":  "NEXT_PLAYER",
+                                        "primary":  { "type": "LITERAL", "primary":  "active" }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "wild",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "suitSelection" },
+                            "filter": {
+                                "type":  "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type":  "UPDATE_VARIABLE",
+                                        "variableType":  "Suit",
+                                        "name":  { "type": "LITERAL", "primary": "CurrentSuit" },
+                                        "value": {
+                                            "type":  "CLICKED_LABEL"
+                                        }
+                                    },
+                                    {
+                                        "type":  "SET_BUTTON_VISIBILITY",
+                                        "primary":  { "type": "LITERAL", "primary":  "Hearts" },
+                                        "secondary":  { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type":  "SET_BUTTON_VISIBILITY",
+                                        "primary":  { "type": "LITERAL", "primary":  "Spades" },
+                                        "secondary":  { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type":  "SET_BUTTON_VISIBILITY",
+                                        "primary":  { "type": "LITERAL", "primary":  "Clubs" },
+                                        "secondary":  { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type":  "SET_BUTTON_VISIBILITY",
+                                        "primary":  { "type": "LITERAL", "primary":  "Diamonds" },
+                                        "secondary":  { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type":  "SET_STEP",
+                                        "primary":  { "type": "LITERAL", "primary": "play" }
+                                    },
+                                    {
+                                        "type":  "NEXT_PLAYER",
+                                        "primary":  { "type": "LITERAL", "primary":  "active" }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

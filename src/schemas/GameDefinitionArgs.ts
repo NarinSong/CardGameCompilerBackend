@@ -72,7 +72,7 @@ export const BoardSchema = z.object({
 
 export const ActionSchema = z.object({
     trigger: TriggerSchema,
-    filter: ValueNodeSchema.optional().or(z.null()),
+    filter: ValueNodeSchema.or(z.null()).optional(),
     result: ValueNodeSchema,
 })
 

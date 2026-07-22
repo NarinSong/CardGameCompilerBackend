@@ -6,7 +6,7 @@ import { PileState, TriggerType, Visibility } from "../schemas/types.js";
 const CrazyEights = new GameDefinition();
 
 // Step 1: Define the players
-CrazyEights.addPlayerPile({ label: 'Hand', actionRole: 'Hand', initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
+CrazyEights.addPlayerPile({ label: 'Hand', actionRoles: ['Hand'], initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
 
 // Step 2: Set the game meta
 

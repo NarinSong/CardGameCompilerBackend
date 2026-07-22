@@ -60,7 +60,7 @@ export default class GameDefinition {
         definition: {
             label?: string | undefined,
             displayName?: string | undefined,
-            actionRole?: string | undefined,
+            actionRoles?: string[] | undefined,
             initialValue?: PileState | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
@@ -84,7 +84,7 @@ export default class GameDefinition {
         definition: {
             label?: string | undefined,
             displayName?: string | undefined,
-            actionRole?: string | undefined,
+            actionRoles?: string[] | undefined,
             number?: number | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
@@ -108,7 +108,7 @@ export default class GameDefinition {
         definition: {
             label?: string | undefined,
             displayName?: string | undefined,
-            actionRole?: string | undefined,
+            actionRoles?: string[] | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
             type?: ButtonType | undefined,
@@ -133,7 +133,7 @@ export default class GameDefinition {
         definition: {
             label?: string | undefined,
             displayName?: string | undefined,
-            actionRole?: string | undefined,
+            actionRoles?: string[] | undefined,
             initialValue?: PileState | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
@@ -157,7 +157,7 @@ export default class GameDefinition {
         definition: {
             label?: string | undefined,
             displayName?: string | undefined,
-            actionRole?: string | undefined,
+            actionRoles?: string[] | undefined,
             number?: number | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,

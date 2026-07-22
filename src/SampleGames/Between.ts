@@ -28,7 +28,7 @@ Between.addBoardCounter({ label: 'Pot', number: 50 });
 
 Between.addBoardButton({ label: 'Bet', type: ButtonType.NUMBER, range: { min: 0, increment: 1 } });
 
-Between.addPlayerCounter({ actionRole: 'Chips', number: 50 });
+Between.addPlayerCounter({ actionRoles: ['Chips'], number: 50 });
 
 // Step 4: Create the Actions
 
