@@ -102,7 +102,7 @@ export default class GameManager {
      * @param roomId - The id of the room to retrieve.
      * @returns The room, or null if not found.
      */
-    static getRoomFromId(roomId: RoomID) {
+    static getRoomFromId(roomId: RoomID): Room | null {
         const room = GameManager.rooms[roomId];
         if (!room) return null;
         return room;
@@ -112,7 +112,7 @@ export default class GameManager {
      * Removes a client from the server, cleaning up their room and lobby if applicable.
      * @param clientId - The id of the client to remove.
      */
-    static removeClient(clientId: ClientID) {
+    static removeClient(clientId: ClientID): void {
         const client = GameManager.clientFromId(clientId);
         if (!client || !client.roomId) return; // Already taken care of
 
@@ -133,7 +133,7 @@ export default class GameManager {
      * @param clientId - The id of the client leaving the game.
      * @returns True if the client was successfully removed, false if the client was not in a game.
      */
-    static leaveGame(clientId: ClientID) {
+    static leaveGame(clientId: ClientID): boolean {
         const client = GameManager.clientFromId(clientId);
         if (!client || !client.roomId) return false;
 
@@ -147,7 +147,7 @@ export default class GameManager {
      * Closes a room, notifies all clients that the game has ended, and cleans up room state.
      * @param room - The room to close.
      */
-    static closeRoom(room: Room) {
+    static closeRoom(room: Room): void {
         const clients = room.clients;
         for (const idx in clients) {
             const clientId = +idx;
@@ -171,7 +171,7 @@ export default class GameManager {
      * @param id - The id to register the game under.
      * @param json - The JSON string representation of the game definition.
      */
-    static registerGameDefinition(game: GameDefinition, id: GameID , json: string) {
+    static registerGameDefinition(game: GameDefinition, id: GameID , json: string): void {
         GameManager.availableGames[id] = game;
         GameManager.availableGamesJson[id] = json;
     }
@@ -195,10 +195,10 @@ export default class GameManager {
      * Returns the list of all available game names and ids, including built-in games.
      * @returns A list of game names and ids, or undefined on database failure.
      */
-    static async getAvailableGameNames() {
+    static async getAvailableGameNames(): Promise<{name: string, id: number}[]> {
         // Potential: caching
         const list = await Database.getGamesList();
-        return list?.concat({name: 'Pickup', id: 1000}, {name:'Button Counter', id: 999});
+        return [{name: 'Pickup', id: 1000}, {name:'Button Counter', id: 999}].concat(list ?? []);
     }
 
     /**
@@ -217,7 +217,7 @@ export default class GameManager {
      * @param id - The id of the game to retrieve.
      * @returns The game definition, or null if not registered.
      */
-    static getRegisteredGameDefinition(id: GameID) {
+    static getRegisteredGameDefinition(id: GameID): GameDefinition | null {
         return GameManager.availableGames[id] ?? null;
     }
     
@@ -226,7 +226,7 @@ export default class GameManager {
      * @param id - The id of the game to retrieve.
      * @returns The JSON string, or null if not registered.
      */
-    static getRegisteredGameDefinitionJson(id: GameID) {
+    static getRegisteredGameDefinitionJson(id: GameID): string | null {
         return GameManager.availableGamesJson[id] ?? null;
     }
 

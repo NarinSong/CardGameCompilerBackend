@@ -100,7 +100,7 @@ io.on('connection', (socket: Socket) => {
  * @param clientId - Client id that was supposed to receive.
  * @param functionName - Function name that it failed on.
  */
-function failedSend(clientId: ClientID, functionName: string) {
+function failedSend(clientId: ClientID, functionName: string): void {
     Logger.log(`Failed emit: ${clientId} attempted ${functionName}`);
 }
 
@@ -111,7 +111,7 @@ function failedSend(clientId: ClientID, functionName: string) {
  * @param gamestate - Game state to send to client.
  * @returns void
  */
-function sendClientGamestate(clientId: ClientID, gamestate: ClientView) {
+function sendClientGamestate(clientId: ClientID, gamestate: ClientView): void {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendClientGamestate()');
@@ -121,7 +121,7 @@ function sendClientGamestate(clientId: ClientID, gamestate: ClientView) {
     socket.emit('gamestate', gamestate);
 }
 
-function sendGameEnded(clientId: ClientID) {
+function sendGameEnded(clientId: ClientID): void {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendGameEnded()');
@@ -131,7 +131,7 @@ function sendGameEnded(clientId: ClientID) {
     socket.emit('gameEnded');
 }
 
-function sendLobbyStatus(clientId: ClientID, lobbyStatus: LobbyView) {
+function sendLobbyStatus(clientId: ClientID, lobbyStatus: LobbyView): void {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendClientGamestate()');
@@ -141,7 +141,7 @@ function sendLobbyStatus(clientId: ClientID, lobbyStatus: LobbyView) {
     socket.emit('lobbyStatus', lobbyStatus);
 }
 
-function sendLobbyClosed(clientId: ClientID) {
+function sendLobbyClosed(clientId: ClientID): void {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendLobbyClosed()');
@@ -151,7 +151,7 @@ function sendLobbyClosed(clientId: ClientID) {
     socket.emit('lobbyClosed');
 }
 
-function sendReaction(clientId: ClientID, from: string, reaction: string) {
+function sendReaction(clientId: ClientID, from: string, reaction: string): void {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendReaction()');
