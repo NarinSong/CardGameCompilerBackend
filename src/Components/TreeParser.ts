@@ -1,6 +1,6 @@
 import Game from "../Game/Game.js";
 import { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
-import { ButtonRange, ButtonType, LocationResolver, PileState, rank, suit, Visibility } from "../schemas/types.js";
+import { ButtonRange, ButtonType, CardSchema, LocationResolver, PileState, rank, suit, Visibility } from "../schemas/types.js";
 import Card from "./Card.js";
 
 // Using Zod schemas
@@ -9,7 +9,25 @@ import { ValueReturn, ValueTypeName, ValueTypeValues } from "../schemas/Blocks.j
 import { NODE_NAMES } from "../schemas/Constants.js";
 import Pile from "../Game/Pile.js";
 import Counter from "../Game/Counter.js";
+import z from "zod";
 // Helper functions
+
+// Zod Schema transformers
+function zn(value: unknown): number {
+    return z.number().parse(value);
+}
+function zmn(value: unknown): number | undefined {
+    return z.number().or(z.undefined()).parse(value);
+}
+
+function zs(value: unknown): string {
+    return z.string().parse(value);
+}
+
+function zc(value: unknown): Card {
+    return CardSchema.parse(value);
+}
+
 /**
  *  Evaluates an ARRAY value node and returns its computed array contents.
  * @param g - The current game instance.
@@ -209,8 +227,8 @@ function executeRemoveCounter(g: Game, c: ActionContext, node: ValueNode) {
 function executeShuffleInto(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.ShuffleInto) throw new Error("Called executeShuffleInto with an invalid node");
 
-    const fromPileLabel = evaluate(g, c, node.primary) as Label;
-    const toPileLabel = evaluate(g, c, node.secondary) as Label;
+    const fromPileLabel = zs(evaluate(g, c, node.primary));
+    const toPileLabel = zs(evaluate(g, c, node.secondary));
 
     g.gameState.dealCards(fromPileLabel, toPileLabel, 1000000);
     g.gameState.shuffle(toPileLabel);
@@ -229,9 +247,9 @@ function executeShuffleInto(g: Game, c: ActionContext, node: ValueNode) {
 function executeMoveCounterValue(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.MoveCounterValue) throw new Error("Called executeMoveCounterValue with an invalid node");
 
-    const fromCounterLabel = evaluate(g, c, node.primary) as Label;
-    const toCounterLabel = evaluate(g, c, node.secondary) as Label;
-    const amount = evaluate(g, c, node.tertiary) as number | undefined;
+    const fromCounterLabel = zs(evaluate(g, c, node.primary)) as Label;
+    const toCounterLabel = zs(evaluate(g, c, node.secondary)) as Label;
+    const amount = zmn(evaluate(g, c, node.tertiary));
 
     const move = amount ?? 1;
 
@@ -256,11 +274,11 @@ function executeMoveCounterValue(g: Game, c: ActionContext, node: ValueNode) {
 function executeSetCounterValue(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetCounterValue) throw new Error("Called executeSetCounterValue with an invalid node");
 
-    const counterLabel = evaluate(g, c, node.primary) as Label;
+    const counterLabel = zs(evaluate(g, c, node.primary)) as Label;
     const counter = g.gameState.counters[counterLabel];
     
     if (counter) {
-        counter.counter.value = (evaluate(g, c, node.secondary) as number);
+        counter.counter.value = (zn(evaluate(g, c, node.secondary)));
     }
 
     return counterLabel;
@@ -278,7 +296,7 @@ function executeSetCounterValue(g: Game, c: ActionContext, node: ValueNode) {
 function executeSetRange(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetRange) throw new Error("Called executeSetRange with an invalid node");
 
-    const buttonLabel = evaluate(g, c, node.primary) as Label;
+    const buttonLabel = zs(evaluate(g, c, node.primary)) as Label;
     const button = g.gameState.buttons[buttonLabel];
     
     if (button) {
@@ -300,7 +318,7 @@ function executeSetRange(g: Game, c: ActionContext, node: ValueNode) {
 function executeSetCounterVisibility(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetCounterVisibility) throw new Error("Called executeSetCounterVisibility with an invalid node");
 
-    const counterLabel = evaluate(g, c, node.primary) as Label;
+    const counterLabel = zs(evaluate(g, c, node.primary)) as Label;
     const counter = g.gameState.counters[counterLabel];
     
     if (counter) {
@@ -322,7 +340,7 @@ function executeSetCounterVisibility(g: Game, c: ActionContext, node: ValueNode)
 function executeSetButtonVisibility(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetButtonVisisibility) throw new Error("Called executeSetButtonVisibility with an invalid node");
 
-    const buttonLabel = evaluate(g, c, node.primary) as Label;
+    const buttonLabel = zs(evaluate(g, c, node.primary)) as Label;
     const button = g.gameState.buttons[buttonLabel];
     
     if (button) {
@@ -344,7 +362,7 @@ function executeSetButtonVisibility(g: Game, c: ActionContext, node: ValueNode) 
 function executeSetPileVisibility(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetPileVisibility) throw new Error("Called executeSetPileVisibility with an invalid node");
 
-    const pileLabel = evaluate(g, c, node.primary) as Label;
+    const pileLabel = zs(evaluate(g, c, node.primary)) as Label;
     const pile = g.gameState.piles[pileLabel];
     
     if (pile) {
@@ -365,7 +383,7 @@ function executeSetPileVisibility(g: Game, c: ActionContext, node: ValueNode) {
 function evaluateIdFromRole(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.GetIdFromRole) throw new Error("Called evaluateIdFromRole with an invalid node");
 
-    return g.gameState.roles[ evaluate(g, c, node.role ) as string ]?.at( evaluate(g, c, node.index ) as number ?? 0 );
+    return g.gameState.roles[ zs(evaluate(g, c, node.role)) ]?.at( zmn(evaluate(g, c, node.index)) ?? 0 );
 }
 
 /**
@@ -379,8 +397,8 @@ function evaluateIdFromRole(g: Game, c: ActionContext, node: ValueNode) {
 function evaluatePileOf(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.PileOf) throw new Error("Called evaluatePileOf with an invalid node");
 
-    const playerId = evaluate(g, c, node.id) as number;
-    const actionRole = evaluate(g, c, node.actionRole) as string;
+    const playerId = zn(evaluate(g, c, node.id));
+    const actionRole = zs(evaluate(g, c, node.actionRole));
 
     for (let p in g.gameState.piles) {
         const pile = g.gameState.piles[p];
@@ -404,8 +422,8 @@ function evaluatePileOf(g: Game, c: ActionContext, node: ValueNode) {
 function evaluateCounterOf(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.CounterOf) throw new Error("Called evaluateCounterOf with an invalid node");
 
-    const playerId = evaluate(g, c, node.primary) as number;
-    const actionRole = evaluate(g, c, node.secondary) as string;
+    const playerId = zn(evaluate(g, c, node.primary));
+    const actionRole = zs(evaluate(g, c, node.secondary));
 
     for (let p in g.gameState.counters) {
         const counter = g.gameState.counters[p];
@@ -430,8 +448,8 @@ function evaluateCounterOf(g: Game, c: ActionContext, node: ValueNode) {
 function evaluateButtonOf(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.ButtonOf) throw new Error("Called evaluateButtonOf with an invalid node");
 
-    const playerId = evaluate(g, c, node.primary) as number;
-    const actionRole = evaluate(g, c, node.secondary) as string;
+    const playerId = zn(evaluate(g, c, node.primary));
+    const actionRole = zs(evaluate(g, c, node.secondary));
 
     for (let p in g.gameState.buttons) {
         const button = g.gameState.buttons[p];
@@ -454,8 +472,8 @@ function evaluateButtonOf(g: Game, c: ActionContext, node: ValueNode) {
 function evaluateIdHasRole(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.HasRole) throw new Error("Called evaluateIdHasRole with an invalid node");
 
-    const role = evaluate(g, c, node.role) as string;
-    const playerId = evaluate(g, c, node.id) as number;
+    const role = zs(evaluate(g, c, node.role));
+    const playerId = zn(evaluate(g, c, node.id));
 
     return g.gameState.roles[role]?.includes(playerId) ?? false;
 }
@@ -471,8 +489,8 @@ function evaluateIdHasRole(g: Game, c: ActionContext, node: ValueNode) {
 function evaluateAssignRole(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.AssignRole) throw new Error("Called evaluateAssignRole with an invalid node");
 
-    const role = evaluate(g, c, node.role) as string;
-    const playerId = evaluate(g, c, node.id) as number;
+    const role = zs(evaluate(g, c, node.role));
+    const playerId = zn(evaluate(g, c, node.id));
 
     if (g.gameState.roles[role] && !g.gameState.roles[role].includes(playerId)) {
         g.gameState.roles[role].push(playerId);
@@ -493,8 +511,8 @@ function evaluateAssignRole(g: Game, c: ActionContext, node: ValueNode) {
 function evaluateUnassignRole(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.UnassignRole) throw new Error("Called evaluateUnassignRole with an invalid node");
 
-    const role = evaluate(g, c, node.role) as string;
-    const playerId = evaluate(g, c, node.id) as number;
+    const role = zs(evaluate(g, c, node.role));
+    const playerId = zn(evaluate(g, c, node.id));
 
     if (g.gameState.roles[role]) {
         const idx = g.gameState.roles[role].indexOf(playerId);
@@ -518,8 +536,8 @@ function evaluateUnassignRole(g: Game, c: ActionContext, node: ValueNode) {
 function evaluateAssignRoleSingular(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.AssignRoleSingular) throw new Error("Called evaluateAssignRoleSingular with an invalid node");
 
-    const role = evaluate(g, c, node.role) as string;
-    const playerId = evaluate(g, c, node.id) as number;
+    const role = zs(evaluate(g, c, node.role));
+    const playerId = zn(evaluate(g, c, node.id));
 
     if (g.gameState.roles[role] && !g.gameState.roles[role].includes(playerId)) {
         g.gameState.roles[role] = [playerId];
@@ -543,7 +561,7 @@ function evaluateNextPlayer(g: Game, c: ActionContext, node: ValueNode) {
 
     const playerCount = Object.keys(g.gameState.players).length;
 
-    const role = evaluate(g, c, node.primary) as string;
+    const role = zs(evaluate(g, c, node.primary));
 
     const currentPlayer = g.gameState.roles[role];
 
@@ -718,7 +736,7 @@ function evaluatePileFlushOfSuit(g: Game, c: ActionContext, node: ValueNode) {
 function evaluatePileRun(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.PileRun) throw new Error("Called evaluatePileRun with invalid node");
 
-    const pileLabel = evaluate(g, c, node.primary) as string;
+    const pileLabel = zs(evaluate(g, c, node.primary));
     const suit = evaluate(g, c, node.secondary) as suit | undefined;
 
     const pile = g.gameLabels.getFromLabel(pileLabel) as Pile | undefined;
@@ -740,8 +758,8 @@ function evaluatePileRun(g: Game, c: ActionContext, node: ValueNode) {
 function evaluatePileRunFrom(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.PileRunFrom) throw new Error("Called evaluatePileRunFrom with invalid node");
 
-    const pileLabel = evaluate(g, c, node.primary) as string;
-    const number = (evaluate(g, c, node.secondary) ?? 1) as number;
+    const pileLabel = zs(evaluate(g, c, node.primary));
+    const number = zn(evaluate(g, c, node.secondary) ?? 1);
     const rank = evaluate(g, c, node.tertiary) as rank | undefined;
     const suit = evaluate(g, c, node.fourth) as suit | undefined;
 
@@ -762,12 +780,12 @@ function evaluatePileRunFrom(g: Game, c: ActionContext, node: ValueNode) {
 function executeUpdateVariable(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.UpdateVariable) throw new Error("Called executeUpdateVariable with invalid node");
 
-    const name = evaluate(g, c, node.name) as string;
-    const type = node.variableType as ValueTypeName;
+    const name = zs(evaluate(g, c, node.name));
+    const type = zs(node.variableType) as ValueTypeName;
 
     // TODO: Value's type can't be checked statically in the AST, so we have to check here that it matches 'type' given above
 
-    const value = evaluate(g, c, node.value) as ValueTypeValues;
+    const value = evaluate(g, c, node.value);
 
     g.gameState.setVariable(type, name, value)
 
@@ -785,7 +803,7 @@ function executeUpdateVariable(g: Game, c: ActionContext, node: ValueNode) {
 function executeSetPhase(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetPhase) throw new Error("Called executeSetPhase with invalid node");
     
-    const phaseLabel: PhaseLabel = evaluate(g, c, node.primary) as string;
+    const phaseLabel: PhaseLabel = zs(evaluate(g, c, node.primary));
 
     g.gameState.moveToPhase(phaseLabel);
 }
@@ -801,7 +819,7 @@ function executeSetPhase(g: Game, c: ActionContext, node: ValueNode) {
 function executeSetStep(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.SetStep) throw new Error("Called executeSetStep with invalid node");
     
-    const stepLabel: StepLabel = evaluate(g, c, node.primary) as string;
+    const stepLabel: StepLabel = zs(evaluate(g, c, node.primary));
 
     g.gameState.moveToStep(stepLabel);
 }
@@ -857,6 +875,7 @@ function executeLose(g: Game, c: ActionContext, node: ValueNode) {
  * @param c - The current action context.
  * @param node - AST node to evaluate.
  * @returns The evaluated value or undefined if the node does not produce a value.
+ * @throws errors when values aren't what they're expected to be
  */
 export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
     switch (node.type) {
@@ -868,19 +887,19 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.And: return evaluate(g, c, node.primary) && evaluate(g, c, node.secondary);
         case NODE_NAMES.Or: return evaluate(g, c, node.primary) || evaluate(g, c, node.secondary);
         case NODE_NAMES.Not: return !evaluate(g, c, node.primary);
-        case NODE_NAMES.LessThan: return (evaluate(g, c, node.primary) as number) < (evaluate(g, c, node.secondary) as number);
-        case NODE_NAMES.GreaterThan: return (evaluate(g, c, node.primary) as number) > (evaluate(g, c, node.secondary) as number);
-        case NODE_NAMES.Equal: return (evaluate(g, c, node.primary) as number) == (evaluate(g, c, node.secondary) as number);
+        case NODE_NAMES.LessThan: return zn(evaluate(g, c, node.primary)) < zn(evaluate(g, c, node.secondary));
+        case NODE_NAMES.GreaterThan: return zn(evaluate(g, c, node.primary)) > zn(evaluate(g, c, node.secondary));
+        case NODE_NAMES.Equal: return zn(evaluate(g, c, node.primary)) == zn(evaluate(g, c, node.secondary));
         // Arithmetic
-        case NODE_NAMES.Plus: return (evaluate(g, c, node.primary) as number) + (evaluate(g, c, node.secondary) as number);
-        case NODE_NAMES.Times: return (evaluate(g, c, node.primary) as number) * (evaluate(g, c, node.secondary) as number);
-        case NODE_NAMES.Minus: return (evaluate(g, c, node.primary) as number) - (evaluate(g, c, node.secondary) as number);
-        case NODE_NAMES.Div: return (evaluate(g, c, node.primary) as number) / (evaluate(g, c, node.secondary) as number);
+        case NODE_NAMES.Plus: return zn(evaluate(g, c, node.primary)) + zn(evaluate(g, c, node.secondary));
+        case NODE_NAMES.Times: return zn(evaluate(g, c, node.primary)) * zn(evaluate(g, c, node.secondary));
+        case NODE_NAMES.Minus: return zn(evaluate(g, c, node.primary)) - zn(evaluate(g, c, node.secondary));
+        case NODE_NAMES.Div: return zn(evaluate(g, c, node.primary)) / zn(evaluate(g, c, node.secondary));
         // Strings
-        case NODE_NAMES.StringEq: return (evaluate(g, c, node.primary) as string) == (evaluate(g, c, node.secondary) as string);
+        case NODE_NAMES.StringEq: return zs(evaluate(g, c, node.primary)) == zs(evaluate(g, c, node.secondary));
         // Location
-        case NODE_NAMES.Location: return { type: 'exact', location: { x: evaluate(g, c, node.primary) as number, y: evaluate(g, c, node.secondary) as number } };
-        case NODE_NAMES.RelativeLocation: return { type: 'relative', location: evaluate(g, c, node.primary) as string };
+        case NODE_NAMES.Location: return { type: 'exact', location: { x: zn(evaluate(g, c, node.primary)), y: zn(evaluate(g, c, node.secondary)) } };
+        case NODE_NAMES.RelativeLocation: return { type: 'relative', location: zs(evaluate(g, c, node.primary)) };
         // Button Range
         case NODE_NAMES.ButtonRange: return evaluateButtonRange(g, c, node);
         // Ternary
@@ -923,11 +942,11 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.NextPlayer: return evaluateNextPlayer(g, c, node);
         case NODE_NAMES.FirstPlayer: return evaluateFirstPlayer(g, c, node);
         // Game info extraction
-        case NODE_NAMES.Rank: return (evaluate(g, c, node.primary) as Card).rank;
-        case NODE_NAMES.Suit: return (evaluate(g, c, node.primary) as Card).suit;
-        case NODE_NAMES.NumCardsInPile: return (g.gameState.piles[evaluate(g, c, node.primary) as string])?.pile.cards.length;
-        case NODE_NAMES.ValueOf: return (evaluate(g, c, node.primary) as Counter).value;
-        case NODE_NAMES.CardOfPile: return (g.gameState.piles[evaluate(g, c, node.primary) as string])?.pile.cards[evaluate(g, c, node.secondary) as number ?? 0];
+        case NODE_NAMES.Rank: return zc(evaluate(g, c, node.primary)).rank;
+        case NODE_NAMES.Suit: return zc(evaluate(g, c, node.primary)).suit;
+        case NODE_NAMES.NumCardsInPile: return (g.gameState.piles[zs(evaluate(g, c, node.primary))])?.pile.cards.length;
+        case NODE_NAMES.ValueOf: return g.gameState.counters[zs(evaluate(g, c, node.primary))]?.counter.value;
+        case NODE_NAMES.CardOfPile: return (g.gameState.piles[zs(evaluate(g, c, node.primary))])?.pile.cards[zmn(evaluate(g, c, node.secondary)) ?? 0];
         // Pile Evaluation
         case NODE_NAMES.PileSet: return evaluatePileSet(g, c, node);
         case NODE_NAMES.PileSetOfRank: return evaluatePileSetOfRank(g, c, node);
@@ -936,9 +955,9 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.PileRun: return evaluatePileRun(g, c, node);
         case NODE_NAMES.PileRunFrom: return evaluatePileRunFrom(g, c, node);
         // Map usage
-        case NODE_NAMES.Map: return (g.definition.gameMeta.maps[ evaluate(g, c, node.secondary) as string ]?.get( evaluate(g, c, node.primary) ));
+        case NODE_NAMES.Map: return (g.definition.gameMeta.maps[ zs(evaluate(g, c, node.secondary)) ]?.get( evaluate(g, c, node.primary) ));
         case NODE_NAMES.UpdateVariable: return executeUpdateVariable(g, c, node);
-        case NODE_NAMES.GetVariable: return g.gameState.getVariable(node.variableType as ValueTypeName, evaluate(g, c, node.name) as string);
+        case NODE_NAMES.GetVariable: return g.gameState.getVariable(zs(node.variableType) as ValueTypeName, zs(evaluate(g, c, node.name) ));
         // Phase and Step Logic
         case NODE_NAMES.SetPhase: executeSetPhase(g, c, node); return;
         case NODE_NAMES.SetStep: executeSetStep(g, c, node); return;

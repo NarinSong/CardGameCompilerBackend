@@ -40,17 +40,22 @@ export default class Game {
 
 
     runAutoActions(): void {
-        while(true) {
-            const action = this.currentActions.find(a=>a.trigger.type == TriggerType.AUTO && evaluate(this, this.buildAutoContext(), a.filter));
-            if (!action) return;
+        try {
+            while(true) {
+                const action = this.currentActions.find(a=>a.trigger.type == TriggerType.AUTO && evaluate(this, this.buildAutoContext(), a.filter));
+                if (!action) return;
 
-            if(this.gameState.incrementAutoActionCount()){
-                this.aborted = true;
-                return;
+                if(this.gameState.incrementAutoActionCount()){
+                    this.aborted = true;
+                    return;
+                }
+
+                evaluate(this, this.buildAutoContext(), action.result)
+
             }
-
-            evaluate(this, this.buildAutoContext(), action.result)
-
+        } catch (error) {
+            // Error executing an action
+            console.error(error);
         }
     }
 
@@ -126,20 +131,24 @@ export default class Game {
 
         let actionRoles: ActionRole[] = gameObject.actionRoles;
 
-        const card: Card|undefined = this.getCard(cardId)
+        const card: Card|undefined = this.getCard(cardId);
 
-        for (let action of actions) {
-            const ctx: ActionContext = { label: label, trigger: action.trigger, player: playerId, card: card };
-            if (action.trigger.type === TriggerType.CLICK && actionRoles.includes(action.trigger.target) && evaluate(this, ctx, action.filter)) {
-
-                console.log(`Player took action by clicking on label ${label}`);
-                this.gameState.resetAutoActionCount();
-                evaluate(this, ctx, action.result);
-                this.runAutoActions();
-                return true;
+        try {
+            for (let action of actions) {
+                const ctx: ActionContext = { label: label, trigger: action.trigger, player: playerId, card: card };
+                if (action.trigger.type === TriggerType.CLICK && actionRoles.includes(action.trigger.target) && evaluate(this, ctx, action.filter)) {
+                    console.log(`Player took action by clicking on label ${label}`);
+                    this.gameState.resetAutoActionCount();
+                    evaluate(this, ctx, action.result);
+                    this.runAutoActions();
+                    return true;
+                }
             }
-
+        } catch (error) {
+            // Error evaluating the action or filter
+            console.error(error);
         }
+
 
         return false;
     }
