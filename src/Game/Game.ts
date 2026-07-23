@@ -12,6 +12,8 @@ import { GamePiece } from "./GameLabels.js";
 import Logger from "../Components/Logger.js";
 import { ActionContext } from "../schemas/AST.js";
 import { evaluate } from "../Components/TreeParser.js";
+import Card from "../Components/Card";
+import Pile from "./Pile";
 
 /**
  * Represents a running game instance and its current state.
@@ -21,6 +23,8 @@ import { evaluate } from "../Components/TreeParser.js";
 export default class Game {
     definition: GameDefinition;
     gameState: GameState;
+
+    aborted = false;
 
     // Player handling
     #nextPlayerId: number = 0;
@@ -32,6 +36,26 @@ export default class Game {
     constructor(definition: GameDefinition) {
         this.gameState = new GameState(definition);
         this.definition = definition;
+    }
+
+
+    runAutoActions(): void {
+        while(true) {
+            const action = this.currentActions.find(a=>a.trigger.type == TriggerType.AUTO && evaluate(this, this.buildAutoContext(), a.filter));
+            if (!action) return;
+
+            if(this.gameState.incrementAutoActionCount()){
+                this.aborted = true;
+                return;
+            }
+
+            evaluate(this, this.buildAutoContext(), action.result)
+
+        }
+    }
+
+    buildAutoContext(): ActionContext {
+        return { trigger: {type: TriggerType.AUTO}, player: -1};
     }
 
     // Assuming for now that the player can join. No restrictions on when :)
@@ -80,14 +104,18 @@ export default class Game {
 
         // Move to step 1
         this.currentStep = this.definition.getStartingStep();
+
+        this.runAutoActions();
     }
 
     /**
      * Evaluates and performs a click-triggered action for a labeled game object.
      * @param label - The label of the clicked game object.
+     * @param cardId - (Optional) the card Id clicked if passed
+     * @param playerId
      * @returns True if a valid action was found and executed, false if no valid action was found or if the label does not map to a game object.
      */
-    clickAction(label: string): boolean {
+    clickAction(label: string, cardId: number|undefined, playerId: PlayerID): boolean {
         const actions = this.currentActions;
         if (!actions) return false;
 
@@ -98,14 +126,19 @@ export default class Game {
 
         let actionRoles: ActionRole[] = gameObject.actionRoles;
 
+        const card: Card|undefined = this.getCard(cardId)
+
         for (let action of actions) {
-            const ctx: ActionContext = { label: label, trigger: action.trigger, player: 0, card: { suit: 'Clubs', rank: 'Ace', id: 0 } }; // TODO add the actual player and card. Note: card is optional
+            const ctx: ActionContext = { label: label, trigger: action.trigger, player: playerId, card: card };
             if (action.trigger.type === TriggerType.CLICK && actionRoles.includes(action.trigger.target) && evaluate(this, ctx, action.filter)) {
-                
+
                 console.log(`Player took action by clicking on label ${label}`);
+                this.gameState.resetAutoActionCount();
                 evaluate(this, ctx, action.result);
+                this.runAutoActions();
                 return true;
             }
+
         }
 
         return false;
@@ -118,6 +151,22 @@ export default class Game {
      */
     getPlayer(id: PlayerID): Player | undefined {
         return this.gameState.players[id];
+    }
+
+    /**
+     * Returns the card associated with a given card id.
+     * @param cardId - The id of the card to retrieve.
+     * @returns The card associated with the id, or undefined if not found.
+     */
+    getCard(cardId: number|undefined): Card | undefined {
+        if (cardId === undefined) {return undefined};
+
+        for (const label in this.gameState.piles) {
+            const found = this.gameState.piles[label]?.pile.cards.find(c => c.id === cardId);
+            if (found) return found;
+        }
+        return undefined;
+
     }
 
     /**

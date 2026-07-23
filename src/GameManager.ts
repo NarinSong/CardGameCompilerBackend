@@ -161,6 +161,7 @@ export default class GameManager {
 
         room.clients = {};
         room.clearTimeouts();
+        room.destroy();
 
         delete GameManager.rooms[room.name];
     }

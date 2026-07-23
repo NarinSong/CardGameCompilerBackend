@@ -39,6 +39,7 @@ export default class GameState {
     counters: Record<Label, {counter: Counter, owner: PlayerID | BoardID}>;
     buttons: Record<Label, {button: Button, owner: PlayerID | BoardID}>;
     gameMeta: GameMeta;
+    #autoActionCount: number = 0;
 
     variables: VariableArrayType;
 
@@ -379,5 +380,18 @@ export default class GameState {
      */
     setVariable(type: ValueTypeName, name: string, value: ValueTypeValues): void {
         this.variables[type][name] = value;
+    }
+
+    getAutoActionCount(){
+        return this.#autoActionCount;
+    }
+
+    incrementAutoActionCount(){
+        this.#autoActionCount += 1;
+        return this.#autoActionCount > 50;
+    }
+
+    resetAutoActionCount(){
+        this.#autoActionCount = 0;
     }
 }

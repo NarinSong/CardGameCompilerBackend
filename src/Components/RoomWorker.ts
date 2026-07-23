@@ -36,11 +36,12 @@ parentPort?.on("message", (msg) => {
     switch (msg.type){
         case "START_GAME":
             game.startGame();
-            
+            if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
             parentPort?.postMessage({type: "GAME_STATE", views: buildViews(game)});
             break;
         case "PLAYER_CLICK":
-            let actionTaken = game.clickAction(msg.label);
+            let actionTaken = game.clickAction(msg.label, msg.cardId, msg.playerId);
+            if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
             if (actionTaken) {
                 // Update clients with new gamestate
                 parentPort?.postMessage({type: "GAME_STATE", views: buildViews(game)});
@@ -49,6 +50,7 @@ parentPort?.on("message", (msg) => {
             break;
         case "JOIN_ROOM":
             const player = game.handlePlayerJoin(msg.playerType);
+            if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
             parentPort?.postMessage({
                 type: "PLAYER_JOINED",
                 playerId: player?.id ?? null

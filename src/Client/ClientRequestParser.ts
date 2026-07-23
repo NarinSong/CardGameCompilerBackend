@@ -661,9 +661,13 @@ export function clientRequestClickLabel(clientId: number, label: unknown, cardId
     const room = GameManager.getRoomFromId(client.roomId);
     if (!room) return callback(false);
 
-    room.handlePlayerClick(labelCheck.data, cardIdCheck.data);
+    if (typeof client.player === "number") {
+        room.handlePlayerClick(labelCheck.data, cardIdCheck.data, client.player);
+        callback(true);
+    }
 
-    callback(true);
+    callback(false);
+
 }
 
 /**

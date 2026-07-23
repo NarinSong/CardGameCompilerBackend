@@ -63,7 +63,10 @@ export default class Room {
                 case "GAME_STATE":
                     this.emitGameState(msg.views);
                     break;
-        
+                case "GAME_ABORTED":
+                    GameManager.closeRoom(this);
+                    break;
+
             }
         });
 
@@ -82,9 +85,8 @@ export default class Room {
         
         this.timeouts.set("inactivity", setTimeout(() => {
             console.log(`Room ${this.name} timed out due to inactivity`);
-            //TODO: notify clients that the room has timed out
-            this.destroy();
-        }, 30 * 60 * 1000)); 
+            GameManager.closeRoom(this);
+        }, 30 * 60 * 1000));
     }
 
     /**
@@ -111,12 +113,14 @@ export default class Room {
     /**
      * Handles the action whenever a player clicks an object (Pile, Card, etc.).
      * @param label - The object that the user clicked.
+     * @param cardId
+     * @param playerId
      * @todo use cardId and player number to build action context
      */
-    handlePlayerClick(label: string, cardId: number): void {
+    handlePlayerClick(label: string, cardId: number|undefined, playerId: number): void {
         if (!this.started) return;
         this.resetInactivityTimeout();
-        this.worker.postMessage({type: "PLAYER_CLICK", label})
+        this.worker.postMessage({type: "PLAYER_CLICK", label, cardId, playerId})
 
     }
 
