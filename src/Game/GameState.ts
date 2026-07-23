@@ -379,7 +379,14 @@ export default class GameState {
      * @param value - The value to set.
      */
     setVariable(type: ValueTypeName, name: string, value: ValueTypeValues): void {
-        this.variables[type][name] = value;
+        if (!type || !name) return;
+
+        if (this.variables[type]) {
+            this.variables[type][name] = value;
+        } else {
+            this.variables[type] = {};
+            this.variables[type][name] = value;
+        }
     }
 
     getAutoActionCount(){
