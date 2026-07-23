@@ -55,7 +55,7 @@ export default class Pile {
      * @returns A newly constructed pile.
      */
     static fromDefinition(definition: PileDefinition, gameLabels: GameLabels, playerId?: number): Pile {
-        const label = typeof playerId !== 'undefined' ? definition.label + playerId : definition.label;
+        const label = typeof playerId !== 'undefined' && playerId !== -1 ? definition.label + playerId : definition.label;
         
         return new Pile(
             definition.initialState,

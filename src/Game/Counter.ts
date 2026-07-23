@@ -54,7 +54,7 @@ export default class Counter {
      * @returns A newly constructed counter.
      */
     static fromDefinition(definition: CounterDefinition, gameLabels: GameLabels, playerId?: number): Counter {
-        const label = typeof playerId !== 'undefined' ? definition.label + playerId : definition.label;
+        const label = typeof playerId !== 'undefined' && playerId !== -1 ? definition.label + playerId : definition.label;
 
         return new Counter(
             definition.number,
