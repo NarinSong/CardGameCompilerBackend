@@ -83,7 +83,8 @@
         "buttons": [
             {
                 "label": "Pass", 
-                "type": "CLICK"
+                "type": "CLICK",
+                "location": { "locationType": "relative", "location": "deck" }
             },
             {
                 "label": "Hearts",   
