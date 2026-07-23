@@ -24,6 +24,10 @@ function buildViews(game: Game): { playerId: number; view: ClientView; }[] {
     }));
 }
 
+function updateGameState(): void {
+    parentPort?.postMessage({type: "GAME_STATE", views: buildViews(game)});
+}
+
 /**
  * Handles messages from the parent thread.
  * 
@@ -37,14 +41,14 @@ parentPort?.on("message", (msg) => {
         case "START_GAME":
             game.startGame();
             if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
-            parentPort?.postMessage({type: "GAME_STATE", views: buildViews(game)});
+            updateGameState();
             break;
         case "PLAYER_CLICK":
             let actionTaken = game.clickAction(msg.label, msg.cardId, msg.playerId);
             if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
             if (actionTaken) {
                 // Update clients with new gamestate
-                parentPort?.postMessage({type: "GAME_STATE", views: buildViews(game)});
+                updateGameState();
             }
             
             break;
