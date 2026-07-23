@@ -193,12 +193,12 @@
                                         }
                                     },
                                     {
-                                        "type":  "DEAL_CARDS",
+                                        "type":  "MOVE_CARD",
                                         "primary": {
                                             "type":  "CLICKED_LABEL"
                                         },
                                         "secondary":  { "type": "LITERAL", "primary":  "Discard" },
-                                        "tertiary":  { "type": "LITERAL", "primary": 1 }
+                                        "tertiary":  { "type": "CTX_CARD" }
                                     },
                                     {
                                         "type":  "IF",

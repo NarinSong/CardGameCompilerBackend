@@ -291,4 +291,15 @@ export default class Card {
 
         return current;
     }
+
+    static removeCard(pile: Card[], card: Card): boolean {
+        for (const c in pile) {
+            if (pile[+c]?.id === card.id) {
+                pile.splice(+c, 1);
+                return true;
+            }
+        }
+        
+        return false;
+    }
 }

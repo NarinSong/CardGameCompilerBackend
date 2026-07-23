@@ -62,6 +62,7 @@ const BinaryOperatorsSchema = z.enum([
 const TernaryOperatorsSchema = z.enum([
   NODE_NAMES.Ternary,
   NODE_NAMES.DealCards,
+  NODE_NAMES.MoveCard,
   NODE_NAMES.If,
   NODE_NAMES.MoveCounterValue,
   NODE_NAMES.IsBetween,

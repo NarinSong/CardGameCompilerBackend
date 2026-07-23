@@ -126,6 +126,29 @@ const DEAL_CARDS = defineBlock({
     ] as const,
 });
 
+const MOVE_CARD = defineBlock({
+    name: NODE_NAMES.MoveCard,
+    displayName: "Move Card",
+    returnType: "Void",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "From",
+            type: "PileLabel"
+        },
+        {
+            name: "secondary",
+            displayName: "To",
+            type: "PileLabel",
+        },
+        {
+            name: "tertiary",
+            displayName: "Card",
+            type: "Card",
+        },
+    ]
+})
+
 const CREATE_PILE = defineBlock({
     name: NODE_NAMES.CreatePile,
     displayName: "Create Pile",
@@ -1425,6 +1448,7 @@ const COMMENT = defineBlock({
 export const BLOCKS = {
     UNDEFINED,
     DEAL_CARDS,
+    MOVE_CARD,
     CREATE_PILE,
     REMOVE_PILE,
     IF,

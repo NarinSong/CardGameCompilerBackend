@@ -24,6 +24,7 @@ export const NODE_NAMES = {
   UnassignRole: "UNASSIGN_ROLE",
   AssignRoleSingular: "ASSIGN_ROLE_SINGULAR",
   DealCards: "DEAL_CARDS",
+  MoveCard: "MOVE_CARD",
   If: "IF",
   CreatePile: "CREATE_PILE",
   GetIdFromRole: "GET_ID_FROM_ROLE",

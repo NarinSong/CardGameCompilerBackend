@@ -98,6 +98,23 @@ function executeDealCards(g: Game, c: ActionContext, node: ValueNode) {
     g.gameState.dealCards(evaluate(g, c, node.primary) as Label, evaluate(g, c, node.secondary) as Label, evaluate(g, c, node.tertiary) as number);
 }
 
+function executeMoveCard(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.MoveCard) throw new Error("Called executeMoveCard with an invalid node");
+
+    const fromLabel = zs(evaluate(g, c, node.primary));
+    const toLabel = zs(evaluate(g, c, node.secondary));
+    const card = zc(evaluate(g, c, node.tertiary));
+
+    const fromPile = g.gameState.piles[fromLabel]?.pile;
+    const toPile = g.gameState.piles[toLabel]?.pile;
+
+    if (!fromPile || !toPile) return;
+
+    if (Card.removeCard(fromPile.cards, card)) {
+        toPile.cards.push(card);
+    }
+}
+
 /**
  * Executes a "CREATE_PILE" value node and returns the created pile label.
  * @param g - The current game instance.
@@ -912,6 +929,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         //case 'FOR_EACH': executeForEach(g, c, node); return;
         // Game Actions
         case NODE_NAMES.DealCards: executeDealCards(g, c, node); return;
+        case NODE_NAMES.MoveCard: executeMoveCard(g, c, node); return;
         case NODE_NAMES.CreatePile: return executeCreatePile(g, c, node);
         case NODE_NAMES.CreateButton: return executeCreateButton(g, c, node);
         case NODE_NAMES.CreateCounter: return executeCreateCounter(g, c, node);
