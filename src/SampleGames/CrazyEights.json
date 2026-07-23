@@ -14,7 +14,7 @@
                 "label": "Hand",
                 "actionRoles": ["Hand"],
                 "initialState": "EMPTY",
-                "visibility": "FACE_UP"
+                "visibility": "PRIVATE"
             }
         ]
     },
