@@ -29,7 +29,8 @@ export const ButtonTypeSchema = z.enum([
 export const VisibilitySchema = z.enum([
   "FACE_UP",
   "FACE_DOWN",
-  "INVISIBLE"
+  "INVISIBLE",
+  "PRIVATE" // FACE_DOWN for everyone except the owner, who it's FACE_UP for
 ]);
 
 /**

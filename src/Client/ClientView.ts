@@ -36,6 +36,14 @@ function resolveLocation(location: LocationResolver, locations: Record<string, L
     return toReturn;
 }
 
+function resolveVisibility(vis: Visibility, owner: PlayerID, player: Player): Visibility {
+    if (vis !== Visibility.PRIVATE) return vis;
+
+    if (owner === player.id) return Visibility.FACE_UP;
+
+    return Visibility.FACE_DOWN;
+}
+
 /**
  * The current gamestate from the perspective of the client.
  * 
@@ -79,10 +87,12 @@ export default class ClientView {
      * @returns Created pileView object, else null if the pile is supposed to be invisible.
      */
     static pileView(pile: Pile, owner: number, player: Player, suitMap: ValueMap<string, number>, rankMap: ValueMap<string, number>, locations: Record<string, Location>, gameMeta: GameMeta) {
+        const vis = resolveVisibility(pile.visibility, owner, player);
+
         // Do *not* mutate pile, since it's from the gamestate
-        if (pile.visibility == Visibility.INVISIBLE) return null;
+        if (vis == Visibility.INVISIBLE) return null;
         
-        let hide = pile.visibility == Visibility.FACE_DOWN;
+        let hide = vis == Visibility.FACE_DOWN;
         
         const cards: {suit: number, rank: number, id: number}[] = [];
 
@@ -94,7 +104,7 @@ export default class ClientView {
 
         const pileView: ClientPileType = {
             owner: owner,
-            visibility: pile.visibility,
+            visibility: vis,
             label: pile.label,
             actionRoles: pile.actionRoles,
             displayName: pile.displayName,
@@ -115,14 +125,16 @@ export default class ClientView {
      * @returns Created counterView object, else null if the counter is supposed to be invisible.
      */
     static counterView(counter: Counter, owner: number, player: Player, locations: Record<string, Location>, gameMeta: GameMeta) {
-        if (counter.visibility == Visibility.INVISIBLE) return null;
+        const vis = resolveVisibility(counter.visibility, owner, player);
 
-        let hide = counter.visibility == Visibility.FACE_DOWN;
+        if (vis == Visibility.INVISIBLE) return null;
+
+        let hide = vis == Visibility.FACE_DOWN;
 
         const counterView: ClientCounterType = {
             owner: owner,
             value: hide ? 0 : counter.value,
-            visibility: counter.visibility,
+            visibility: vis,
             label: counter.label,
             displayName: counter.displayName,
             actionRoles: counter.actionRoles,
@@ -142,13 +154,15 @@ export default class ClientView {
      * @returns Created buttonView object, else null if the counter is supposed to be invisible.
      */
     static buttonView(button: Button, owner: number, player: Player, locations: Record<string, Location>, gameMeta: GameMeta) {
-        if (button.visibility == Visibility.INVISIBLE) return null;
+        const vis = resolveVisibility(button.visibility, owner, player);
 
-        //let hide = button.visibility == Visibility.FACE_DOWN;
+        if (vis == Visibility.INVISIBLE) return null;
+
+        //let hide = vis == Visibility.FACE_DOWN;
 
         const buttonView: ClientButtonType = {
             owner: owner,
-            visibility: button.visibility,
+            visibility: vis,
             label: button.label,
             displayName: button.displayName,
             actionRoles: button.actionRoles,
