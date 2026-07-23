@@ -105,7 +105,8 @@ export const LocationResolverSchema = z.discriminatedUnion('locationType', [
   }),
   z.object({
     locationType: z.literal('relative'),
-    location: z.string()
+    location: z.string(),
+    ownerLocation: z.string().optional().or(z.undefined()),
   })
 ]);
 export const ButtonRangeSchema = z.object({

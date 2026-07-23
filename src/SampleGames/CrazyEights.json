@@ -6,6 +6,52 @@
         "description": "The OG Uno. First to play all their cards, wins!",
         "variables": {
             "CurrentSuit": "Suit"
+        },
+        "locations": {
+            "opponent": {
+                "anchor": {
+                    "x": -800,
+                    "y": 420
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 130,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
+            "deck": {
+                "anchor": {
+                    "x": -130,
+                    "y": 0
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 130,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
+            "yours": {
+                "anchor": {
+                    "x": -800,
+                    "y": -420
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": 180,
+                "horizontalOffset": 130,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
+            "wilds": {
+                "anchor": {
+                    "x": -500,
+                    "y": -150
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": 100,
+                "horizontalOffset": 250,
+                "wraptAt": 800,
+                "wrapTo": -800
+            }
         }
     },
     "playerDefinition": {
@@ -14,7 +60,8 @@
                 "label": "Hand",
                 "actionRoles": ["Hand"],
                 "initialState": "EMPTY",
-                "visibility": "PRIVATE"
+                "visibility": "PRIVATE",
+                "location": { "locationType": "relative", "location": "opponent", "ownerLocation": "yours" }
             }
         ]
     },
@@ -23,12 +70,14 @@
             {
                 "label": "Deck",
                 "initialState": "SHUFFLED",
-                "visibility": "FACE_DOWN"
+                "visibility": "FACE_DOWN",
+                "location": { "locationType": "relative", "location": "deck" }
             },
             {
                 "label": "Discard",
                 "initialState": "EMPTY",
-                "visibility": "FACE_UP"
+                "visibility": "FACE_UP",
+                "location": { "locationType": "relative", "location": "deck" }
             }
         ],
         "buttons": [
@@ -40,25 +89,29 @@
                 "label": "Hearts",   
                 "actionRoles": ["suitSelection"], 
                 "type": "CLICK", 
-                "visibility": "INVISIBLE"
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "wilds" }
             },
             {
                 "label": "Clubs",   
                 "actionRoles": ["suitSelection"], 
                 "type": "CLICK", 
-                "visibility": "INVISIBLE"
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "wilds" }
             },
             {
                 "label": "Spades",   
                 "actionRoles": ["suitSelection"], 
                 "type": "CLICK", 
-                "visibility": "INVISIBLE"
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "wilds" }
             },
             {
                 "label": "Diamonds",   
                 "actionRoles": ["suitSelection"], 
                 "type": "CLICK", 
-                "visibility": "INVISIBLE"
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "wilds" }
             }
         ]
     },

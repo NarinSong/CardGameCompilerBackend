@@ -24,14 +24,19 @@ type ClientPlayerType = { playerId: PlayerID, type: PlayerType };
  * @param gameMeta - The game meta used to compute the next location.
  * @returns The resolved concrete Location.
  */
-function resolveLocation(location: LocationResolver, locations: Record<string, Location>, gameMeta: GameMeta): Location {
+function resolveLocation(location: LocationResolver, locations: Record<string, Location>, gameMeta: GameMeta, isOwner: boolean): Location {
     if (location.locationType === 'exact') return location.location;
 
+    const toResolve =
+        location.ownerLocation && isOwner ?
+            location.ownerLocation :
+            location.location;
+
     const toReturn = gameMeta.nextLocation(
-        location.location, locations[location.location]
+        toResolve, locations[toResolve]
     );
 
-    locations[location.location] = toReturn;
+    locations[toResolve] = toReturn;
 
     return toReturn;
 }
@@ -109,7 +114,7 @@ export default class ClientView {
             actionRoles: pile.actionRoles,
             displayName: pile.displayName,
             cards: cards,
-            location: resolveLocation(pile.location, locations, gameMeta),
+            location: resolveLocation(pile.location, locations, gameMeta, owner === player.id),
         };
 
         return pileView;
@@ -138,7 +143,7 @@ export default class ClientView {
             label: counter.label,
             displayName: counter.displayName,
             actionRoles: counter.actionRoles,
-            location: resolveLocation(counter.location, locations, gameMeta),
+            location: resolveLocation(counter.location, locations, gameMeta, owner === player.id),
         }
 
         return counterView;
@@ -168,7 +173,7 @@ export default class ClientView {
             actionRoles: button.actionRoles,
             type: button.type,
             range: button.range,
-            location: resolveLocation(button.location, locations, gameMeta),
+            location: resolveLocation(button.location, locations, gameMeta, owner === player.id),
         }
 
         return buttonView;
