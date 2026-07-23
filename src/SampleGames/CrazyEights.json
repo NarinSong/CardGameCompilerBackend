@@ -21,12 +21,12 @@
             },
             "deck": {
                 "anchor": {
-                    "x": -130,
+                    "x": -250,
                     "y": 0
                 },
                 "direction": "HORIZONTAL",
                 "verticalOffset": -180,
-                "horizontalOffset": 130,
+                "horizontalOffset": 250,
                 "wraptAt": 800,
                 "wrapTo": -800
             },
