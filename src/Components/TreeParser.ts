@@ -1,6 +1,6 @@
 import Game from "../Game/Game.js";
 import { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
-import { ButtonRange, ButtonType, CardSchema, LocationResolver, PileState, rank, suit, Visibility } from "../schemas/types.js";
+import { ButtonRange, ButtonType, CardSchema, LocationResolver, PileState, PlayerID, rank, suit, Visibility } from "../schemas/types.js";
 import Card from "./Card.js";
 
 // Using Zod schemas
@@ -685,6 +685,58 @@ function evaluateDisplayName(g: Game, c: ActionContext, node: ValueNode) {
     return g.players[playerId]?.displayName;
 }
 
+function evaluateNumPlayers(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.NumPlayers) throw new Error("Called evaluateNumPlayers with invalid node");
+
+    let numPlayers = 0;
+    for (let i in g.gameState.players) {
+        if (g.gameState.players[i] && g.gameState.players[i].state === 'Active') numPlayers++;
+    }
+
+    return numPlayers;
+}
+
+function evaluatePlayerScore(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.PlayerScore) throw new Error("Called evaluatePlayerScore with invalid node");
+
+    const playerId = zn(evaluate(g, c, node.primary)) as PlayerID;
+    const player = g.players[playerId];
+
+    return player?.score;
+}
+
+function evaluatePlayerStatus(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.PlayerStatus) throw new Error("Called evaluatePlayerStatus with invalid node");
+
+    const playerId = zn(evaluate(g, c, node.primary)) as PlayerID;
+    const player = g.players[playerId];
+
+    return player?.state;
+}
+
+function evaluateSetScore(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.SetScore) throw new Error("Called evaluateSetScore with invalid node");
+
+    const playerId = zn(evaluate(g, c, node.primary)) as PlayerID;
+    const player = g.players[playerId];
+    const score = zn(evaluate(g, c, node.secondary));
+
+    player!.score = score;
+
+    return score;
+}
+
+function evaluateRevive(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.Revive) throw new Error("Called evaluateRevive with invalid node");
+
+    const playerId = zn(evaluate(g, c, node.primary)) as PlayerID;
+    const player = g.players[playerId];
+
+    player!.state = 'Active';
+
+    return playerId;
+}
+
 /*
 function evaluateSmallerThan(g: Game, c: ActionContext, node: ValueNode): boolean {
 
@@ -1060,6 +1112,11 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.NextPlayer: return evaluateNextPlayer(g, c, node);
         case NODE_NAMES.FirstPlayer: return evaluateFirstPlayer(g, c, node);
         case NODE_NAMES.DisplayName: return evaluateDisplayName(g, c, node);
+        case NODE_NAMES.NumPlayers: return evaluateNumPlayers(g, c, node);
+        case NODE_NAMES.PlayerScore: return evaluatePlayerScore(g, c, node);
+        case NODE_NAMES.PlayerStatus: return evaluatePlayerStatus(g, c, node);
+        case NODE_NAMES.SetScore: return evaluateSetScore(g, c, node);
+        case NODE_NAMES.Revive: return evaluateRevive(g, c, node);
         // Game info extraction
         case NODE_NAMES.Rank: return zc(evaluate(g, c, node.primary)).rank;
         case NODE_NAMES.Suit: return zc(evaluate(g, c, node.primary)).suit;

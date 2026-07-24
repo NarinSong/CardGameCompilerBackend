@@ -19,6 +19,7 @@ const OperatorlessSchema = z.enum([
   NODE_NAMES.CtxCard,
   NODE_NAMES.FirstPlayer,
   NODE_NAMES.ButtonValue,
+  NODE_NAMES.NumPlayers,
 ]);
 const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.Not,
@@ -36,6 +37,9 @@ const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.BroadcastPopup,
   NODE_NAMES.NumberToString,
   NODE_NAMES.DisplayName,
+  NODE_NAMES.PlayerScore,
+  NODE_NAMES.PlayerStatus,
+  NODE_NAMES.Revive,
 ]);
 const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.And,
@@ -67,6 +71,7 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.PileRun,
   NODE_NAMES.SetText,
   NODE_NAMES.SendPopup,
+  NODE_NAMES.SetScore,
 ]);
 
 const TernaryOperatorsSchema = z.enum([

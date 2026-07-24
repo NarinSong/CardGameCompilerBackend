@@ -1666,6 +1666,76 @@ const BROADCAST_POPUP = defineBlock({
     ]
 });
 
+const NUM_PLAYERS = defineBlock({
+    name: NODE_NAMES.NumPlayers,
+    displayName: "Number of Players",
+    returnType: "Number",
+    arguments: []
+});
+
+const PLAYER_SCORE = defineBlock({
+    name: NODE_NAMES.PlayerScore,
+    displayName: "Player's Score",
+    returnType: "Number",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "Player",
+            optional: false
+        }
+    ]
+});
+
+const PLAYER_STATUS = defineBlock({
+    name: NODE_NAMES.PlayerStatus,
+    displayName: "Player's Status",
+    returnType: "String",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "Player",
+            optional: false
+        }
+    ]
+});
+
+const SET_SCORE = defineBlock({
+    name: NODE_NAMES.SetScore,
+    displayName: "Set Score",
+    returnType: "Number",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "Player",
+            optional: false
+        },
+        {
+            name: "secondary",
+            displayName: "Score",
+            type: "Number",
+            optional: false
+        }
+    ]
+});
+
+const REVIVE = defineBlock({
+    name: NODE_NAMES.Revive,
+    displayName: "Revive",
+    returnType: "Player",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "Player",
+            optional: false
+        }
+    ]
+});
+
+
 
 // Put the blocks together in a registry to export them
 export const BLOCKS = {
@@ -1745,6 +1815,11 @@ export const BLOCKS = {
     SEND_POPUP,
     BROADCAST_POPUP,
     NUMBER_TO_STRING,
+    NUM_PLAYERS,
+    PLAYER_SCORE,
+    PLAYER_STATUS,
+    SET_SCORE,
+    REVIVE,
 } as const;
 
 export type BlockName = keyof typeof BLOCKS;

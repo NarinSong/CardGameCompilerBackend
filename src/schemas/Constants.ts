@@ -80,4 +80,9 @@ export const NODE_NAMES = {
   SendPopup: "SEND_POPUP",
   BroadcastPopup: "BROADCAST_POPUP",
   NumberToString: "NUMBER_TO_STRING",
+  NumPlayers: "NUM_PLAYERS",
+  PlayerScore: "PLAYER_SCORE",
+  SetScore: "SET_SCORE",
+  PlayerStatus: "PLAYER_STATUS",
+  Revive: "REVIVE",
 } as const;

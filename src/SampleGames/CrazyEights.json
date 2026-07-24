@@ -11,7 +11,7 @@
             "opponent": {
                 "anchor": {
                     "x": -800,
-                    "y": 420
+                    "y": 410
                 },
                 "direction": "HORIZONTAL",
                 "verticalOffset": -180,
@@ -33,7 +33,7 @@
             "yours": {
                 "anchor": {
                     "x": -800,
-                    "y": -420
+                    "y": -410
                 },
                 "direction": "HORIZONTAL",
                 "verticalOffset": 180,
