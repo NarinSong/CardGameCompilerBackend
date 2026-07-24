@@ -15,6 +15,7 @@ export const ValueTypes = {
   PileLabel: z.string(),
   CounterLabel: z.string(),
   ButtonLabel: z.string(),
+  TextLabel: z.string(),
   ActionRole: z.string(),
   PileState: PileStateSchema,
   Visibility: VisibilitySchema,
@@ -406,6 +407,40 @@ const STRING_EQ = defineBlock({
     ]
 });
 
+const STRING_JOIN = defineBlock({
+    "name": NODE_NAMES.StringJoin,
+    "displayName": "String Join",
+    "returnType": "String",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Left",
+            "type": "String",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Right",
+            "type": "String",
+            "optional": false
+        }
+    ]
+});
+
+const NUMBER_TO_STRING = defineBlock({
+    "name": NODE_NAMES.NumberToString,
+    "displayName": "Number to String",
+    "returnType": "String",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Number",
+            "type": "Number",
+            "optional": false
+        }
+    ]
+});
+
 const TERNARY = defineBlock({
     "name": NODE_NAMES.Ternary,
     "displayName": "Ternary",
@@ -784,6 +819,21 @@ const VALUE_OF = defineBlock({
     ]
 });
 
+const TEXT_VALUE_OF = defineBlock({
+    "name": NODE_NAMES.TextValueOf,
+    "displayName": "Value of Text",
+    "returnType": "String",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Text",
+            "type": "TextLabel",
+            "optional": false
+        },
+    ]
+});
+
+
 const MOVE_COUNTER_VALUE = defineBlock({
     "name": NODE_NAMES.MoveCounterValue,
     "displayName": "Move Counter Value",
@@ -841,6 +891,20 @@ const FIRST_PLAYER = defineBlock({
     "displayName": "First Player",
     "returnType": "Player",
     "arguments": []
+});
+
+const DISPLAY_NAME = defineBlock({
+    "name": NODE_NAMES.DisplayName,
+    "displayName": "Player Name",
+    "returnType": "String",
+    "arguments": [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "Player",
+            optional: false
+        }
+    ]
 });
 
 const LOCATION = defineBlock({
@@ -980,6 +1044,56 @@ const CREATE_BUTTON = defineBlock({
             "type": "ButtonRange",
             "optional": true
         },
+    ] as const
+});
+
+const CREATE_TEXT = defineBlock({
+    name: NODE_NAMES.CreateText,
+    displayName: "Create Text",
+    returnType: "TextLabel",
+    arguments: [
+        {
+            name: "text",
+            displayName: "Initial Text",
+            type: "String",
+            optional: true
+        },
+        {
+            "name": "name",
+            "displayName": "Name",
+            "type": "PileLabel",
+            "optional": true
+        },
+        {
+            "name": "visibility",
+            "displayName": "Visibility",
+            "type": "Visibility",
+            "optional": true
+        },
+        {
+            "name": "displayName",
+            "displayName": "Display Name",
+            "type": "String",
+            "optional": true
+        },
+        {
+            "name": "actionRoles",
+            "displayName": "Action Roles",
+            "type": "Array",
+            "optional": true
+        },
+        {
+            "name": "owner",
+            "displayName": "Owner",
+            "type": "Number",
+            "optional": true
+        },
+        {
+            "name": "location",
+            "displayName": "Location",
+            "type": "Location",
+            "optional": true
+        }
     ] as const
 });
 
@@ -1188,6 +1302,26 @@ const SET_COUNTER_VISIBILITY = defineBlock({
     ]
 });
 
+const SET_TEXT_VISIBILITY = defineBlock({
+    "name": NODE_NAMES.SetTextVisibility,
+    "displayName": "Set Text Visibility",
+    "returnType": "TextLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Text",
+            "type": "TextLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Visibility",
+            "type": "Visibility",
+            "optional": true
+        },
+    ]
+});
+
 const REMOVE_COUNTER = defineBlock({
     "name": NODE_NAMES.RemoveCounter,
     "displayName": "Remove Counter",
@@ -1217,6 +1351,20 @@ const REMOVE_BUTTON = defineBlock({
             "name": "primary",
             "displayName": "Button",
             "type": "ButtonLabel",
+            "optional": false
+        },
+    ]
+});
+
+const REMOVE_TEXT = defineBlock({
+    "name": NODE_NAMES.RemoveText,
+    "displayName": "Remove Text",
+    "returnType": "TextLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Text",
+            "type": "TextLabel",
             "optional": false
         },
     ]
@@ -1256,6 +1404,26 @@ const BUTTON_OF = defineBlock({
         {
             "name": "actionRole",
             "displayName": "Button's Action Role",
+            "type": "ActionRole",
+            "optional": false
+        }
+    ]
+});
+
+const TEXT_OF = defineBlock({
+    "name": NODE_NAMES.TextOf,
+    "displayName": "Get a Player's Text",
+    "returnType": "TextLabel",
+    "arguments": [
+        {
+            "name": "id",
+            "displayName": "Player ID",
+            "type": "Player",
+            "optional": false
+        },
+        {
+            "name": "actionRole",
+            "displayName": "Text's Action Role",
             "type": "ActionRole",
             "optional": false
         }
@@ -1442,7 +1610,62 @@ const COMMENT = defineBlock({
             "optional": true
         }
     ]
-})
+});
+
+const SET_TEXT = defineBlock({
+    name: NODE_NAMES.SetText,
+    displayName: "Set Text",
+    returnType: "TextLabel",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Text",
+            type: "TextLabel",
+            optional: false
+        },
+        {
+            name: "secondary",
+            displayName: "String",
+            type: "String",
+            optional: false
+        }
+    ]
+});
+
+const SEND_POPUP = defineBlock({
+    name: NODE_NAMES.SendPopup,
+    displayName: "Send Popup",
+    returnType: "Void",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "String",
+            type: "String",
+            optional: false
+        },
+        {
+            name: "secondary",
+            displayName: "To",
+            type: "Player",
+            optional: false
+        }
+    ]
+});
+
+const BROADCAST_POPUP = defineBlock({
+    name: NODE_NAMES.BroadcastPopup,
+    displayName: "Broadcast Popup",
+    returnType: "Void",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "String",
+            type: "String",
+            optional: false
+        }
+    ]
+});
+
 
 // Put the blocks together in a registry to export them
 export const BLOCKS = {
@@ -1483,9 +1706,11 @@ export const BLOCKS = {
     SHUFFLE_INTO,
     NUM_CARDS_IN_PILE,
     VALUE_OF,
+    TEXT_VALUE_OF,
     MOVE_COUNTER_VALUE,
     IS_BETWEEN,
     FIRST_PLAYER,
+    DISPLAY_NAME,
     LOCATION,
     RELATIVE_LOCATION,
     CREATE_COUNTER,
@@ -1511,6 +1736,15 @@ export const BLOCKS = {
     PILE_RUN,
     PILE_RUN_FROM,
     COMMENT,
+    CREATE_TEXT,
+    SET_TEXT,
+    SET_TEXT_VISIBILITY,
+    REMOVE_TEXT,
+    TEXT_OF,
+    STRING_JOIN,
+    SEND_POPUP,
+    BROADCAST_POPUP,
+    NUMBER_TO_STRING,
 } as const;
 
 export type BlockName = keyof typeof BLOCKS;

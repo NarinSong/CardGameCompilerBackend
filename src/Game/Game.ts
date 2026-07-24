@@ -13,7 +13,6 @@ import Logger from "../Components/Logger.js";
 import { ActionContext } from "../schemas/AST.js";
 import { evaluate } from "../Components/TreeParser.js";
 import Card from "../Components/Card";
-import Pile from "./Pile";
 
 /**
  * Represents a running game instance and its current state.
@@ -69,13 +68,13 @@ export default class Game {
      * @param type - Type of player to add.
      * @returns The created player, or null if the game is already full.
      */
-    handlePlayerJoin(type: PlayerType): Player | null {
+    handlePlayerJoin(type: PlayerType, name: string): Player | null {
         Logger.debug('Player joined');
         if (this.numPlayers < this.definition.maxPlayers) {
             // Assign the new player's id
             let id = this.nextPlayerId;
 
-            const p = new Player(this.definition.player, type, this.gameLabels, id);
+            const p = new Player(this.definition.player, type, this.gameLabels, id, name);
             this.players[id] = p;
             this.numPlayers++;
 
@@ -92,6 +91,10 @@ export default class Game {
                 this.gameState.createButtonFromDefinition(bd, id);
             }
 
+            for (let td of this.definition.player.texts) {
+                this.gameState.createTextFromDefinition(td, id);
+            }
+
             return p;
         }
         Logger.debug('Player join failure');
@@ -104,7 +107,7 @@ export default class Game {
     startGame(): void {
         while (this.numPlayers < this.definition.minPlayers) {
             // Add bots
-            this.handlePlayerJoin(PlayerType.ROBOT);
+            this.handlePlayerJoin(PlayerType.ROBOT, 'Robot');
         }
 
         // Move to step 1

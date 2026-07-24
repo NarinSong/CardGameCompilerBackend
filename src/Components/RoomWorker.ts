@@ -2,6 +2,7 @@ import { parentPort, workerData } from "node:worker_threads";
 import Game from "../Game/Game.js";
 import ClientView from "../Client/ClientView.js";
 import { buildGameFromJSON } from "../Client/GameBuilder.js";
+import { PlayerID } from "../schemas/types.js";
 
 // This is the worker thread that owns and runs the game instance.
 // It receives messages from the parent thread (Room.ts) via postMessage()
@@ -50,10 +51,14 @@ parentPort?.on("message", (msg) => {
                 // Update clients with new gamestate
                 updateGameState();
             }
+            if (game.gameState.popups.length > 0) {
+                parentPort?.postMessage({ type: "SEND_POPUPS", popups: game.gameState.popups });
+                game.gameState.popups.splice(0);
+            }
             
             break;
         case "JOIN_ROOM":
-            const player = game.handlePlayerJoin(msg.playerType);
+            const player = game.handlePlayerJoin(msg.playerType, msg.playerName);
             if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
             parentPort?.postMessage({
                 type: "PLAYER_JOINED",

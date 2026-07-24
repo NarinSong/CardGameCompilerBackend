@@ -185,6 +185,21 @@ function executeCreateCounter(g: Game, c: ActionContext, node: ValueNode) {
             });
 }
 
+function executeCreateText(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.CreateText) throw new Error("Called executeCreateText with an invalid node");
+    
+    // Note: Any of these could be "UNDEFINED" nodes, which will then be given default values
+    return g.gameState.createText({
+                text: evaluate(g, c , node.text) as string | undefined,
+                name: evaluate(g, c, node.name) as string | undefined,
+                visibility: evaluate(g, c, node.visibility) as Visibility | undefined,
+                actionRoles: evaluate(g, c, node.actionRoles) as string[] | undefined,
+                displayName: evaluate(g, c, node.displayName) as string | undefined,
+                owner: evaluate(g, c, node.owner) as number | undefined,
+                location: evaluate(g, c, node.location) as LocationResolver | undefined,
+            });
+}
+
 /**
  * Executes a "REMOVE_PILE" action node.
  * @param g - The current game instance.
@@ -227,10 +242,19 @@ function executeRemoveCounter(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.RemoveCounter) throw new Error("Called executeRemoveCounter with an invalid node");
 
     g.gameState.removeCounterByLabel(
-        evaluate(g, c, node.primary) as Label,
+        zs(evaluate(g, c, node.primary)) as Label,
         evaluate(g, c, node.secondary) as Label | undefined
     )
 }
+
+function executeRemoveText(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.RemoveText) throw new Error("Called executeRemoveText with an invalid node");
+
+    g.gameState.removeTextByLabel(
+        zs(evaluate(g, c, node.primary)) as Label
+    )
+}
+
 
 /**
  * Executes a "SHUFFLE_INTO" action node.
@@ -299,6 +323,19 @@ function executeSetCounterValue(g: Game, c: ActionContext, node: ValueNode) {
     }
 
     return counterLabel;
+}
+
+function executeSetText(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.SetText) throw new Error("Called executeSetText with an invalid node");
+
+    const textLabel = zs(evaluate(g, c, node.primary)) as Label;
+    const text = g.gameState.texts[textLabel];
+    
+    if (text) {
+        text.text.text = (zs(evaluate(g, c, node.secondary)));
+    }
+
+    return textLabel;
 }
 
 /**
@@ -389,6 +426,19 @@ function executeSetPileVisibility(g: Game, c: ActionContext, node: ValueNode) {
     return pileLabel;
 }
 
+function executeSetTextVisibility(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.SetTextVisibility) throw new Error("Called executeSetTextVisibility with an invalid node");
+
+    const textLabel = zs(evaluate(g, c, node.primary)) as Label;
+    const text = g.gameState.texts[textLabel];
+    
+    if (text) {
+        text.text.visibility = (evaluate(g, c, node.secondary) as Visibility);
+    }
+
+    return textLabel;
+}
+
 /**
  *  Executes a "GET_ID_FROM_ROLE" action node.
  * @param g - The current game instance.
@@ -477,6 +527,23 @@ function evaluateButtonOf(g: Game, c: ActionContext, node: ValueNode) {
 
     return null;
 }
+
+function evaluateTextOf(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.TextOf) throw new Error("Called evaluateTextOf with an invalid node");
+
+    const playerId = zn(evaluate(g, c, node.primary));
+    const actionRole = zs(evaluate(g, c, node.secondary));
+
+    for (let p in g.gameState.texts) {
+        const text = g.gameState.texts[p];
+        if (text?.owner === playerId
+            && text.text.actionRoles.includes(actionRole)
+        ) return p;
+    }
+
+    return null;
+}
+
 
 /**
  * Executes a "HAS_ROLE" action node.
@@ -608,6 +675,14 @@ function evaluateFirstPlayer(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.FirstPlayer) throw new Error("Called evaluateFirstPlayer with invalid node");
 
     return 0; // First player's id is always 0. TODO: allow gameMeta to change how this works
+}
+
+function evaluateDisplayName(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.DisplayName) throw new Error("Called evaluateDisplayName with invalid node");
+
+    const playerId = zn(evaluate(g, c, node.primary));
+
+    return g.players[playerId]?.displayName;
 }
 
 /*
@@ -879,6 +954,24 @@ function executeLose(g: Game, c: ActionContext, node: ValueNode) {
     // TODO: end the game
 }
 
+function executeSendPopup(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.SendPopup) throw new Error("Called executeSendPopup with invalid node");
+
+    const message = zs(evaluate(g, c, node.primary));
+    const playerId = zn(evaluate(g, c, node.secondary));
+
+    g.gameState.sendPopup(message, playerId);
+}
+
+
+function executeBroadcastPopup(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.BroadcastPopup) throw new Error("Called executeBroadcastPopup with invalid node");
+
+    const message = zs(evaluate(g, c, node.primary));
+
+    g.gameState.sendPopup(message);
+}
+
 // Note: calls to evaluate should *always* be wrapped in a try-catch :)
 /**
  * Evaluates an AST node within the current game and action context.
@@ -914,6 +1007,8 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.Div: return zn(evaluate(g, c, node.primary)) / zn(evaluate(g, c, node.secondary));
         // Strings
         case NODE_NAMES.StringEq: return zs(evaluate(g, c, node.primary)) == zs(evaluate(g, c, node.secondary));
+        case NODE_NAMES.StringJoin: return zs(evaluate(g, c, node.primary)) + zs(evaluate(g, c, node.secondary));
+        case NODE_NAMES.NumberToString: return '' + (zn(evaluate(g, c, node.primary)));
         // Location
         case NODE_NAMES.Location: return { type: 'exact', location: { x: zn(evaluate(g, c, node.primary)), y: zn(evaluate(g, c, node.secondary)) } };
         case NODE_NAMES.RelativeLocation: return { type: 'relative', location: zs(evaluate(g, c, node.primary)) };
@@ -933,16 +1028,20 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.CreatePile: return executeCreatePile(g, c, node);
         case NODE_NAMES.CreateButton: return executeCreateButton(g, c, node);
         case NODE_NAMES.CreateCounter: return executeCreateCounter(g, c, node);
+        case NODE_NAMES.CreateText: return executeCreateText(g, c, node);
         case NODE_NAMES.RemovePile: executeRemovePile(g, c, node); return;
         case NODE_NAMES.RemoveButton: executeRemoveButton(g, c, node); return;
         case NODE_NAMES.RemoveCounter: executeRemoveCounter(g, c, node); return;
+        case NODE_NAMES.RemoveText: executeRemoveText(g, c, node); return;
         case NODE_NAMES.ShuffleInto: return executeShuffleInto(g, c, node);
         case NODE_NAMES.MoveCounterValue: executeMoveCounterValue(g, c, node); return;
         case NODE_NAMES.SetCounterValue: return executeSetCounterValue(g, c, node);
+        case NODE_NAMES.SetText: return executeSetText(g, c, node);
         case NODE_NAMES.SetRange: return executeSetRange(g, c, node);
         case NODE_NAMES.SetCounterVisibility: return executeSetCounterVisibility(g, c, node);
         case NODE_NAMES.SetButtonVisisibility: return executeSetButtonVisibility(g, c, node);
         case NODE_NAMES.SetPileVisibility: return executeSetPileVisibility(g, c, node);
+        case NODE_NAMES.SetTextVisibility: return executeSetTextVisibility(g, c, node);
         // Action context
         case NODE_NAMES.ClickedLabel: return c.label;
         case NODE_NAMES.CtxCard: return c.card;
@@ -953,17 +1052,20 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.PileOf: return evaluatePileOf(g, c, node);
         case NODE_NAMES.CounterOf: return evaluateCounterOf(g, c, node);
         case NODE_NAMES.ButtonOf: return evaluateButtonOf(g, c, node);
+        case NODE_NAMES.TextOf: return evaluateTextOf(g, c, node);
         case NODE_NAMES.HasRole: return evaluateIdHasRole(g, c, node);
         case NODE_NAMES.AssignRole: return evaluateAssignRole(g, c, node);
         case NODE_NAMES.UnassignRole: return evaluateUnassignRole(g, c, node);
         case NODE_NAMES.AssignRoleSingular: return evaluateAssignRoleSingular(g, c, node);
         case NODE_NAMES.NextPlayer: return evaluateNextPlayer(g, c, node);
         case NODE_NAMES.FirstPlayer: return evaluateFirstPlayer(g, c, node);
+        case NODE_NAMES.DisplayName: return evaluateDisplayName(g, c, node);
         // Game info extraction
         case NODE_NAMES.Rank: return zc(evaluate(g, c, node.primary)).rank;
         case NODE_NAMES.Suit: return zc(evaluate(g, c, node.primary)).suit;
         case NODE_NAMES.NumCardsInPile: return (g.gameState.piles[zs(evaluate(g, c, node.primary))])?.pile.cards.length;
         case NODE_NAMES.ValueOf: return g.gameState.counters[zs(evaluate(g, c, node.primary))]?.counter.value;
+        case NODE_NAMES.TextValueOf: return g.gameState.texts[zs(evaluate(g, c, node.primary))]?.text.text;
         case NODE_NAMES.CardOfPile: return ( (g.gameState.piles[zs(evaluate(g, c, node.primary))])?.pile.cards[zmn(evaluate(g, c, node.secondary)) ?? 0] );
         // Pile Evaluation
         case NODE_NAMES.PileSet: return evaluatePileSet(g, c, node);
@@ -982,6 +1084,9 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         // Game ending
         case NODE_NAMES.Win: executeWin(g, c, node); return;
         case NODE_NAMES.Lose: executeLose(g, c, node); return;
+        // Informing players
+        case NODE_NAMES.SendPopup: executeSendPopup(g, c, node); return;
+        case NODE_NAMES.BroadcastPopup: executeBroadcastPopup(g, c, node); return;
     }
 
     //throw new Error(`Unsupported type ${node.type}`);

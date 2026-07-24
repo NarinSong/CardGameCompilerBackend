@@ -7,7 +7,7 @@ import { Worker } from "node:worker_threads";
 
 import GameManager from "../GameManager.js";
 import { ClientID, LobbyID, PlayerID, PlayerType, RoomID, GameID } from "../schemas/types.js";
-import { sendClientGamestate, sendReaction } from "../index.js";
+import { sendClientGamestate, sendPopup, sendReaction } from "../index.js";
 import ClientView from "../Client/ClientView.js";
 
 
@@ -66,7 +66,9 @@ export default class Room {
                 case "GAME_ABORTED":
                     GameManager.closeRoom(this);
                     break;
-
+                case "SEND_POPUPS":
+                    this.emitPopups(msg.popups);
+                    break;
             }
         });
 
@@ -106,8 +108,25 @@ export default class Room {
 
             sendClientGamestate(client.identifier,  playerView.view );
         }
+    }
 
+    emitOnePopup(popup: { message: string, player: number | null }) {
+        for (const clientId in this.clients) {
+            const playerId = this.clients[clientId];
+            const client = GameManager.clientFromId(+clientId);
+            if(!client) continue;
 
+            if (popup.player === null || popup.player == playerId)
+
+            sendPopup(+clientId, popup.message);
+        }
+    }
+
+    emitPopups(popups: { message: string, player: number | null }[]){
+        for (const popup of popups) {
+            if (!popup) continue;
+            this.emitOnePopup(popup);
+        }
     }
 
     /**
@@ -171,7 +190,7 @@ export default class Room {
                 resolve(true)
             };
             this.worker.on("message", listener);
-            this.worker.postMessage({ type: "JOIN_ROOM", playerType: PlayerType.HUMAN });
+            this.worker.postMessage({ type: "JOIN_ROOM", playerType: PlayerType.HUMAN, playerName: client.displayName });
         });
        
     }

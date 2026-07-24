@@ -9,11 +9,13 @@ import Pile from "../Game/Pile.js";
 import Player from "../Game/Player.js";
 import Button from "../Game/Button.js";
 import GameMeta from "../Rules/GameMeta.js";
+import Text from "../Game/Text.js";
 
 type ClientPileType = { owner: number, visibility: Visibility, cards: {suit: number, rank: number, id: number}[], label: string, displayName: string, actionRoles: string[], location: Location };
 type ClientCounterType = { owner: number, visibility: Visibility, value: number, label: string, displayName: string, actionRoles: string[], location: Location };
 type ClientButtonType = { owner: number, visibility: Visibility, label: string, actionRoles: string[], displayName: string, type: ButtonType, range: { min: number | undefined, max: number | undefined, increment: number | undefined } | undefined, location: Location };
-type ClientPlayerType = { playerId: PlayerID, type: PlayerType };
+type ClientTextType = { owner: number, visibility: Visibility, text: string, label: string, displayName: string, actionRoles: string[], location: Location };
+type ClientPlayerType = { playerId: PlayerID, type: PlayerType, status: 'Won' | 'Lost' | 'Active', score: number, displayName: string };
 
 /**
  * Resolves a LocationResolver to a concrete Location.
@@ -64,6 +66,7 @@ export default class ClientView {
     readonly counters: ClientCounterType[];
     readonly buttons: ClientButtonType[];
     readonly players: ClientPlayerType[];
+    readonly texts: ClientTextType[];
 
     /**
      * Creates the ClientView.
@@ -76,11 +79,13 @@ export default class ClientView {
         piles: ClientPileType[],
         counters: ClientCounterType[],
         buttons: ClientButtonType[],
-        players: ClientPlayerType[]
+        texts: ClientTextType[],
+        players: ClientPlayerType[],
     ) {
         this.piles = piles;
         this.counters = counters;
         this.buttons = buttons;
+        this.texts = texts;
         this.players = players;
     }
 
@@ -183,6 +188,26 @@ export default class ClientView {
         return buttonView;
     }
 
+    static textView(text: Text, owner: number, player: Player, locations: Record<string, Location>, gameMeta: GameMeta) {
+        const vis = resolveVisibility(text.visibility, owner, player);
+
+        if (vis == Visibility.INVISIBLE) return null;
+
+        let hide = vis == Visibility.FACE_DOWN;
+
+        const textView: ClientTextType = {
+            owner: owner,
+            text: hide ? '' : text.text,
+            visibility: vis,
+            label: text.label,
+            displayName: text.displayName,
+            actionRoles: text.actionRoles,
+            location: resolveLocation(text.location, locations, gameMeta, owner === player.id),
+        }
+
+        return textView;
+    }
+
     /**
      * Creates the view that the client will see from the game state
      * @param g - running game instance.
@@ -194,6 +219,7 @@ export default class ClientView {
         const counters: ClientCounterType[] = [];
         const buttons: ClientButtonType[] = [];
         const players: ClientPlayerType[] = [];
+        const texts: ClientTextType[] = [];
 
         const locations: Record<string, Location> = {};
 
@@ -221,17 +247,28 @@ export default class ClientView {
             if (buttonView) buttons.push(buttonView);
         }
 
+        for (let key of Object.keys(g.gameState.texts)) {
+            let item = g.gameState.texts[key];
+            if (!item || !item.text) continue;
+
+            let textView = ClientView.textView(item.text, item.owner, p, locations, g.definition.gameMeta);
+            if (textView) texts.push(textView);
+        }
+
         const gamePlayers = Object.entries(g.gameState.players);
 
         for (let player of gamePlayers) {
             players.push({
                 playerId: player[1].id,
-                type: player[1].type
+                type: player[1].type,
+                displayName: player[1].displayName,
+                score: player[1].score,
+                status: player[1].state,
             })
         }
 
         return new ClientView(
-            piles, counters, buttons, players
+            piles, counters, buttons, texts, players
         );
     }
 }

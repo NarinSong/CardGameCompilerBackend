@@ -1,7 +1,7 @@
 import ValueMap, { CardValueMap, DEFAULT_CARD_RANK_MAP, DEFAULT_CLIENT_VIEW_RANK_MAP, DEFAULT_CLIENT_VIEW_SUIT_MAP, DEFAULT_VALUE_MAP } from "../Components/ValueMap.js";
 import { ValueTypeName } from "../schemas/Blocks.js";
 import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
-import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DefaultLocation, Location } from "../schemas/types.js";
+import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DEFAULT_TEXT_LOCATION, DefaultLocation, Location } from "../schemas/types.js";
 
 
 /**
@@ -46,6 +46,7 @@ export default class GameMeta {
             'DEFAULT_PILE': DEFAULT_PILE_LOCATION,
             'DEFAULT_BUTTON': DEFAULT_BUTTON_LOCATION,
             'DEFAULT_COUNTER': DEFAULT_COUNTER_LOCATION,
+            'DEFAULT_TEXT': DEFAULT_TEXT_LOCATION
         };
 
         this.addLocations(obj.locations ?? {});
@@ -69,7 +70,7 @@ export default class GameMeta {
     static locationOffset(current: number, offset: number, threshold: number, wrapTo: number): { value: number, wrapped: boolean } {
         current += offset;
         let wrapped = false;
-        if (current > threshold) {
+        if ((offset > 0 && current > threshold) || (offset < 0 && current < threshold)) {
             current = wrapTo;
             wrapped = true;
         }

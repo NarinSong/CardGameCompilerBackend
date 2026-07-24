@@ -219,6 +219,17 @@ export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
     wraptAt: 780,
     wrapTo: -780,
 };
+export const DEFAULT_TEXT_LOCATION: DefaultLocation = {
+    anchor: {
+        x: -780,
+        y: 450,
+    },
+    direction: "VERTICAL",
+    verticalOffset: -100,
+    horizontalOffset: 250,
+    wraptAt: -450,
+    wrapTo: 450,
+};
 
 // Default deck. TODO: Switch to RANKENUM.ACE, etc. so that it's more readable
 export const DEFAULT_DECK_DEFINITION: DeckDefinition = [

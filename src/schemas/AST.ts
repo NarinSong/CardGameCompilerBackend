@@ -29,8 +29,13 @@ const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.NextPlayer,
   NODE_NAMES.NumCardsInPile,
   NODE_NAMES.ValueOf,
+  NODE_NAMES.TextValueOf,
   NODE_NAMES.RemoveButton,
+  NODE_NAMES.RemoveText,
   NODE_NAMES.RelativeLocation,
+  NODE_NAMES.BroadcastPopup,
+  NODE_NAMES.NumberToString,
+  NODE_NAMES.DisplayName,
 ]);
 const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.And,
@@ -40,6 +45,7 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.Div,
   NODE_NAMES.Minus,
   NODE_NAMES.StringEq,
+  NODE_NAMES.StringJoin,
   NODE_NAMES.Map,
   NODE_NAMES.While,
   NODE_NAMES.LessThan,
@@ -53,10 +59,14 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.SetCounterVisibility,
   NODE_NAMES.SetButtonVisisibility,
   NODE_NAMES.SetPileVisibility,
+  NODE_NAMES.SetTextVisibility,
   NODE_NAMES.RemoveCounter,
   NODE_NAMES.CounterOf,
   NODE_NAMES.ButtonOf,
+  NODE_NAMES.TextOf,
   NODE_NAMES.PileRun,
+  NODE_NAMES.SetText,
+  NODE_NAMES.SendPopup,
 ]);
 
 const TernaryOperatorsSchema = z.enum([
@@ -189,6 +199,15 @@ export type AST_Node =
   location: AST_Node;
   buttonType: AST_Node;
   range: AST_Node;
+} | {
+  type: typeof NODE_NAMES.CreateText;
+  text: AST_Node;
+  name: AST_Node;
+  visibility: AST_Node;
+  actionRoles: AST_Node;
+  displayName: AST_Node;
+  owner: AST_Node;
+  location: AST_Node;
 };
 
 export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
@@ -271,6 +290,17 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
       location: ValueNodeSchema,
       buttonType: ValueNodeSchema,
       range: ValueNodeSchema,
+    }),
+
+    z.object({
+      type: z.literal(NODE_NAMES.CreateText),
+      text: ValueNodeSchema,
+      name: ValueNodeSchema,
+      visibility: ValueNodeSchema,
+      actionRoles: ValueNodeSchema,
+      displayName: ValueNodeSchema,
+      owner: ValueNodeSchema,
+      location: ValueNodeSchema,
     }),
 
     z.object({

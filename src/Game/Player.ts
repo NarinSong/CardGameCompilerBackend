@@ -14,6 +14,9 @@ import Pile from "./Pile";
 export default class Player {
     type: PlayerType;
     id: PlayerID;
+    displayName: string;
+    state: 'Won' | 'Lost' | 'Active' = 'Active';
+    score: number = 0;
 
     /**
      * Creates a new player.
@@ -22,8 +25,9 @@ export default class Player {
      * @param gameLabels - The game's label manager.
      * @param id - Unique identifier assigned to the player. 
      */
-    constructor(definition: PlayerDefinition, type: PlayerType, gameLabels: GameLabels, id: PlayerID) {
+    constructor(definition: PlayerDefinition, type: PlayerType, gameLabels: GameLabels, id: PlayerID, displayName: string) {
         this.type = type;
         this.id = id;
+        this.displayName = displayName;
     }
 }
