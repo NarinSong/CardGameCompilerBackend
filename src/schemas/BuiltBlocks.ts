@@ -134,6 +134,7 @@ function validateArray(node: ArrayNode): void {
     }
   }
 }
+
 function validateBlock(node: BlockNode): void {
   const block = BLOCKS[node.block as BlockName];
 
@@ -160,7 +161,8 @@ function validateBlock(node: BlockNode): void {
       continue;
     }
 
-    if (actualType !== argDef.type) {
+    // Kind of a loose comparison but it'll allow any "string" to match with any other "string" and vice-versa
+    if (ValueTypes[actualType].type !== ValueTypes[argDef.type].type) {
       throw new Error(
         `Type mismatch for ${argDef.name}: expected ${argDef.type}, got ${actualType}`
       );
