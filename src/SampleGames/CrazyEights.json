@@ -189,7 +189,7 @@
                         {
                             "trigger": { "type": "CLICK", "target": "Hand" },
                             "filter": {
-                                "type":  "AND",
+                                "type": "AND",
                                 "primary": {
                                     "type":  "HAS_ROLE",
                                     "id": {
@@ -198,35 +198,51 @@
                                     "role":  { "type": "LITERAL", "primary":  "active" }
                                 },
                                 "secondary": {
-                                    "type":  "OR",
+                                    "type": "OR",
                                     "primary": {
-                                        "type":  "EQUAL",
+                                        "type": "STRING_EQ",
                                         "primary": {
-                                            "type":  "RANK",
-                                            "primary": {
-                                                "type":  "CARD_OF_PILE",
-                                                "primary":  { "type": "LITERAL", "primary":  "Discard" },
-                                                "secondary":  { "type": "LITERAL", "primary": 0 }
-                                            }
-                                        },
-                                        "secondary": {
                                             "type":  "RANK",
                                             "primary": {
                                                 "type":  "CTX_CARD"
                                             }
+                                        },
+                                        "secondary": {
+                                            "type": "LITERAL",
+                                            "primary": "Eight"
                                         }
                                     },
                                     "secondary": {
-                                        "type":  "EQUAL",
+                                        "type": "OR",
                                         "primary": {
-                                            "type":  "GET_VARIABLE",
-                                            "name":  { "type": "LITERAL", "primary": "CurrentSuit" },
-                                            "variableType":  "Suit"
+                                            "type":  "STRING_EQ",
+                                            "primary": {
+                                                "type":  "RANK",
+                                                "primary": {
+                                                    "type":  "CARD_OF_PILE",
+                                                    "primary":  { "type": "LITERAL", "primary":  "Discard" },
+                                                    "secondary":  { "type": "LITERAL", "primary": 0 }
+                                                }
+                                            },
+                                            "secondary": {
+                                                "type":  "RANK",
+                                                "primary": {
+                                                    "type":  "CTX_CARD"
+                                                }
+                                            }
                                         },
                                         "secondary": {
-                                            "type":  "SUIT",
+                                            "type":  "STRING_EQ",
                                             "primary": {
-                                                "type":  "CTX_CARD"
+                                                "type":  "GET_VARIABLE",
+                                                "name":  { "type": "LITERAL", "primary": "CurrentSuit" },
+                                                "variableType":  "Suit"
+                                            },
+                                            "secondary": {
+                                                "type":  "SUIT",
+                                                "primary": {
+                                                    "type":  "CTX_CARD"
+                                                }
                                             }
                                         }
                                     }

@@ -4,7 +4,6 @@ import pickupJson from "./Pickup.json" with { type: "json" };
 import buttonCounterJson from "./ButtonCounter.json" with { type: "json" };
 import crazyEightsJson from "./CrazyEights.json" with { type: "json" };
 import GameManager from "../GameManager.js";
-import CrazyEights from "./CrazyEights.js";
 
 const PickupGame = buildGameFromJSON(pickupJson);
 export const ButtonCounterGame = buildGameFromJSON(buttonCounterJson) as GameDefinition;
