@@ -737,6 +737,23 @@ function evaluateRevive(g: Game, c: ActionContext, node: ValueNode) {
     return playerId;
 }
 
+function evaluateCardOfPile(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.CardOfPile) throw new Error("Called evaluateCardOfPile with invalid node");
+
+    const pileLabel = zs(evaluate(g, c, node.primary)) as Label;
+    const pile = g.gameState.piles[pileLabel];
+
+    if (!pile) return;
+
+    let index = zmn(evaluate(g, c, node.secondary)) ?? 0;
+
+    if (index < 0) {
+        index = pile.pile.cards.length + index; // Index from the end
+    }
+
+    return pile.pile.cards[index];
+}
+
 /*
 function evaluateSmallerThan(g: Game, c: ActionContext, node: ValueNode): boolean {
 
@@ -1123,7 +1140,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.NumCardsInPile: return (g.gameState.piles[zs(evaluate(g, c, node.primary))])?.pile.cards.length;
         case NODE_NAMES.ValueOf: return g.gameState.counters[zs(evaluate(g, c, node.primary))]?.counter.value;
         case NODE_NAMES.TextValueOf: return g.gameState.texts[zs(evaluate(g, c, node.primary))]?.text.text;
-        case NODE_NAMES.CardOfPile: return ( (g.gameState.piles[zs(evaluate(g, c, node.primary))])?.pile.cards[zmn(evaluate(g, c, node.secondary)) ?? 0] );
+        case NODE_NAMES.CardOfPile: return evaluateCardOfPile(g, c, node);;
         // Pile Evaluation
         case NODE_NAMES.PileSet: return evaluatePileSet(g, c, node);
         case NODE_NAMES.PileSetOfRank: return evaluatePileSetOfRank(g, c, node);
