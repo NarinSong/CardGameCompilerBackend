@@ -206,7 +206,7 @@
                                             "primary": {
                                                 "type":  "CARD_OF_PILE",
                                                 "primary":  { "type": "LITERAL", "primary":  "Discard" },
-                                                "secondary":  { "type": "LITERAL", "primary": 1 }
+                                                "secondary":  { "type": "LITERAL", "primary": 0 }
                                             }
                                         },
                                         "secondary": {

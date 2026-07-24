@@ -650,6 +650,7 @@ export function clientRequestClickLabel(clientId: number, label: unknown, cardId
 
     const cardIdCheck = z
         .number()
+        .or(z.undefined())
         .safeParse(cardId);
 
     if (!cardIdCheck.success)

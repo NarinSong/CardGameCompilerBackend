@@ -964,7 +964,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.Suit: return zc(evaluate(g, c, node.primary)).suit;
         case NODE_NAMES.NumCardsInPile: return (g.gameState.piles[zs(evaluate(g, c, node.primary))])?.pile.cards.length;
         case NODE_NAMES.ValueOf: return g.gameState.counters[zs(evaluate(g, c, node.primary))]?.counter.value;
-        case NODE_NAMES.CardOfPile: return (g.gameState.piles[zs(evaluate(g, c, node.primary))])?.pile.cards[zmn(evaluate(g, c, node.secondary)) ?? 0];
+        case NODE_NAMES.CardOfPile: return ( (g.gameState.piles[zs(evaluate(g, c, node.primary))])?.pile.cards[zmn(evaluate(g, c, node.secondary)) ?? 0] );
         // Pile Evaluation
         case NODE_NAMES.PileSet: return evaluatePileSet(g, c, node);
         case NODE_NAMES.PileSetOfRank: return evaluatePileSetOfRank(g, c, node);
