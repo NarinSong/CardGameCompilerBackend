@@ -106,7 +106,7 @@ export default class ClientView {
         // Do *not* mutate pile, since it's from the gamestate
         if (vis == Visibility.INVISIBLE) return null;
         
-        let hide = vis == Visibility.FACE_DOWN;
+        let hide = vis == Visibility.FACE_DOWN || vis == Visibility.FACE_DOWN_SPREAD;
         
         const cards: {suit: number, rank: number, id: number}[] = [];
 
