@@ -109,7 +109,7 @@ export default class Card {
     static dealCards(from: Pile, to: Pile, number: number): void {
         let i = 0;
         while (i < number && from.cards.length) {
-            const card = from.cards.pop();
+            const card = from.cards.shift();
             if (card)
                 to.cards.unshift(card);
             i++;
