@@ -60,7 +60,7 @@
                 "label": "Hand",
                 "actionRoles": ["Hand"],
                 "initialState": "EMPTY",
-                "visibility": "PRIVATE",
+                "visibility": "PRIVATE_SPREAD",
                 "location": { "locationType": "relative", "location": "opponent", "ownerLocation": "yours" }
             }
         ]

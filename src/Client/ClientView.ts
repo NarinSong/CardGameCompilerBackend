@@ -42,11 +42,15 @@ function resolveLocation(location: LocationResolver, locations: Record<string, L
 }
 
 function resolveVisibility(vis: Visibility, owner: PlayerID, player: Player): Visibility {
-    if (vis !== Visibility.PRIVATE) return vis;
+    if (vis !== Visibility.PRIVATE && vis !== Visibility.PRIVATE_SPREAD) return vis;
 
-    if (owner === player.id) return Visibility.FACE_UP;
+    if (owner === player.id && vis === Visibility.PRIVATE) return Visibility.FACE_UP;
+    if (owner === player.id && vis === Visibility.PRIVATE_SPREAD) return Visibility.FACE_UP_SPREAD;
 
-    return Visibility.FACE_DOWN;
+    if (vis === Visibility.PRIVATE) return Visibility.FACE_DOWN;
+    if (vis === Visibility.PRIVATE_SPREAD) return Visibility.FACE_DOWN_SPREAD;
+    
+    throw new Error(`Unknown visibility/owner combo while evaluating visibility: ${vis}, ${owner === player.id}`);
 }
 
 /**
