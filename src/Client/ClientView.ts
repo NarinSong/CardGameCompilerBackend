@@ -191,14 +191,13 @@ export default class ClientView {
     static textView(text: Text, owner: number, player: Player, locations: Record<string, Location>, gameMeta: GameMeta) {
         const vis = resolveVisibility(text.visibility, owner, player);
 
-        if (vis == Visibility.INVISIBLE) return null;
-
-        let hide = vis == Visibility.FACE_DOWN;
+        // Text will just not display if it isn't face up
+        if (vis == Visibility.INVISIBLE || vis == Visibility.FACE_DOWN || vis == Visibility.FACE_DOWN_SPREAD) return null;
 
         const textView: ClientTextType = {
             owner: owner,
-            text: hide ? '' : text.text,
-            visibility: vis,
+            text: text.text,
+            visibility: Visibility.FACE_UP,
             label: text.label,
             displayName: text.displayName,
             actionRoles: text.actionRoles,
