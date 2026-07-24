@@ -111,7 +111,7 @@ export default class Card {
         while (i < number && from.cards.length) {
             const card = from.cards.pop();
             if (card)
-                to.cards.push(card);
+                to.cards.unshift(card);
             i++;
         }
     }

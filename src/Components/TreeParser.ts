@@ -111,7 +111,7 @@ function executeMoveCard(g: Game, c: ActionContext, node: ValueNode) {
     if (!fromPile || !toPile) return;
 
     if (Card.removeCard(fromPile.cards, card)) {
-        toPile.cards.push(card);
+        toPile.cards.unshift(card);
     }
 }
 
