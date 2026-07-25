@@ -44,6 +44,8 @@ export default class Game {
                 const action = this.currentActions.find(a=>a.trigger.type == TriggerType.AUTO && evaluate(this, this.buildAutoContext(), a.filter));
                 if (!action) return;
 
+                Logger.log('Running AUTO action in step ' + this.currentStep);
+
                 if(this.gameState.incrementAutoActionCount()){
                     this.aborted = true;
                     return;
