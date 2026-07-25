@@ -20,7 +20,7 @@
             "finalscore": {
                 "displayName": "Final Score",
                 "variableType": "Number",
-                "default": 500 
+                "defaultValue": 500 
             }
         },
         "maps": {
