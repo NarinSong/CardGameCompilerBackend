@@ -73,8 +73,13 @@ export default class GameState {
 
 
         this.gameMeta = definition.gameMeta; // Linked. Game Meta should be *immutable*
+        //this.initializeRoles(definition.gameMeta.roles);
         this.initializeBoard(definition.board);
         this.initializeConstants(definition.gameMeta.constants);
+    }
+
+    initializeRoles() {
+
     }
 
     initializeConstants(constants: Record<string, ConstantArg>) {

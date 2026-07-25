@@ -590,6 +590,8 @@ function evaluateIdHasRole(g: Game, c: ActionContext, node: ValueNode) {
 
     const role = zs(evaluate(g, c, node.role));
     const playerId = zn(evaluate(g, c, node.id));
+    
+    if (!g.gameState.roles[role]) g.gameState.roles[role] = [];
 
     return g.gameState.roles[role]?.includes(playerId) ?? false;
 }
@@ -607,6 +609,8 @@ function evaluateAssignRole(g: Game, c: ActionContext, node: ValueNode) {
 
     const role = zs(evaluate(g, c, node.role));
     const playerId = zn(evaluate(g, c, node.id));
+
+    if (!g.gameState.roles[role]) g.gameState.roles[role] = [];
 
     if (g.gameState.roles[role] && !g.gameState.roles[role].includes(playerId)) {
         g.gameState.roles[role].push(playerId);
@@ -629,6 +633,8 @@ function evaluateUnassignRole(g: Game, c: ActionContext, node: ValueNode) {
 
     const role = zs(evaluate(g, c, node.role));
     const playerId = zn(evaluate(g, c, node.id));
+
+    if (!g.gameState.roles[role]) g.gameState.roles[role] = [];
 
     if (g.gameState.roles[role]) {
         const idx = g.gameState.roles[role].indexOf(playerId);
@@ -654,6 +660,8 @@ function evaluateAssignRoleSingular(g: Game, c: ActionContext, node: ValueNode) 
 
     const role = zs(evaluate(g, c, node.role));
     const playerId = zn(evaluate(g, c, node.id));
+
+    if (!g.gameState.roles[role]) g.gameState.roles[role] = [];
 
     if (g.gameState.roles[role] && !g.gameState.roles[role].includes(playerId)) {
         g.gameState.roles[role] = [playerId];
