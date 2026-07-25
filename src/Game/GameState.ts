@@ -79,10 +79,11 @@ export default class GameState {
 
     initializeConstants(constants: Record<string, ConstantArg>) {
         // TODO: Allow custom constants from player starting the game
-        
+
         for (const c in constants) {
             if (!constants[c]) continue;
 
+            this.constants[constants[c].variableType] = {};
             this.constants[constants[c].variableType][c] = constants[c].defaultValue;
         }
     }
