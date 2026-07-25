@@ -45,7 +45,7 @@ parentPort?.on("message", (msg) => {
             updateGameState();
             break;
         case "PLAYER_CLICK":
-            let actionTaken = game.clickAction(msg.label, msg.cardId, msg.playerId);
+            let actionTaken = game.clickAction(msg.label, msg.cardId, msg.playerId, msg.buttonValue);
             if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
             if (actionTaken) {
                 // Update clients with new gamestate

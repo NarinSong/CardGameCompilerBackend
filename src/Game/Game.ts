@@ -125,7 +125,7 @@ export default class Game {
      * @param playerId
      * @returns True if a valid action was found and executed, false if no valid action was found or if the label does not map to a game object.
      */
-    clickAction(label: string, cardId: number|undefined, playerId: PlayerID): boolean {
+    clickAction(label: string, cardId: number|undefined, playerId: PlayerID, buttonValue: number | undefined): boolean {
         const actions = this.currentActions;
         if (!actions) return false;
 
@@ -140,7 +140,7 @@ export default class Game {
 
         try {
             for (let action of actions) {
-                const ctx: ActionContext = { label: label, trigger: action.trigger, player: playerId, card: card };
+                const ctx: ActionContext = { label: label, trigger: action.trigger, player: playerId, card: card, buttonValue: buttonValue };
                 if (action.trigger.type === TriggerType.CLICK && actionRoles.includes(action.trigger.target) && evaluate(this, ctx, action.filter)) {
                     console.log(`Player took action by clicking on label ${label}`);
                     this.gameState.resetAutoActionCount();

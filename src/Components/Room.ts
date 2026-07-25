@@ -134,12 +134,11 @@ export default class Room {
      * @param label - The object that the user clicked.
      * @param cardId
      * @param playerId
-     * @todo use cardId and player number to build action context
      */
-    handlePlayerClick(label: string, cardId: number|undefined, playerId: number): void {
+    handlePlayerClick(label: string, cardId: number|undefined, playerId: number, buttonValue: number|undefined): void {
         if (!this.started) return;
         this.resetInactivityTimeout();
-        this.worker.postMessage({type: "PLAYER_CLICK", label, cardId, playerId})
+        this.worker.postMessage({type: "PLAYER_CLICK", label, cardId, playerId, buttonValue})
 
     }
 
