@@ -13,7 +13,7 @@
                     "x": -800,
                     "y": 410
                 },
-                "direction": "HORIZONTAL",
+                "direction": "VERTICAL",
                 "verticalOffset": -180,
                 "horizontalOffset": 130,
                 "wraptAt": 800,

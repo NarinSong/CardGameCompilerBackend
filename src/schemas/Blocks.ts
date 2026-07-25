@@ -16,6 +16,7 @@ export const ValueTypes = {
   CounterLabel: z.string(),
   ButtonLabel: z.string(),
   TextLabel: z.string(),
+  Label: z.string(),
   ActionRole: z.string(),
   PileState: PileStateSchema,
   Visibility: VisibilitySchema,
@@ -516,6 +517,62 @@ const PILE_OF = defineBlock({
             "name": "actionRole",
             "displayName": "Pile's Action Role",
             "type": "ActionRole",
+            "optional": false
+        }
+    ]
+});
+
+const PILE_OWNER = defineBlock({
+    "name": NODE_NAMES.PileOwner,
+    "displayName": "Pile's Owner",
+    "returnType": "Player",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        }
+    ]
+});
+
+const COUNTER_OWNER = defineBlock({
+    "name": NODE_NAMES.CounterOwner,
+    "displayName": "Counter's Owner",
+    "returnType": "Player",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Counter",
+            "type": "CounterLabel",
+            "optional": false
+        }
+    ]
+});
+
+const BUTTON_OWNER = defineBlock({
+    "name": NODE_NAMES.ButtonOwner,
+    "displayName": "Button's Owner",
+    "returnType": "Player",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Button",
+            "type": "ButtonLabel",
+            "optional": false
+        }
+    ]
+});
+
+const TEXT_OWNER = defineBlock({
+    "name": NODE_NAMES.TextOwner,
+    "displayName": "Text's Owner",
+    "returnType": "Player",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Text",
+            "type": "TextLabel",
             "optional": false
         }
     ]
@@ -1604,7 +1661,7 @@ const COMMENT = defineBlock({
     "returnType": "Void",
     "arguments": [
         {
-            "name": "Comment",
+            "name": "primary",
             "displayName": "Comment",
             "type": "Void",
             "optional": true
@@ -1797,6 +1854,10 @@ export const BLOCKS = {
     SET_COUNTER_VISIBILITY,
     REMOVE_COUNTER,
     REMOVE_BUTTON,
+    PILE_OWNER,
+    COUNTER_OWNER,
+    BUTTON_OWNER,
+    TEXT_OWNER,
     COUNTER_OF,
     BUTTON_OF,
     PILE_SET,

@@ -40,6 +40,11 @@ const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.PlayerScore,
   NODE_NAMES.PlayerStatus,
   NODE_NAMES.Revive,
+  NODE_NAMES.PileOwner,
+  NODE_NAMES.CounterOwner,
+  NODE_NAMES.ButtonOwner,
+  NODE_NAMES.TextOwner,
+  NODE_NAMES.Comment,
 ]);
 const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.And,
@@ -101,6 +106,11 @@ const RoleOperatorsSchema = z.enum([
   NODE_NAMES.HasRole,
 ]);
 
+const VariableGetterSchema = z.enum([
+  NODE_NAMES.GetVariable,
+  NODE_NAMES.GetConstant,
+])
+
 const VariableOperatorsSchema = z.enum([
   NODE_NAMES.UpdateVariable,
 ])
@@ -114,6 +124,7 @@ type BinaryOperatorsNames = z.infer<typeof BinaryOperatorsSchema>;
 type TernaryOperatorsNames = z.infer<typeof TernaryOperatorsSchema>;
 type QuarnaryOperatorsNames = z.infer<typeof QuarnaryOperatorsSchema>;
 type RoleOperatorsNames = z.infer<typeof RoleOperatorsSchema>;
+type VariableGetterNames = z.infer<typeof VariableGetterSchema>;
 type VariableOperatorsNames = z.infer<typeof VariableOperatorsSchema>;
 
 // Typescript type structure
@@ -174,7 +185,7 @@ export type AST_Node =
   value: AST_Node;
   variableType: string;
 } | {
-  type: typeof NODE_NAMES.GetVariable;
+  type: VariableGetterNames;
   name: AST_Node;
   variableType: string;
 } | {
@@ -336,7 +347,7 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
     }),
 
     z.object({
-      type: z.literal(NODE_NAMES.GetVariable),
+      type: VariableGetterSchema,
       name: ValueNodeSchema,
       variableType: z.string(),
     }),

@@ -31,6 +31,7 @@ export const NODE_NAMES = {
   PileOf: "PILE_OF",
   UpdateVariable: "UPDATE_VARIABLE",
   GetVariable: "GET_VARIABLE",
+  GetConstant: "GET_CONSTANT",
   Sequence: "SEQUENCE",
   RemovePile: "REMOVE_PILE",
   While: "WHILE",
@@ -85,4 +86,8 @@ export const NODE_NAMES = {
   SetScore: "SET_SCORE",
   PlayerStatus: "PLAYER_STATUS",
   Revive: "REVIVE",
+  PileOwner: "PILE_OWNER",
+  CounterOwner: "COUNTER_OWNER",
+  ButtonOwner: "BUTTON_OWNER",
+  TextOwner: "TEXT_OWNER",
 } as const;

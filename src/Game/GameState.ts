@@ -13,6 +13,7 @@ import PileDefinition from "../Rules/PileDefinition.js";
 import StepDefinition from "../Rules/StepDefinition.js";
 import TextDefinition from "../Rules/TextDefinition.js";
 import { ValueTypeName, ValueTypeNameSchema, ValueTypeValues } from "../schemas/Blocks.js";
+import { ConstantArg } from "../schemas/GameDefinitionArgs.js";
 import { BoardID, ButtonRange, ButtonType, LocationResolver, PileState, PlayerID, Visibility } from "../schemas/types.js";
 import Board from "./Board.js";
 import Button from "./Button.js";
@@ -45,6 +46,7 @@ export default class GameState {
     #autoActionCount: number = 0;
     popups: { message: string, player: PlayerID | null }[] = [];
 
+    constants: VariableArrayType;
     variables: VariableArrayType;
 
 
@@ -65,9 +67,24 @@ export default class GameState {
         this.variables = Object.keys(ValueTypeNameSchema).reduce<EmptyVariableArrayType>(
             (prev: EmptyVariableArrayType, curr: string) => { return {...prev, [curr]: {} } }, {}
         ) as VariableArrayType;
+        this.constants = Object.keys(ValueTypeNameSchema).reduce<EmptyVariableArrayType>(
+            (prev: EmptyVariableArrayType, curr: string) => { return {...prev, [curr]: {} } }, {}
+        ) as VariableArrayType;
+
 
         this.gameMeta = definition.gameMeta; // Linked. Game Meta should be *immutable*
         this.initializeBoard(definition.board);
+        this.initializeConstants(definition.gameMeta.constants);
+    }
+
+    initializeConstants(constants: Record<string, ConstantArg>) {
+        // TODO: Allow custom constants from player starting the game
+        
+        for (const c in constants) {
+            if (!constants[c]) continue;
+
+            this.constants[constants[c].variableType][c] = constants[c].defaultValue;
+        }
     }
 
     /**
@@ -412,6 +429,10 @@ export default class GameState {
         if (!step) return;
 
         this.currentStep = step;
+    }
+
+    getConstant(type: ValueTypeName, name: string) {
+        return this.constants[type][name];
     }
 
     /**

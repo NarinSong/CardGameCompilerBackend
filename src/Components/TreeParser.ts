@@ -453,6 +453,38 @@ function evaluateIdFromRole(g: Game, c: ActionContext, node: ValueNode) {
     return g.gameState.roles[ zs(evaluate(g, c, node.role)) ]?.at( zmn(evaluate(g, c, node.index)) ?? 0 );
 }
 
+function evaluatePileOwner(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.PileOwner) throw new Error("Called evaluatePileOwner with an invalid node");
+
+    const pileLabel = zs(evaluate(g, c, node.primary)) as Label;
+
+    return g.gameState.piles[pileLabel]?.owner;
+}
+
+function evaluateCounterOwner(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.CounterOwner) throw new Error("Called evaluateCounterOwner with an invalid node");
+
+    const counterLabel = zs(evaluate(g, c, node.primary)) as Label;
+
+    return g.gameState.counters[counterLabel]?.owner;
+}
+
+function evaluateButtonOwner(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.ButtonOwner) throw new Error("Called evaluateButtonOwner with an invalid node");
+
+    const buttonLabel = zs(evaluate(g, c, node.primary)) as Label;
+
+    return g.gameState.buttons[buttonLabel]?.owner;
+}
+
+function evaluateTextOwner(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.TextOwner) throw new Error("Called evaluateTextOwner with an invalid node");
+
+    const textLabel = zs(evaluate(g, c, node.primary)) as Label;
+
+    return g.gameState.texts[textLabel]?.owner;
+}
+
 /**
  * Executes a "PILE_OF" action node.
  * @param g - The current game instance.
@@ -1060,6 +1092,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
     switch (node.type) {
         // Literal
         case NODE_NAMES.Undefined: return undefined;
+        case NODE_NAMES.Comment: return;
         case NODE_NAMES.Literal: return node.primary;
         case NODE_NAMES.Array: return executeCreateArray(g, c, node);
         // Boolean
@@ -1118,6 +1151,10 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.ButtonValue: return c.buttonValue;
         // Users and roles
         case NODE_NAMES.GetIdFromRole: return evaluateIdFromRole(g, c, node);
+        case NODE_NAMES.PileOwner: return evaluatePileOwner(g, c, node);
+        case NODE_NAMES.CounterOwner: return evaluateCounterOwner(g, c, node);
+        case NODE_NAMES.ButtonOwner: return evaluateButtonOwner(g, c, node);
+        case NODE_NAMES.TextOwner: return evaluateTextOwner(g, c, node);
         case NODE_NAMES.PileOf: return evaluatePileOf(g, c, node);
         case NODE_NAMES.CounterOf: return evaluateCounterOf(g, c, node);
         case NODE_NAMES.ButtonOf: return evaluateButtonOf(g, c, node);
@@ -1152,6 +1189,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.Map: return (g.definition.gameMeta.maps[ zs(evaluate(g, c, node.secondary)) ]?.get( evaluate(g, c, node.primary) ));
         case NODE_NAMES.UpdateVariable: return executeUpdateVariable(g, c, node);
         case NODE_NAMES.GetVariable: return g.gameState.getVariable(zs(node.variableType) as ValueTypeName, zs(evaluate(g, c, node.name) ));
+        case NODE_NAMES.GetConstant: return g.gameState.getConstant(zs(node.variableType) as ValueTypeName, zs(evaluate(g, c, node.name) ));
         // Phase and Step Logic
         case NODE_NAMES.SetPhase: executeSetPhase(g, c, node); return;
         case NODE_NAMES.SetStep: executeSetStep(g, c, node); return;
