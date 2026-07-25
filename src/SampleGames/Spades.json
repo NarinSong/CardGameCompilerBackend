@@ -109,7 +109,7 @@
                 "label": "Wins",
                 "actionRoles": ["Wins"],
                 "initialState": "EMPTY",
-                "visibility": "PRIVATE",
+                "visibility": "FACE_DOWN",
                 "location": { "locationType": "relative", "location": "opponentright", "ownerLocation": "yoursright" }
             },
             {
@@ -147,7 +147,7 @@
             {
                 "label": "Discard",
                 "initialState": "EMPTY",
-                "visibility": "FACE_DOWN",
+                "visibility": "INVISIBLE",
                 "location": { "locationType": "relative", "location": "deck" }
             }
         ],
