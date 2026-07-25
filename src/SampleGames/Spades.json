@@ -869,6 +869,11 @@
                                         "type": "SET_PILE_VISIBILITY",
                                         "primary": { "type": "LITERAL", "primary": "Play1" },
                                         "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
+                                    },
+                                    {
+                                        "type": "SET_PILE_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
                                     }
                                 ]
                             }
@@ -1900,6 +1905,11 @@
                                         "type": "SET_PILE_VISIBILITY",
                                         "primary": { "type": "LITERAL", "primary": "Play1" },
                                         "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type": "SET_PILE_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": { "type": "LITERAL", "primary": "FACE_DOWN" }
                                     },
                                     {
                                         "type": "UPDATE_VARIABLE",
