@@ -55,11 +55,11 @@
                     "x": 800,
                     "y": 410
                 },
-                "direction": "HORIZONTAL",
+                "direction": "VERTICAL",
                 "verticalOffset": -180,
                 "horizontalOffset": -130,
-                "wraptAt": -800,
-                "wrapTo": 800
+                "wraptAt": -410,
+                "wrapTo": 410
             },
             "deck": {
                 "anchor": {
@@ -80,16 +80,16 @@
                 "direction": "HORIZONTAL",
                 "verticalOffset": 180,
                 "horizontalOffset": 130,
-                "wraptAt": 800,
-                "wrapTo": -800
+                "wraptAt": 410,
+                "wrapTo": -410
             },
             "yoursright": {
                 "anchor": {
                     "x": 800,
                     "y": -410
                 },
-                "direction": "HORIZONTAL",
-                "verticalOffset": -180,
+                "direction": "VERTICAL",
+                "verticalOffset": 180,
                 "horizontalOffset": -130,
                 "wraptAt": -800,
                 "wrapTo": 800
@@ -1900,6 +1900,18 @@
                                         "type": "SET_PILE_VISIBILITY",
                                         "primary": { "type": "LITERAL", "primary": "Play1" },
                                         "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type": "UPDATE_VARIABLE",
+                                        "variableType": "Number",
+                                        "name": { "type": "LITERAL", "primary": "PlayerOneWins" },
+                                        "value": { "type": "LITERAL", "primary": 0 }
+                                    },
+                                    {
+                                        "type": "UPDATE_VARIABLE",
+                                        "variableType": "Number",
+                                        "name": { "type": "LITERAL", "primary": "PlayerTwoWins" },
+                                        "value": { "type": "LITERAL", "primary": 0 }
                                     }
                                 ]
                             }
