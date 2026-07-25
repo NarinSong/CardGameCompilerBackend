@@ -1,0 +1,825 @@
+{
+    "gameMeta": {
+        "minPlayers": 2,
+        "maxPlayers": 2,
+        "name": "Spades",
+        "description": "A two-player trick-taking game",
+        "variables": {
+            "PlayerOneBid": "Number",
+            "PlayerTwoBid": "Number",
+            "Broken": "Boolean"
+        },
+        "locations": {
+            "opponent": {
+                "anchor": {
+                    "x": -800,
+                    "y": 410
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 130,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
+            "deck": {
+                "anchor": {
+                    "x": -250,
+                    "y": 0
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 250,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
+            "yours": {
+                "anchor": {
+                    "x": -800,
+                    "y": -410
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": 180,
+                "horizontalOffset": 130,
+                "wraptAt": 800,
+                "wrapTo": -800
+            }
+        }
+    },
+    "playerDefinition": {
+        "piles": [
+            {
+                "label": "Hand",
+                "actionRoles": ["Hand"],
+                "initialState": "EMPTY",
+                "visibility": "PRIVATE_SPREAD",
+                "location": { "locationType": "relative", "location": "opponent", "ownerLocation": "yours" }
+            },
+            {
+                "label": "Wins",
+                "actionRoles": ["Wins"],
+                "initialState": "EMPTY",
+                "visibility": "PRIVATE",
+                "location": { "locationType": "relative", "location": "opponent", "ownerLocation": "yours" }
+            },
+            {
+                "label": "Choice",
+                "actionRoles": ["Choice"],
+                "initialState": "EMPTY",
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "deck" }
+            },
+            {
+                "label": "Play",
+                "actionRoles": ["Play"],
+                "initialState": "EMPTY",
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "deck" }
+            }
+        ]
+    },
+    "boardDefinition": {
+        "piles": [
+            {
+                "label": "Deck",
+                "initialState": "SHUFFLED",
+                "visibility": "FACE_DOWN",
+                "location": { "locationType": "relative", "location": "deck" }
+            },
+            {
+                "label": "Discard",
+                "initialState": "EMPTY",
+                "visibility": "FACE_DOWN",
+                "location": { "locationType": "relative", "location": "deck" }
+            }
+        ],
+        "buttons": [
+            {
+                "label": "Bid", 
+                "type": "NUMBER",
+                "location": { "locationType": "relative", "location": "deck" },
+                "range": { "min": 0, "max": 13, "increment": 1 },
+                "visibility": "INVISIBLE"
+            }
+        ]
+    },
+    "phases": [
+        {
+            "name": "Setup",
+            "steps": [
+                {
+                    "name": "first",
+                    "actions": [
+                        {
+                            "trigger": { "type": "AUTO" },
+                            "filter": null,
+                            "result": {
+                                "type": "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "ASSIGN_ROLE",
+                                        "id": { "type": "FIRST_PLAYER" },
+                                        "role": { "type": "LITERAL", "primary": "active" }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "deal" }
+                                    },
+                                    {
+                                        "type": "UPDATE_VARIABLE",
+                                        "variableType": "Boolean",
+                                        "name": "Broken",
+                                        "value": false
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "deal",
+                    "actions": [
+                        {
+                            "trigger": { "type": "AUTO" },
+                            "filter": null,
+                            "result": {
+                                "type": "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "SET_PILE_VISIBILITY",
+                                        "primary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                        },
+                                        "secondary": { "type": "LITERAL", "primary": "PRIVATE" }
+                                    },
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                        },
+                                        "tertiary": { "type": "LITERAL", "primary": 2 }
+                                    },
+                                    {
+                                        "type": "SET_PHASE",
+                                        "primary": { "type": "LITERAL", "primary": "draw" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn! Click the card you want to keep" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "draw",
+            "steps": [
+                {
+                    "name": "choose",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "Choice" },
+                            "filter": {
+                                "type": "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type": "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "MOVE_CARD",
+                                        "primary": { "type": "CLICKED_LABEL" },
+                                        "secondary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Hand" }
+                                        },
+                                        "tertiary": { "type": "CTX_CARD" }
+                                    },
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "CLICKED_LABEL" },
+                                        "secondary": { "type": "LITERAL", "primary": "Discard" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "NEXT_PLAYER",
+                                        "primary": { "type": "LITERAL", "primary": "active" }
+                                    },
+                                    {
+                                        "type": "SET_PILE_VISIBILITY",
+                                        "primary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                        },
+                                        "secondary": { "type": "LITERAL", "primary": "PRIVATE" }
+                                    },
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                        },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "accept" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn! Click the card to accept it, or click the deck to get a random card" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "accept",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "Choice" },
+                            "filter": {
+                                "type": "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type": "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "CLICKED_LABEL" },
+                                        "secondary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Hand" }
+                                        },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": { "type": "LITERAL", "primary": "Discard" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "BROADCAST_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Kept the card." }
+                                    },
+                                    {
+                                        "type": "NEXT_PLAYER",
+                                        "primary": { "type": "LITERAL", "primary": "active" }
+                                    },
+                                    {
+                                        "type": "IF",
+                                        "primary": {
+                                            "type": "EQUAL",
+                                            "primary": {
+                                                "type": "NUM_CARDS_IN_PILE",
+                                                "primary": { "type": "LITERAL", "primary": "Deck" }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": 2 }
+                                        },
+                                        "secondary": {
+                                            "type": "SEQUENCE",
+                                            "primary": [
+                                                {
+                                                    "type": "SET_STEP",
+                                                    "primary": { "type": "LITERAL", "primary": "finalchoice" }
+                                                },
+                                                {
+                                                    "type": "SEND_POPUP",
+                                                    "primary": { "type": "LITERAL", "primary": "Your turn! Click the card you want to keep" },
+                                                    "secondary": { 
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    }
+                                                },
+                                                {
+                                                    "type": "DEAL_CARDS",
+                                                    "primary": { "type": "LITERAL", "primary": "Deck" },
+                                                    "secondary": {
+                                                        "type": "PILE_OF",
+                                                        "id": {
+                                                            "type": "GET_ID_FROM_ROLE",
+                                                            "role": { "type": "LITERAL", "primary": "active" },
+                                                            "index": { "type": "UNDEFINED" }
+                                                        },
+                                                        "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                                    },
+                                                    "tertiary": { "type": "LITERAL", "primary": 2 }
+                                                }
+                                            ]
+                                        },
+                                        "tertiary": {
+                                            "type": "SEQUENCE",
+                                            "primary": [
+                                                {
+                                                    "type": "DEAL_CARDS",
+                                                    "primary": { "type": "LITERAL", "primary": "Deck" },
+                                                    "secondary": {
+                                                        "type": "PILE_OF",
+                                                        "id": {
+                                                            "type": "GET_ID_FROM_ROLE",
+                                                            "role": { "type": "LITERAL", "primary": "active" },
+                                                            "index": { "type": "UNDEFINED" }
+                                                        },
+                                                        "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                                    },
+                                                    "tertiary": { "type": "LITERAL", "primary": 1 }
+                                                },
+                                                {
+                                                    "type": "SEND_POPUP",
+                                                    "primary": { "type": "LITERAL", "primary": "Your turn! Click the card to accept it, or click the deck to get a random card" },
+                                                    "secondary": { 
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "trigger": { "type": "CLICK", "target": "Deck" },
+                            "filter": {
+                                "type": "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type": "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "CLICKED_LABEL" },
+                                        "secondary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Hand" }
+                                        },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                        },
+                                        "secondary": { "type": "LITERAL", "primary": "Discard" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "BROADCAST_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Took a random card." }
+                                    },
+                                    {
+                                        "type": "NEXT_PLAYER",
+                                        "primary": { "type": "LITERAL", "primary": "active" }
+                                    },
+                                    {
+                                        "type": "IF",
+                                        "primary": {
+                                            "type": "EQUAL",
+                                            "primary": {
+                                                "type": "NUM_CARDS_IN_PILE",
+                                                "primary": { "type": "LITERAL", "primary": "Deck" }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": 2 }
+                                        },
+                                        "secondary": {
+                                            "type": "SEQUENCE",
+                                            "primary": [
+                                                {
+                                                    "type": "SET_STEP",
+                                                    "primary": { "type": "LITERAL", "primary": "finalchoice" }
+                                                },
+                                                {
+                                                    "type": "SEND_POPUP",
+                                                    "primary": { "type": "LITERAL", "primary": "Your turn! Click the card you want to keep" },
+                                                    "secondary": { 
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    }
+                                                },
+                                                {
+                                                    "type": "DEAL_CARDS",
+                                                    "primary": { "type": "LITERAL", "primary": "Deck" },
+                                                    "secondary": {
+                                                        "type": "PILE_OF",
+                                                        "id": {
+                                                            "type": "GET_ID_FROM_ROLE",
+                                                            "role": { "type": "LITERAL", "primary": "active" },
+                                                            "index": { "type": "UNDEFINED" }
+                                                        },
+                                                        "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                                    },
+                                                    "tertiary": { "type": "LITERAL", "primary": 2 }
+                                                }
+                                            ]
+                                        },
+                                        "tertiary": {
+                                            "type": "SEQUENCE",
+                                            "primary": [
+                                                {
+                                                    "type": "DEAL_CARDS",
+                                                    "primary": { "type": "LITERAL", "primary": "Deck" },
+                                                    "secondary": {
+                                                        "type": "PILE_OF",
+                                                        "id": {
+                                                            "type": "GET_ID_FROM_ROLE",
+                                                            "role": { "type": "LITERAL", "primary": "active" },
+                                                            "index": { "type": "UNDEFINED" }
+                                                        },
+                                                        "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                                    },
+                                                    "tertiary": { "type": "LITERAL", "primary": 1 }
+                                                },
+                                                {
+                                                    "type": "SEND_POPUP",
+                                                    "primary": { "type": "LITERAL", "primary": "Your turn! Click the card to accept it, or click the deck to get a random card" },
+                                                    "secondary": { 
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "finalchoice",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "Choice" },
+                            "filter": {
+                                "type": "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type": "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "MOVE_CARD",
+                                        "primary": { "type": "CLICKED_LABEL" },
+                                        "secondary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Hand" }
+                                        },
+                                        "tertiary": { "type": "CTX_CARD" }
+                                    },
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "CLICKED_LABEL" },
+                                        "secondary": { "type": "LITERAL", "primary": "Discard" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "SET_PILE_VISIBILITY",
+                                        "primary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                        },
+                                        "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type": "NEXT_PLAYER",
+                                        "primary": { "type": "LITERAL", "primary": "active" }
+                                    },
+                                    {
+                                        "type": "SET_PILE_VISIBILITY",
+                                        "primary": {
+                                            "type": "PILE_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "actionRole": { "type": "LITERAL", "primary": "Choice" }
+                                        },
+                                        "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type": "SET_BUTTON_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "Bid" },
+                                        "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
+                                    },
+                                    {
+                                        "type": "SET_PHASE",
+                                        "primary": { "type": "LITERAL", "primary": "play" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn! Bid based on how many tricks you expect to win" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "play",
+            "steps": [
+                {
+                    "name": "firstbid",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "Bid" },
+                            "filter": {
+                                "type":  "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "UPDATE_VARIABLE",
+                                        "variableType": "Number",
+                                        "name": { 
+                                            "type": "TERNARY",
+                                            "primary": {
+                                                "type": "EQUAL",
+                                                "primary": { "type": "FIRST_PLAYER" },
+                                                "secondary": { "type": "CTX_PLAYER" }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": "PlayerOneBid" },
+                                            "tertiary": { "type": "LITERAL", "primary": "PlayerTwoBid" }
+                                        },
+                                        "value": { "type": "BUTTON_VALUE" }
+                                    },
+                                    {
+                                        "type": "BROADCAST_POPUP",
+                                        "primary": { 
+                                            "type": "STRING_JOIN", 
+                                            "primary": { "type": "LITERAL", "primary": "Bid: " },
+                                            "secondary": { 
+                                                "type": "NUMBER_TO_STRING",
+                                                "primary": { "type": "BUTTON_VALUE" }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "NEXT_PLAYER",
+                                        "primary": { "type": "LITERAL", "primary": "active" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn! Bid based on how many tricks you expect to win" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "secondbid" }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "secondbid",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "Bid" },
+                            "filter": {
+                                "type":  "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "UPDATE_VARIABLE",
+                                        "variableType": "Number",
+                                        "name": { 
+                                            "type": "TERNARY",
+                                            "primary": {
+                                                "type": "EQUAL",
+                                                "primary": { "type": "FIRST_PLAYER" },
+                                                "secondary": { "type": "CTX_PLAYER" }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": "PlayerOneBid" },
+                                            "tertiary": { "type": "LITERAL", "primary": "PlayerTwoBid" }
+                                        },
+                                        "value": { "type": "BUTTON_VALUE" }
+                                    },
+                                    {
+                                        "type": "BROADCAST_POPUP",
+                                        "primary": { 
+                                            "type": "STRING_JOIN", 
+                                            "primary": { "type": "LITERAL", "primary": "Bid: " },
+                                            "secondary": { 
+                                                "type": "NUMBER_TO_STRING",
+                                                "primary": { "type": "BUTTON_VALUE" }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "IF",
+                                        "primary": { 
+                                            "type": "GREATER_THAN", 
+                                            "primary": {
+                                                "type": "GET_VARIABLE",
+                                                "variableType": "Number",
+                                                "name": { 
+                                                    "type": "TERNARY",
+                                                    "primary": {
+                                                        "type": "EQUAL",
+                                                        "primary": { "type": "FIRST_PLAYER" },
+                                                        "secondary": { "type": "CTX_PLAYER" }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "PlayerOneBid" },
+                                                    "tertiary": { "type": "LITERAL", "primary": "PlayerTwoBid" }
+                                                }
+                                            },
+                                            "secondary": {
+                                                "type": "GET_VARIABLE",
+                                                "variableType": "Number",
+                                                "name": { 
+                                                    "type": "TERNARY",
+                                                    "primary": {
+                                                        "type": "NOT",
+                                                        "primary": {
+                                                            "type": "EQUAL",
+                                                            "primary": { "type": "FIRST_PLAYER" },
+                                                            "secondary": { "type": "CTX_PLAYER" }
+                                                        }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "PlayerOneBid" },
+                                                    "tertiary": { "type": "LITERAL", "primary": "PlayerTwoBid" }
+                                                }
+                                            }
+                                        },
+                                        "secondary": {
+                                            "type": "UNDEFINED"
+                                        },
+                                        "tertiary": {
+                                            "type": "NEXT_PLAYER",
+                                            "primary": { "type": "LITERAL", "primary": "active" }
+                                        }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn! Lead a card" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "lead" }
+                                    },
+                                    {
+                                        "type": "SET_BUTTON_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "Bid" },
+                                        "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "lead",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "Hand" },
+                            "filter": {
+                                "type":  "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "score",
+                    "actions": [
+                        {
+                            "trigger": { "type": "AUTO" },
+                            "filter": null,
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
