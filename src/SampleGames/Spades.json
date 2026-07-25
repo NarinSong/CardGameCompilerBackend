@@ -221,7 +221,7 @@
                                             },
                                             "actionRole": { "type": "LITERAL", "primary": "Choice" }
                                         },
-                                        "secondary": { "type": "LITERAL", "primary": "PRIVATE" }
+                                        "secondary": { "type": "LITERAL", "primary": "PRIVATE_SPREAD" }
                                     },
                                     {
                                         "type": "DEAL_CARDS",
@@ -310,7 +310,7 @@
                                             },
                                             "actionRole": { "type": "LITERAL", "primary": "Choice" }
                                         },
-                                        "secondary": { "type": "LITERAL", "primary": "PRIVATE" }
+                                        "secondary": { "type": "LITERAL", "primary": "PRIVATE_SPREAD" }
                                     },
                                     {
                                         "type": "DEAL_CARDS",
