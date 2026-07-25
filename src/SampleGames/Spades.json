@@ -11,8 +11,6 @@
             "LeadSuit": "Suit",
             "LeadRank": "Rank",
             "LeadPlayer": "Player",
-            "PlayerOneScore": "Number",
-            "PlayerTwoScore": "Number",
             "PlayerOneWins": "Number",
             "PlayerTwoWins": "Number"
         },
@@ -37,7 +35,7 @@
                 "Jack": 10,
                 "Queen": 11,
                 "King": 12,
-                "Ace": 12
+                "Ace": 13
             }
         },
         "locations": {
@@ -128,6 +126,14 @@
                 "visibility": "INVISIBLE",
                 "location": { "locationType": "relative", "location": "deck" }
             }
+        ],
+        "counters": [
+            {
+                "label": "Score",
+                "initialValue": 0,
+                "visibility": "FACE_UP",
+                "location": { "locationType": "relative", "location": "opponentright", "ownerLocation": "yoursright" }
+            }
         ]
     },
     "boardDefinition": {
@@ -188,18 +194,6 @@
                                         "variableType": "Boolean",
                                         "name": { "type": "LITERAL", "primary": "Broken" },
                                         "value": { "type": "LITERAL", "primary": false }
-                                    },
-                                    {
-                                        "type": "UPDATE_VARIABLE",
-                                        "variableType": "Number",
-                                        "name": { "type": "LITERAL", "primary": "PlayerOneScore" },
-                                        "value": { "type": "LITERAL", "primary": 0 }
-                                    },
-                                    {
-                                        "type": "UPDATE_VARIABLE",
-                                        "variableType": "Number",
-                                        "name": { "type": "LITERAL", "primary": "PlayerTwoScore" },
-                                        "value": { "type": "LITERAL", "primary": 0 }
                                     },
                                     {
                                         "type": "UPDATE_VARIABLE",
@@ -1430,29 +1424,25 @@
                                                 "secondary": { "type": "LITERAL", "primary": 0 }
                                             },
                                             "secondary": {
-                                                "type": "UPDATE_VARIABLE",
-                                                "variableType": "Number",
-                                                "name": { "type": "LITERAL", "primary": "PlayerOneScore" },
-                                                "value": {
+                                                "type": "SET_COUNTER_VALUE",
+                                                "primary": { "type": "LITERAL", "primary": "Score0" },
+                                                "secondary": {
                                                     "type": "PLUS",
                                                     "primary": {
-                                                        "type": "GET_VARIABLE",
-                                                        "variableType": "Number",
-                                                        "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                        "type": "VALUE_OF",
+                                                        "primary": { "type": "LITERAL", "primary": "Score0" }
                                                     },
                                                     "secondary": { "type": "LITERAL", "primary": 130 }
                                                 }
                                             },
                                             "tertiary": {
-                                                "type": "UPDATE_VARIABLE",
-                                                "variableType": "Number",
-                                                "name": { "type": "LITERAL", "primary": "PlayerOneScore" },
-                                                "value": {
+                                                "type": "SET_COUNTER_VALUE",
+                                                "primary": { "type": "LITERAL", "primary": "Score0" },
+                                                "secondary": {
                                                     "type": "MINUS",
                                                     "primary": {
-                                                        "type": "GET_VARIABLE",
-                                                        "variableType": "Number",
-                                                        "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                        "type": "VALUE_OF",
+                                                        "primary": { "type": "LITERAL", "primary": "Score0" }
                                                     },
                                                     "secondary": { "type": "LITERAL", "primary": 130 }
                                                 }
@@ -1474,15 +1464,13 @@
                                                 }
                                             },
                                             "secondary": {
-                                                "type": "UPDATE_VARIABLE",
-                                                "variableType": "Number",
-                                                "name": { "type": "LITERAL", "primary": "PlayerOneScore" },
-                                                "value": {
+                                                "type": "SET_COUNTER_VALUE",
+                                                "primary": { "type": "LITERAL", "primary": "Score0" },
+                                                "secondary": {
                                                     "type": "MINUS",
                                                     "primary": {
-                                                        "type": "GET_VARIABLE",
-                                                        "variableType": "Number",
-                                                        "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                        "type": "VALUE_OF",
+                                                        "primary": { "type": "LITERAL", "primary": "Score0" }
                                                     },
                                                     "secondary": { 
                                                         "type": "TIMES",
@@ -1496,15 +1484,13 @@
                                                 }
                                             },
                                             "tertiary": {
-                                                "type": "UPDATE_VARIABLE",
-                                                "variableType": "Number",
-                                                "name": { "type": "LITERAL", "primary": "PlayerOneScore" },
-                                                "value": {
+                                                "type": "SET_COUNTER_VALUE",
+                                                "primary": { "type": "LITERAL", "primary": "Score0" },
+                                                "secondary": {
                                                     "type": "PLUS",
                                                     "primary": {
-                                                        "type": "GET_VARIABLE",
-                                                        "variableType": "Number",
-                                                        "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                        "type": "VALUE_OF",
+                                                        "primary": { "type": "LITERAL", "primary": "Score0" }
                                                     },
                                                     "secondary": {
                                                         "type": "PLUS",
@@ -1566,29 +1552,25 @@
                                                 "secondary": { "type": "LITERAL", "primary": 0 }
                                             },
                                             "secondary": {
-                                                "type": "UPDATE_VARIABLE",
-                                                "variableType": "Number",
-                                                "name": { "type": "LITERAL", "primary": "PlayerTwoScore" },
-                                                "value": {
+                                                "type": "SET_COUNTER_VALUE",
+                                                "primary": { "type": "LITERAL", "primary": "Score1" },
+                                                "secondary": {
                                                     "type": "PLUS",
                                                     "primary": {
-                                                        "type": "GET_VARIABLE",
-                                                        "variableType": "Number",
-                                                        "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                        "type": "VALUE_OF",
+                                                        "primary": { "type": "LITERAL", "primary": "Score1" }
                                                     },
                                                     "secondary": { "type": "LITERAL", "primary": 130 }
                                                 }
                                             },
                                             "tertiary": {
-                                                "type": "UPDATE_VARIABLE",
-                                                "variableType": "Number",
-                                                "name": { "type": "LITERAL", "primary": "PlayerTwoScore" },
-                                                "value": {
+                                                "type": "SET_COUNTER_VALUE",
+                                                "primary": { "type": "LITERAL", "primary": "Score1" },
+                                                "secondary": {
                                                     "type": "MINUS",
                                                     "primary": {
-                                                        "type": "GET_VARIABLE",
-                                                        "variableType": "Number",
-                                                        "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                        "type": "VALUE_OF",
+                                                        "primary": { "type": "LITERAL", "primary": "Score1" }
                                                     },
                                                     "secondary": { "type": "LITERAL", "primary": 130 }
                                                 }
@@ -1610,15 +1592,13 @@
                                                 }
                                             },
                                             "secondary": {
-                                                "type": "UPDATE_VARIABLE",
-                                                "variableType": "Number",
-                                                "name": { "type": "LITERAL", "primary": "PlayerTwoScore" },
-                                                "value": {
+                                                "type": "SET_COUNTER_VALUE",
+                                                "primary": { "type": "LITERAL", "primary": "Score1" },
+                                                "secondary": {
                                                     "type": "MINUS",
                                                     "primary": {
-                                                        "type": "GET_VARIABLE",
-                                                        "variableType": "Number",
-                                                        "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                        "type": "VALUE_OF",
+                                                        "primary": { "type": "LITERAL", "primary": "Score1" }
                                                     },
                                                     "secondary": { 
                                                         "type": "TIMES",
@@ -1632,15 +1612,13 @@
                                                 }
                                             },
                                             "tertiary": {
-                                                "type": "UPDATE_VARIABLE",
-                                                "variableType": "Number",
-                                                "name": { "type": "LITERAL", "primary": "PlayerTwoScore" },
-                                                "value": {
+                                                "type": "SET_COUNTER_VALUE",
+                                                "primary": { "type": "LITERAL", "primary": "Score1" },
+                                                "secondary": {
                                                     "type": "PLUS",
                                                     "primary": {
-                                                        "type": "GET_VARIABLE",
-                                                        "variableType": "Number",
-                                                        "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                        "type": "VALUE_OF",
+                                                        "primary": { "type": "LITERAL", "primary": "Score1" }
                                                     },
                                                     "secondary": {
                                                         "type": "PLUS",
@@ -1678,9 +1656,8 @@
                                             "primary": {
                                                 "type": "GREATER_THAN",
                                                 "primary": {
-                                                    "type": "GET_VARIABLE",
-                                                    "variableType": "Number",
-                                                    "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                    "type": "VALUE_OF",
+                                                    "primary": { "type": "LITERAL", "primary": "Score0" } 
                                                 },
                                                 "secondary": { 
                                                     "type": "MINUS", 
@@ -1695,9 +1672,8 @@
                                             "secondary": {
                                                 "type": "GREATER_THAN",
                                                 "primary": {
-                                                    "type": "GET_VARIABLE",
-                                                    "variableType": "Number",
-                                                    "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                    "type": "VALUE_OF",
+                                                    "primary": { "type": "LITERAL", "primary": "Score1" } 
                                                 },
                                                 "secondary": { 
                                                     "type": "MINUS", 
@@ -1718,14 +1694,12 @@
                                                     "primary": {
                                                         "type": "GREATER_THAN",
                                                         "primary": {
-                                                            "type": "GET_VARIABLE",
-                                                            "variableType": "Number",
-                                                            "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                            "type": "VALUE_OF",
+                                                            "primary": { "type": "LITERAL", "primary": "Score0" } 
                                                         },
                                                         "secondary": {
-                                                            "type": "GET_VARIABLE",
-                                                            "variableType": "Number",
-                                                            "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                            "type": "VALUE_OF",
+                                                            "primary": { "type": "LITERAL", "primary": "Score1" } 
                                                         }
                                                     },
                                                     "secondary": {
@@ -1746,9 +1720,8 @@
                                                                     "secondary": {
                                                                         "type": "NUMBER_TO_STRING",
                                                                         "primary": {
-                                                                            "type": "GET_VARIABLE",
-                                                                            "variableType": "Number",
-                                                                            "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                                            "type": "VALUE_OF",
+                                                                            "primary": { "type": "LITERAL", "primary": "Score0" }
                                                                         }
                                                                     }
                                                                 }
@@ -1757,9 +1730,8 @@
                                                                 "type": "LOSE",
                                                                 "primary": { "type": "LITERAL", "primary": 1 },
                                                                 "secondary": {
-                                                                    "type": "GET_VARIABLE",
-                                                                    "variableType": "Number",
-                                                                    "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                                    "type": "VALUE_OF",
+                                                                    "primary": { "type": "LITERAL", "primary": "Score1" }
                                                                 },
                                                                 "tertiary": { "type": "LITERAL", "primary": false }
                                                             },
@@ -1767,9 +1739,8 @@
                                                                 "type": "WIN",
                                                                 "primary": { "type": "FIRST_PLAYER" },
                                                                 "secondary": {
-                                                                    "type": "GET_VARIABLE",
-                                                                    "variableType": "Number",
-                                                                    "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                                    "type": "VALUE_OF",
+                                                                    "primary": { "type": "LITERAL", "primary": "Score0" }
                                                                 },
                                                                 "tertiary": { "type": "LITERAL", "primary": true }
                                                             }
@@ -1782,14 +1753,12 @@
                                                     "primary": {
                                                         "type": "GREATER_THAN",
                                                         "primary": {
-                                                            "type": "GET_VARIABLE",
-                                                            "variableType": "Number",
-                                                            "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                            "type": "VALUE_OF",
+                                                            "primary": { "type": "LITERAL", "primary": "Score1" }
                                                         },
                                                         "secondary": {
-                                                            "type": "GET_VARIABLE",
-                                                            "variableType": "Number",
-                                                            "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                            "type": "VALUE_OF",
+                                                            "primary": { "type": "LITERAL", "primary": "Score0" }
                                                         }
                                                     },
                                                     "secondary": {
@@ -1810,9 +1779,8 @@
                                                                     "secondary": {
                                                                         "type": "NUMBER_TO_STRING",
                                                                         "primary": {
-                                                                            "type": "GET_VARIABLE",
-                                                                            "variableType": "Number",
-                                                                            "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                                            "type": "VALUE_OF",
+                                                                            "primary": { "type": "LITERAL", "primary": "Score1" }
                                                                         }
                                                                     }
                                                                 }
@@ -1821,9 +1789,8 @@
                                                                 "type": "LOSE",
                                                                 "primary": { "type": "FIRST_PLAYER" },
                                                                 "secondary": {
-                                                                    "type": "GET_VARIABLE",
-                                                                    "variableType": "Number",
-                                                                    "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                                    "type": "VALUE_OF",
+                                                                    "primary": { "type": "LITERAL", "primary": "Score0" }
                                                                 },
                                                                 "tertiary": { "type": "LITERAL", "primary": false }
                                                             },
@@ -1831,9 +1798,8 @@
                                                                 "type": "WIN",
                                                                 "primary": { "type": "LITERAL", "primary": 1 },
                                                                 "secondary": {
-                                                                    "type": "GET_VARIABLE",
-                                                                    "variableType": "Number",
-                                                                    "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                                    "type": "VALUE_OF",
+                                                                    "primary": { "type": "LITERAL", "primary": "Score1" }
                                                                 },
                                                                 "tertiary": { "type": "LITERAL", "primary": true }
                                                             }
@@ -1898,9 +1864,8 @@
                                             "secondary": {
                                                 "type": "NUMBER_TO_STRING",
                                                 "primary": {
-                                                    "type": "GET_VARIABLE",
-                                                    "variableType": "Number",
-                                                    "name": { "type": "LITERAL", "primary": "PlayerOneScore" }
+                                                    "type": "VALUE_OF",
+                                                    "primary": { "type": "LITERAL", "primary": "Score0" }
                                                 }
                                             }
                                         }
@@ -1920,9 +1885,8 @@
                                             "secondary": {
                                                 "type": "NUMBER_TO_STRING",
                                                 "primary": {
-                                                    "type": "GET_VARIABLE",
-                                                    "variableType": "Number",
-                                                    "name": { "type": "LITERAL", "primary": "PlayerTwoScore" }
+                                                    "type": "VALUE_OF",
+                                                    "primary": { "type": "LITERAL", "primary": "Score1" }
                                                 }
                                             }
                                         }
