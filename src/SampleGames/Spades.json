@@ -52,6 +52,17 @@
                 "wraptAt": 800,
                 "wrapTo": -800
             },
+            "opponentright": {
+                "anchor": {
+                    "x": 800,
+                    "y": 410
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": -130,
+                "wraptAt": -800,
+                "wrapTo": 800
+            },
             "deck": {
                 "anchor": {
                     "x": -250,
@@ -73,6 +84,17 @@
                 "horizontalOffset": 130,
                 "wraptAt": 800,
                 "wrapTo": -800
+            },
+            "yoursright": {
+                "anchor": {
+                    "x": 800,
+                    "y": -410
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 130,
+                "wraptAt": -800,
+                "wrapTo": 800
             }
         }
     },
@@ -90,7 +112,7 @@
                 "actionRoles": ["Wins"],
                 "initialState": "EMPTY",
                 "visibility": "PRIVATE",
-                "location": { "locationType": "relative", "location": "opponent", "ownerLocation": "yours" }
+                "location": { "locationType": "relative", "location": "opponentright", "ownerLocation": "yoursright" }
             },
             {
                 "label": "Choice",
@@ -843,6 +865,16 @@
                                         "type": "SET_BUTTON_VISIBILITY",
                                         "primary": { "type": "LITERAL", "primary": "Bid" },
                                         "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type": "SET_PILE_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "Play0" },
+                                        "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
+                                    },
+                                    {
+                                        "type": "SET_PILE_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "Play1" },
+                                        "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
                                     }
                                 ]
                             }
@@ -1274,13 +1306,13 @@
                                         "secondary": {
                                             "type": "UPDATE_VARIABLE",
                                             "variableType": "Number",
-                                            "name": { "type": "LITERAL", "primary": "FirstPlayerWins" },
+                                            "name": { "type": "LITERAL", "primary": "PlayerOneWins" },
                                             "value": {
                                                 "type": "PLUS",
                                                 "primary": {
                                                     "type": "GET_VARIABLE",
                                                     "variableType": "Number",
-                                                    "name": { "type": "LITERAL", "primary": "FirstPlayerWins" }
+                                                    "name": { "type": "LITERAL", "primary": "PlayerOneWins" }
                                                 },
                                                 "secondary": { "type": "LITERAL", "primary": 1 }
                                             }
@@ -1288,13 +1320,13 @@
                                         "tertiary": {
                                             "type": "UPDATE_VARIABLE",
                                             "variableType": "Number",
-                                            "name": { "type": "LITERAL", "primary": "SecondPlayerWins" },
+                                            "name": { "type": "LITERAL", "primary": "PlayerTwoWins" },
                                             "value": {
                                                 "type": "PLUS",
                                                 "primary": {
                                                     "type": "GET_VARIABLE",
                                                     "variableType": "Number",
-                                                    "name": { "type": "LITERAL", "primary": "SecondPlayerWins" }
+                                                    "name": { "type": "LITERAL", "primary": "PlayerTwoWins" }
                                                 },
                                                 "secondary": { "type": "LITERAL", "primary": 1 }
                                             }
@@ -1894,6 +1926,16 @@
                                                 }
                                             }
                                         }
+                                    },
+                                    {
+                                        "type": "SET_PILE_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "Play0" },
+                                        "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type": "SET_PILE_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "Play1" },
+                                        "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
                                     }
                                 ]
                             }
