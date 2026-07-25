@@ -177,6 +177,15 @@
                                     {
                                         "type": "SET_STEP",
                                         "primary": { "type": "LITERAL", "primary": "play" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn!" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
                                     }
                                 ]
                             }
@@ -334,8 +343,23 @@
                                             ]
                                         },
                                         "tertiary": {
-                                            "type":  "NEXT_PLAYER",
-                                            "primary":  { "type": "LITERAL", "primary":  "active" }
+                                            "type": "SEQUENCE",
+                                            "primary": [
+                                                {
+                                                    "type":  "NEXT_PLAYER",
+                                                    "primary":  { "type": "LITERAL", "primary":  "active" }
+                                                },
+                                                {
+                                                    "type": "SEND_POPUP",
+                                                    "primary": { "type": "LITERAL", "primary": "Your turn!" },
+                                                    "secondary": { 
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    }
+                                                }
+                                            ]
+                                            
                                         }
                                     }
                                 ]
@@ -366,8 +390,21 @@
                                         "tertiary":  { "type": "LITERAL", "primary": 1 }
                                     },
                                     {
+                                        "type": "BROADCAST_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Pass!" }
+                                    },
+                                    {
                                         "type":  "NEXT_PLAYER",
                                         "primary":  { "type": "LITERAL", "primary":  "active" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn!" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
                                     }
                                 ]
                             }
@@ -398,6 +435,16 @@
                                         }
                                     },
                                     {
+                                        "type": "BROADCAST_POPUP",
+                                        "primary": { 
+                                            "type": "STRING_JOIN", 
+                                            "primary": { "type": "LITERAL", "primary": "I choose "},
+                                            "secondary": {
+                                                "type": "CLICKED_LABEL"
+                                            }
+                                        }
+                                    },
+                                    {
                                         "type":  "SET_BUTTON_VISIBILITY",
                                         "primary":  { "type": "LITERAL", "primary":  "Hearts" },
                                         "secondary":  { "type": "LITERAL", "primary": "INVISIBLE" }
@@ -424,6 +471,15 @@
                                     {
                                         "type":  "NEXT_PLAYER",
                                         "primary":  { "type": "LITERAL", "primary":  "active" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn!" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
                                     }
                                 ]
                             }
