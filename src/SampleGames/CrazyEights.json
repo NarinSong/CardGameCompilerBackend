@@ -16,8 +16,8 @@
                 "direction": "VERTICAL",
                 "verticalOffset": -180,
                 "horizontalOffset": 130,
-                "wraptAt": 800,
-                "wrapTo": -800
+                "wraptAt": -410,
+                "wrapTo": 410
             },
             "deck": {
                 "anchor": {
