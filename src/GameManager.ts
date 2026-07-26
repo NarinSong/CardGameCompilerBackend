@@ -146,15 +146,16 @@ export default class GameManager {
     /**
      * Closes a room, notifies all clients that the game has ended, and cleans up room state.
      * @param room - The room to close.
+     * @param players
      */
-    static closeRoom(room: Room): void {
+    static closeRoom(room: Room, players?:{playerId: number; status: string; score: number }[]): void {
         const clients = room.clients;
         for (const idx in clients) {
             const clientId = +idx;
             const client = GameManager.clientFromId(clientId);
             if (!client) continue;
 
-            sendGameEnded(clientId);
+            sendGameEnded(clientId, players);
             client.inGame = false;
             client.roomId = null;
         }

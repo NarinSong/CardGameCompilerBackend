@@ -696,7 +696,11 @@ function evaluateNextPlayer(g: Game, c: ActionContext, node: ValueNode) {
     if (typeof pn === 'undefined') pn = evaluateFirstPlayer(g, c, { type: NODE_NAMES.FirstPlayer } );
 
     // Assign next player the role
-    const newPlayer = (pn + 1) % playerCount;
+    let newPlayer = pn;
+    for (let i = 0; i < playerCount; i++) {
+        newPlayer = (newPlayer + 1) % playerCount;
+        if (g.gameState.players[newPlayer]?.state === 'Active') break;
+    }
     g.gameState.roles[role] = [newPlayer];
 
     return newPlayer;
@@ -1037,11 +1041,20 @@ function executeSetStep(g: Game, c: ActionContext, node: ValueNode) {
 function executeWin(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.Win) throw new Error("Called executeWin with invalid node");
 
-    const player = evaluate(g, c, node.primary);
-    const score = evaluate(g, c, node.secondary);
-    const endGame = evaluate(g, c, node.tertiary);
+    const playerId = zn(evaluate(g, c, node.primary));
+    const score = zmn(evaluate(g, c, node.secondary));
+    const endGame = (evaluate(g, c, node.tertiary) as boolean | undefined) ?? true;
 
-    // TODO: end the game
+    const player = g.players[playerId];
+    if (!player) return;
+
+    player.state = 'Won';
+    if (score !== undefined) player.score = score;
+
+    if (endGame) {
+        g.gameOver = true;
+    }
+
 }
 
 /**
@@ -1056,11 +1069,20 @@ function executeWin(g: Game, c: ActionContext, node: ValueNode) {
 function executeLose(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.Lose) throw new Error("Called executeLose with invalid node");
 
-    const player = evaluate(g, c, node.primary);
-    const score = evaluate(g, c, node.secondary);
-    const endGame = evaluate(g, c, node.tertiary);
+    const playerId = zn(evaluate(g, c, node.primary));
+    const score = zmn(evaluate(g, c, node.secondary));
+    const endGame = (evaluate(g, c, node.tertiary) as boolean | undefined) ?? true;
 
-    // TODO: end the game
+    const player = g.players[playerId];
+    if (!player) return;
+
+    player.state = 'Lost';
+    if (score !== undefined) player.score = score;
+
+    if (endGame) {
+        g.gameOver = true;
+    }
+
 }
 
 function executeSendPopup(g: Game, c: ActionContext, node: ValueNode) {

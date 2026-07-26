@@ -29,6 +29,14 @@ function updateGameState(): void {
     parentPort?.postMessage({type: "GAME_STATE", views: buildViews(game)});
 }
 
+function buildPlayerResults(game: Game): { playerId: number; status: string; score: number }[] {
+    return Object.values(game.players).map(p => ({
+        playerId: p.id,
+        status: p.state,
+        score: p.score
+    }));
+}
+
 /**
  * Handles messages from the parent thread.
  * 
@@ -43,6 +51,7 @@ parentPort?.on("message", (msg) => {
             game.startGame();
             if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
             updateGameState();
+            if (game.gameOver) { parentPort?.postMessage({ type: "GAME_OVER", players: buildPlayerResults(game) }); }
             break;
         case "PLAYER_CLICK":
             let actionTaken = game.clickAction(msg.label, msg.cardId, msg.playerId, msg.buttonValue);
@@ -55,6 +64,7 @@ parentPort?.on("message", (msg) => {
                 parentPort?.postMessage({ type: "SEND_POPUPS", popups: game.gameState.popups });
                 game.gameState.popups.splice(0);
             }
+            if (game.gameOver) { parentPort?.postMessage({ type: "GAME_OVER", players: buildPlayerResults(game) }); }
             
             break;
         case "JOIN_ROOM":
