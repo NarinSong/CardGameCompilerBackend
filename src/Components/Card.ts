@@ -109,9 +109,9 @@ export default class Card {
     static dealCards(from: Pile, to: Pile, number: number): void {
         let i = 0;
         while (i < number && from.cards.length) {
-            const card = from.cards.pop();
+            const card = from.cards.shift();
             if (card)
-                to.cards.push(card);
+                to.cards.unshift(card);
             i++;
         }
     }
@@ -290,5 +290,16 @@ export default class Card {
         // TODO: Ace high vs ace low
 
         return current;
+    }
+
+    static removeCard(pile: Card[], card: Card): boolean {
+        for (const c in pile) {
+            if (pile[+c]?.id === card.id) {
+                pile.splice(+c, 1);
+                return true;
+            }
+        }
+        
+        return false;
     }
 }

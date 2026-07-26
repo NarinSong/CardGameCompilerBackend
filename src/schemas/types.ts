@@ -29,7 +29,11 @@ export const ButtonTypeSchema = z.enum([
 export const VisibilitySchema = z.enum([
   "FACE_UP",
   "FACE_DOWN",
-  "INVISIBLE"
+  "FACE_UP_SPREAD",
+  "FACE_DOWN_SPREAD",
+  "INVISIBLE",
+  "PRIVATE", // FACE_DOWN for everyone except the owner, who it's FACE_UP for
+  "PRIVATE_SPREAD",
 ]);
 
 /**
@@ -104,7 +108,8 @@ export const LocationResolverSchema = z.discriminatedUnion('locationType', [
   }),
   z.object({
     locationType: z.literal('relative'),
-    location: z.string()
+    location: z.string(),
+    ownerLocation: z.string().optional().or(z.undefined()),
   })
 ]);
 export const ButtonRangeSchema = z.object({
@@ -213,6 +218,17 @@ export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
     horizontalOffset: 250,
     wraptAt: 780,
     wrapTo: -780,
+};
+export const DEFAULT_TEXT_LOCATION: DefaultLocation = {
+    anchor: {
+        x: -780,
+        y: 450,
+    },
+    direction: "VERTICAL",
+    verticalOffset: -100,
+    horizontalOffset: 250,
+    wraptAt: -450,
+    wrapTo: 450,
 };
 
 // Default deck. TODO: Switch to RANKENUM.ACE, etc. so that it's more readable

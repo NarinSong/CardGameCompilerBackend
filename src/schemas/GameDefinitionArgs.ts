@@ -1,20 +1,32 @@
 import { z } from "zod";
 import { ValueNodeSchema } from "./AST.js";
 import { ActionRolesSchema, ButtonTypeSchema, DefaultLocationSchema, LocationResolverSchema, PileStateSchema, TriggerSchema, VisibilitySchema } from "./types.js";
-import { ValueTypeNameSchema } from "./Blocks.js";
+import { ValueTypeNameSchema, ValueTypeValuesSchema } from "./Blocks.js";
 
 export const StandardStringSchema = z.string().max(16).min(1).regex(/^[a-zA-Z0-9]+$/);
-export const LongStringSchema = z.string().max(1000).min(1).regex(/^[a-zA-Z0-9 !@#$%^&*(),.?"'\n]+$/);
+export const StandardDisplayStringSchema = z.string().max(16).min(1).regex(/^[a-zA-Z0-9 ]+$/);
+export const LongStringSchema = z.string().max(1000).min(1).regex(/^[a-zA-Z0-9 !@#$%^&*(),.?"'\n\-]+$/);
+
+export const ConstantArgSchema = z.object({
+    displayName: StandardDisplayStringSchema,
+    variableType: ValueTypeNameSchema,
+    defaultValue: ValueTypeValuesSchema,
+});
 
 // Arguments to definitions
 export const GameMetaArgsSchema = z.object({
     minPlayers: z.number().optional(),
     maxPlayers: z.number().optional(),
     name: StandardStringSchema,
+    maps: z.record(
+        StandardStringSchema, 
+        z.record(StandardStringSchema, z.number())
+    ).optional(),
     cardValueMap: z.record(StandardStringSchema, z.number()).optional(),
     clientSuitMap: z.record(StandardStringSchema, z.number()).optional(),
     clientRankMap: z.record(StandardStringSchema, z.number()).optional(),
     variables: z.record(StandardStringSchema,ValueTypeNameSchema).optional(),
+    constants: z.record(StandardStringSchema, ConstantArgSchema).optional(),
     locations: z.record(StandardStringSchema, DefaultLocationSchema).optional(),
     parentGameId: z.number().optional(),
     description: LongStringSchema.optional(),
@@ -88,6 +100,7 @@ export const PhaseSchema = z.object({
 
 const NodeSchema = ValueNodeSchema;
 
+export type ConstantArg = z.infer<typeof ConstantArgSchema>;
 export type GameMetaArgs = z.infer<typeof GameMetaArgsSchema>;
 export type GameDefinitionPhase = z.infer<typeof PhaseSchema>;
 export type GameDefinitionStep = z.infer<typeof StepSchema>;

@@ -161,5 +161,15 @@ function sendReaction(clientId: ClientID, from: string, reaction: string): void 
     socket.emit('reaction', from, reaction);
 }
 
+function sendPopup(clientId: ClientID, text: string): void {
+    const socket = SOCKETS[clientId];
+    if (!socket) {
+        failedSend(clientId, 'sendPopup()');
+        return;
+    }
+
+    socket.emit('popup', text);
+}
+
 // Exports. Note: socket is not exported
-export { sendClientGamestate, sendGameEnded, sendLobbyStatus, sendLobbyClosed, sendReaction };
+export { sendClientGamestate, sendGameEnded, sendLobbyStatus, sendLobbyClosed, sendReaction, sendPopup };

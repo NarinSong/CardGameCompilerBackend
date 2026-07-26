@@ -13,7 +13,6 @@ import Logger from "../Components/Logger.js";
 import { ActionContext } from "../schemas/AST.js";
 import { evaluate } from "../Components/TreeParser.js";
 import Card from "../Components/Card";
-import Pile from "./Pile";
 
 /**
  * Represents a running game instance and its current state.
@@ -40,17 +39,24 @@ export default class Game {
 
 
     runAutoActions(): void {
-        while(true) {
-            const action = this.currentActions.find(a=>a.trigger.type == TriggerType.AUTO && evaluate(this, this.buildAutoContext(), a.filter));
-            if (!action) return;
+        try {
+            while(true) {
+                const action = this.currentActions.find(a=>a.trigger.type == TriggerType.AUTO && evaluate(this, this.buildAutoContext(), a.filter));
+                if (!action) return;
 
-            if(this.gameState.incrementAutoActionCount()){
-                this.aborted = true;
-                return;
+                Logger.log('Running AUTO action in step ' + this.currentStep?.label);
+
+                if(this.gameState.incrementAutoActionCount()){
+                    this.aborted = true;
+                    return;
+                }
+
+                evaluate(this, this.buildAutoContext(), action.result)
+
             }
-
-            evaluate(this, this.buildAutoContext(), action.result)
-
+        } catch (error) {
+            // Error executing an action
+            console.error(error);
         }
     }
 
@@ -64,13 +70,13 @@ export default class Game {
      * @param type - Type of player to add.
      * @returns The created player, or null if the game is already full.
      */
-    handlePlayerJoin(type: PlayerType): Player | null {
+    handlePlayerJoin(type: PlayerType, name: string): Player | null {
         Logger.debug('Player joined');
         if (this.numPlayers < this.definition.maxPlayers) {
             // Assign the new player's id
             let id = this.nextPlayerId;
 
-            const p = new Player(this.definition.player, type, this.gameLabels, id);
+            const p = new Player(this.definition.player, type, this.gameLabels, id, name);
             this.players[id] = p;
             this.numPlayers++;
 
@@ -87,6 +93,10 @@ export default class Game {
                 this.gameState.createButtonFromDefinition(bd, id);
             }
 
+            for (let td of this.definition.player.texts) {
+                this.gameState.createTextFromDefinition(td, id);
+            }
+
             return p;
         }
         Logger.debug('Player join failure');
@@ -99,7 +109,7 @@ export default class Game {
     startGame(): void {
         while (this.numPlayers < this.definition.minPlayers) {
             // Add bots
-            this.handlePlayerJoin(PlayerType.ROBOT);
+            this.handlePlayerJoin(PlayerType.ROBOT, 'Robot');
         }
 
         // Move to step 1
@@ -115,7 +125,7 @@ export default class Game {
      * @param playerId
      * @returns True if a valid action was found and executed, false if no valid action was found or if the label does not map to a game object.
      */
-    clickAction(label: string, cardId: number|undefined, playerId: PlayerID): boolean {
+    clickAction(label: string, cardId: number|undefined, playerId: PlayerID, buttonValue: number | undefined): boolean {
         const actions = this.currentActions;
         if (!actions) return false;
 
@@ -126,20 +136,24 @@ export default class Game {
 
         let actionRoles: ActionRole[] = gameObject.actionRoles;
 
-        const card: Card|undefined = this.getCard(cardId)
+        const card: Card|undefined = this.getCard(cardId);
 
-        for (let action of actions) {
-            const ctx: ActionContext = { label: label, trigger: action.trigger, player: playerId, card: card };
-            if (action.trigger.type === TriggerType.CLICK && actionRoles.includes(action.trigger.target) && evaluate(this, ctx, action.filter)) {
-
-                console.log(`Player took action by clicking on label ${label}`);
-                this.gameState.resetAutoActionCount();
-                evaluate(this, ctx, action.result);
-                this.runAutoActions();
-                return true;
+        try {
+            for (let action of actions) {
+                const ctx: ActionContext = { label: label, trigger: action.trigger, player: playerId, card: card, buttonValue: buttonValue };
+                if (action.trigger.type === TriggerType.CLICK && actionRoles.includes(action.trigger.target) && evaluate(this, ctx, action.filter)) {
+                    console.log(`Player took action by clicking on label ${label}`);
+                    this.gameState.resetAutoActionCount();
+                    evaluate(this, ctx, action.result);
+                    this.runAutoActions();
+                    return true;
+                }
             }
-
+        } catch (error) {
+            // Error evaluating the action or filter
+            console.error(error);
         }
+
 
         return false;
     }

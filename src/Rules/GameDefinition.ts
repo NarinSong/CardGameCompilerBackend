@@ -17,6 +17,7 @@ import Logger from "../Components/Logger.js";
 import ButtonDefinition from "./ButtonDefinition.js";
 import { coerceLocation } from "../Components/LocationUtils.js";
 import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
+import TextDefinition from "./TextDefinition.js";
 
 
 /**
@@ -126,6 +127,26 @@ export default class GameDefinition {
         this.player.buttons.push(button);
     }
 
+    addPlayerText(
+        definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRoles?: string[] | undefined,
+            text?: string | undefined,
+            visibility?: Visibility | undefined,
+            location?: LocationResolver | undefined,
+        }
+    ): void {
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'TEXT')
+        };
+
+        const text = new TextDefinition({ labelManager: this.labelManger, ... dfn });
+        this.player.texts.push(text);
+    }
+
     /**
      *  Adds a pile definition to the board
      * @param definition - Configuration for the pile, including its label, display name, action role, initial value, and visibility.
@@ -197,6 +218,26 @@ export default class GameDefinition {
 
         const button = new ButtonDefinition({ labelManager: this.labelManger, ... dfn });
         this.board.buttons.push(button);
+    }
+
+    addBoardText(
+        definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRoles?: string[] | undefined,
+            text?: string | undefined,
+            visibility?: Visibility | undefined,
+            location?: LocationResolver | undefined,
+        }
+    ): void {
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'TEXT')
+        };
+
+        const text = new TextDefinition({ labelManager: this.labelManger, ... dfn });
+        this.board.texts.push(text);
     }
 
     /**

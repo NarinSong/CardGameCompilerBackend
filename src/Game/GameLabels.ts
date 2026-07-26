@@ -4,11 +4,12 @@ import StepDefinition from "../Rules/StepDefinition.js";
 import Button from "./Button.js";
 import Counter from "./Counter.js";
 import Pile from "./Pile.js";
+import Text from "./Text.js";
 
 /**
  * Runtime game objects that can be referenced by a label.
  */
-export type GamePiece = Pile | Counter | Button;
+export type GamePiece = Pile | Counter | Button | Text;
 
 /**
  * Manages labels for objects, phases, and steps in the game.
@@ -57,6 +58,10 @@ export default class GameLabels {
      */
     registerButton(button: Button, label: Label): void {
         this.gameObjectLabels[label] = button;
+    }
+
+    registerText(text: Text, label: Label): void {
+        this.gameObjectLabels[label] = text;
     }
 
     /**

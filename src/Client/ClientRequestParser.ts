@@ -650,6 +650,7 @@ export function clientRequestClickLabel(clientId: number, label: unknown, cardId
 
     const cardIdCheck = z
         .number()
+        .or(z.undefined())
         .safeParse(cardId);
 
     if (!cardIdCheck.success)
@@ -662,7 +663,8 @@ export function clientRequestClickLabel(clientId: number, label: unknown, cardId
     if (!room) return callback(false);
 
     if (typeof client.player === "number") {
-        room.handlePlayerClick(labelCheck.data, cardIdCheck.data, client.player);
+        // TODO: disambiguate between card id and button value :)
+        room.handlePlayerClick(labelCheck.data, cardIdCheck.data, client.player, cardIdCheck.data);
         callback(true);
     }
 

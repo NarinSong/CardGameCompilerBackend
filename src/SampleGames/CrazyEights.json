@@ -6,6 +6,52 @@
         "description": "The OG Uno. First to play all their cards, wins!",
         "variables": {
             "CurrentSuit": "Suit"
+        },
+        "locations": {
+            "opponent": {
+                "anchor": {
+                    "x": -800,
+                    "y": 410
+                },
+                "direction": "VERTICAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 130,
+                "wraptAt": -410,
+                "wrapTo": 410
+            },
+            "deck": {
+                "anchor": {
+                    "x": -250,
+                    "y": 0
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 250,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
+            "yours": {
+                "anchor": {
+                    "x": -800,
+                    "y": -410
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": 180,
+                "horizontalOffset": 130,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
+            "wilds": {
+                "anchor": {
+                    "x": -500,
+                    "y": -150
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": 100,
+                "horizontalOffset": 250,
+                "wraptAt": 800,
+                "wrapTo": -800
+            }
         }
     },
     "playerDefinition": {
@@ -14,7 +60,8 @@
                 "label": "Hand",
                 "actionRoles": ["Hand"],
                 "initialState": "EMPTY",
-                "visibility": "FACE_UP"
+                "visibility": "PRIVATE_SPREAD",
+                "location": { "locationType": "relative", "location": "opponent", "ownerLocation": "yours" }
             }
         ]
     },
@@ -23,42 +70,49 @@
             {
                 "label": "Deck",
                 "initialState": "SHUFFLED",
-                "visibility": "FACE_DOWN"
+                "visibility": "FACE_DOWN",
+                "location": { "locationType": "relative", "location": "deck" }
             },
             {
                 "label": "Discard",
                 "initialState": "EMPTY",
-                "visibility": "FACE_UP"
+                "visibility": "FACE_UP",
+                "location": { "locationType": "relative", "location": "deck" }
             }
         ],
         "buttons": [
             {
                 "label": "Pass", 
-                "type": "CLICK"
+                "type": "CLICK",
+                "location": { "locationType": "relative", "location": "deck" }
             },
             {
                 "label": "Hearts",   
                 "actionRoles": ["suitSelection"], 
                 "type": "CLICK", 
-                "visibility": "INVISIBLE"
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "wilds" }
             },
             {
                 "label": "Clubs",   
                 "actionRoles": ["suitSelection"], 
                 "type": "CLICK", 
-                "visibility": "INVISIBLE"
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "wilds" }
             },
             {
                 "label": "Spades",   
                 "actionRoles": ["suitSelection"], 
                 "type": "CLICK", 
-                "visibility": "INVISIBLE"
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "wilds" }
             },
             {
                 "label": "Diamonds",   
                 "actionRoles": ["suitSelection"], 
                 "type": "CLICK", 
-                "visibility": "INVISIBLE"
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "wilds" }
             }
         ]
     },
@@ -116,13 +170,22 @@
                                             "primary": {
                                                 "type": "CARD_OF_PILE",
                                                 "primary": { "type": "LITERAL", "primary": "Discard" },
-                                                "secondary": { "type": "LITERAL", "primary": 1 }
+                                                "secondary": { "type": "LITERAL", "primary": 0 }
                                             }
                                         }
                                     },
                                     {
                                         "type": "SET_STEP",
                                         "primary": { "type": "LITERAL", "primary": "play" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn!" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
                                     }
                                 ]
                             }
@@ -135,7 +198,7 @@
                         {
                             "trigger": { "type": "CLICK", "target": "Hand" },
                             "filter": {
-                                "type":  "AND",
+                                "type": "AND",
                                 "primary": {
                                     "type":  "HAS_ROLE",
                                     "id": {
@@ -144,35 +207,51 @@
                                     "role":  { "type": "LITERAL", "primary":  "active" }
                                 },
                                 "secondary": {
-                                    "type":  "OR",
+                                    "type": "OR",
                                     "primary": {
-                                        "type":  "EQUAL",
+                                        "type": "STRING_EQ",
                                         "primary": {
-                                            "type":  "RANK",
-                                            "primary": {
-                                                "type":  "CARD_OF_PILE",
-                                                "primary":  { "type": "LITERAL", "primary":  "Discard" },
-                                                "secondary":  { "type": "LITERAL", "primary": 1 }
-                                            }
-                                        },
-                                        "secondary": {
                                             "type":  "RANK",
                                             "primary": {
                                                 "type":  "CTX_CARD"
                                             }
+                                        },
+                                        "secondary": {
+                                            "type": "LITERAL",
+                                            "primary": "Eight"
                                         }
                                     },
                                     "secondary": {
-                                        "type":  "EQUAL",
+                                        "type": "OR",
                                         "primary": {
-                                            "type":  "GET_VARIABLE",
-                                            "name":  { "type": "LITERAL", "primary": "CurrentSuit" },
-                                            "variableType":  "Suit"
+                                            "type":  "STRING_EQ",
+                                            "primary": {
+                                                "type":  "RANK",
+                                                "primary": {
+                                                    "type":  "CARD_OF_PILE",
+                                                    "primary":  { "type": "LITERAL", "primary":  "Discard" },
+                                                    "secondary":  { "type": "LITERAL", "primary": 0 }
+                                                }
+                                            },
+                                            "secondary": {
+                                                "type":  "RANK",
+                                                "primary": {
+                                                    "type":  "CTX_CARD"
+                                                }
+                                            }
                                         },
                                         "secondary": {
-                                            "type":  "SUIT",
+                                            "type":  "STRING_EQ",
                                             "primary": {
-                                                "type":  "CTX_CARD"
+                                                "type":  "GET_VARIABLE",
+                                                "name":  { "type": "LITERAL", "primary": "CurrentSuit" },
+                                                "variableType":  "Suit"
+                                            },
+                                            "secondary": {
+                                                "type":  "SUIT",
+                                                "primary": {
+                                                    "type":  "CTX_CARD"
+                                                }
                                             }
                                         }
                                     }
@@ -193,12 +272,12 @@
                                         }
                                     },
                                     {
-                                        "type":  "DEAL_CARDS",
+                                        "type":  "MOVE_CARD",
                                         "primary": {
                                             "type":  "CLICKED_LABEL"
                                         },
                                         "secondary":  { "type": "LITERAL", "primary":  "Discard" },
-                                        "tertiary":  { "type": "LITERAL", "primary": 1 }
+                                        "tertiary":  { "type": "CTX_CARD" }
                                     },
                                     {
                                         "type":  "IF",
@@ -264,8 +343,23 @@
                                             ]
                                         },
                                         "tertiary": {
-                                            "type":  "NEXT_PLAYER",
-                                            "primary":  { "type": "LITERAL", "primary":  "active" }
+                                            "type": "SEQUENCE",
+                                            "primary": [
+                                                {
+                                                    "type":  "NEXT_PLAYER",
+                                                    "primary":  { "type": "LITERAL", "primary":  "active" }
+                                                },
+                                                {
+                                                    "type": "SEND_POPUP",
+                                                    "primary": { "type": "LITERAL", "primary": "Your turn!" },
+                                                    "secondary": { 
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    }
+                                                }
+                                            ]
+                                            
                                         }
                                     }
                                 ]
@@ -296,8 +390,21 @@
                                         "tertiary":  { "type": "LITERAL", "primary": 1 }
                                     },
                                     {
+                                        "type": "BROADCAST_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Pass!" }
+                                    },
+                                    {
                                         "type":  "NEXT_PLAYER",
                                         "primary":  { "type": "LITERAL", "primary":  "active" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn!" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
                                     }
                                 ]
                             }
@@ -328,6 +435,16 @@
                                         }
                                     },
                                     {
+                                        "type": "BROADCAST_POPUP",
+                                        "primary": { 
+                                            "type": "STRING_JOIN", 
+                                            "primary": { "type": "LITERAL", "primary": "I choose "},
+                                            "secondary": {
+                                                "type": "CLICKED_LABEL"
+                                            }
+                                        }
+                                    },
+                                    {
                                         "type":  "SET_BUTTON_VISIBILITY",
                                         "primary":  { "type": "LITERAL", "primary":  "Hearts" },
                                         "secondary":  { "type": "LITERAL", "primary": "INVISIBLE" }
@@ -354,6 +471,15 @@
                                     {
                                         "type":  "NEXT_PLAYER",
                                         "primary":  { "type": "LITERAL", "primary":  "active" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn!" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
                                     }
                                 ]
                             }

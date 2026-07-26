@@ -5,6 +5,7 @@
 import ButtonDefinition from "./ButtonDefinition.js";
 import CounterDefinition from "./CounterDefinition.js";
 import PileDefinition from "./PileDefinition.js";
+import TextDefinition from "./TextDefinition.js";
 
 
 /**
@@ -16,6 +17,7 @@ export default class BoardDefinition {
     piles: PileDefinition[];
     counters: CounterDefinition[];
     buttons: ButtonDefinition[];
+    texts: TextDefinition[];
 
     /**
      * Creates a new board definition.
@@ -24,5 +26,6 @@ export default class BoardDefinition {
         this.piles = [];
         this.counters = [];
         this.buttons = [];
+        this.texts = [];
     }
 }

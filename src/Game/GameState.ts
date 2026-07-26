@@ -11,7 +11,9 @@ import GameMeta from "../Rules/GameMeta.js";
 import { Label, PhaseLabel, StepLabel } from "../Rules/LabelManager.js";
 import PileDefinition from "../Rules/PileDefinition.js";
 import StepDefinition from "../Rules/StepDefinition.js";
+import TextDefinition from "../Rules/TextDefinition.js";
 import { ValueTypeName, ValueTypeNameSchema, ValueTypeValues } from "../schemas/Blocks.js";
+import { ConstantArg } from "../schemas/GameDefinitionArgs.js";
 import { BoardID, ButtonRange, ButtonType, LocationResolver, PileState, PlayerID, Visibility } from "../schemas/types.js";
 import Board from "./Board.js";
 import Button from "./Button.js";
@@ -19,6 +21,7 @@ import Counter from "./Counter.js";
 import GameLabels from "./GameLabels.js";
 import Pile from "./Pile.js";
 import Player from "./Player.js";
+import Text from "./Text.js";
 
 type EmptyVariableArrayType = Record<string, Record<string, ValueTypeValues>>;
 type VariableArrayType = Record<ValueTypeName, Record<string, ValueTypeValues>>;
@@ -38,9 +41,12 @@ export default class GameState {
     piles: Record<Label, {pile: Pile, owner: PlayerID | BoardID}>;
     counters: Record<Label, {counter: Counter, owner: PlayerID | BoardID}>;
     buttons: Record<Label, {button: Button, owner: PlayerID | BoardID}>;
+    texts: Record<Label, {text: Text, owner: PlayerID | BoardID}>;
     gameMeta: GameMeta;
     #autoActionCount: number = 0;
+    popups: { message: string, player: PlayerID | null }[] = [];
 
+    constants: VariableArrayType;
     variables: VariableArrayType;
 
 
@@ -57,12 +63,34 @@ export default class GameState {
         this.piles = {};
         this.counters = {};
         this.buttons = {};
+        this.texts = {};
         this.variables = Object.keys(ValueTypeNameSchema).reduce<EmptyVariableArrayType>(
             (prev: EmptyVariableArrayType, curr: string) => { return {...prev, [curr]: {} } }, {}
         ) as VariableArrayType;
+        this.constants = Object.keys(ValueTypeNameSchema).reduce<EmptyVariableArrayType>(
+            (prev: EmptyVariableArrayType, curr: string) => { return {...prev, [curr]: {} } }, {}
+        ) as VariableArrayType;
+
 
         this.gameMeta = definition.gameMeta; // Linked. Game Meta should be *immutable*
+        //this.initializeRoles(definition.gameMeta.roles);
         this.initializeBoard(definition.board);
+        this.initializeConstants(definition.gameMeta.constants);
+    }
+
+    initializeRoles() {
+
+    }
+
+    initializeConstants(constants: Record<string, ConstantArg>) {
+        // TODO: Allow custom constants from player starting the game
+
+        for (const c in constants) {
+            if (!constants[c]) continue;
+
+            this.constants[constants[c].variableType] = {};
+            this.constants[constants[c].variableType][c] = constants[c].defaultValue;
+        }
     }
 
     /**
@@ -80,6 +108,10 @@ export default class GameState {
 
         for (let bd of definition.buttons) {
             this.createButtonFromDefinition(bd, -1);
+        }
+
+        for (let td of definition.texts) {
+            this.createTextFromDefinition(td, -1);
         }
     }
 
@@ -116,6 +148,12 @@ export default class GameState {
         const button = Button.fromDefinition(buttonDefinition, this.gameLabels, id);
 
         this.buttons[button.label] = { button: button, owner: id };
+    }
+
+    createTextFromDefinition(textDefinition: TextDefinition, id: number): void {
+        const text = Text.fromDefinition(textDefinition, this.gameLabels, id);
+
+        this.texts[text.label] = { text: text, owner: id };
     }
 
     /**
@@ -242,6 +280,16 @@ export default class GameState {
         delete this.counters[counter];
     }
 
+    removeTextByLabel(text: Label): void {
+        const textObject: Text | undefined = this.texts[text]?.text;
+
+        if (!textObject)
+            return;
+
+        this.gameLabels.unregister(text);
+        delete this.texts[text];
+    }
+
     /**
      * Creates a button using explicit parameters.
      * @param obj - An object containing the button's configuration.
@@ -309,6 +357,33 @@ export default class GameState {
         return counter.label;
     }
 
+    createText(
+        obj: { 
+            text?: string | undefined, 
+            name?: string | undefined, 
+            visibility?: Visibility | undefined, 
+            actionRoles?: string[] | undefined, 
+            displayName?: string | undefined, 
+            owner?: PlayerID | BoardID | undefined, 
+            location?: LocationResolver | undefined 
+        } = {}
+    ): string {
+        const name = obj.name        ?? this.gameLabels.nextId;
+
+        const text = Text.create(
+            obj.text       ?? '',
+            name,
+            obj.visibility  ?? Visibility.FACE_DOWN,
+            this.gameLabels,
+            obj.actionRoles ?? [name],
+            obj.displayName ?? name,
+            obj.location ?? coerceLocation(obj.location, 'COUNTER'),
+        );
+        this.texts[name] = { text: text, owner: obj.owner ?? -1 };
+
+        return text.label;
+    }
+
     /**
      * Deal a number of cards from one pile to another.
      * @param from - The pile where the cards will be dealt from.
@@ -362,6 +437,10 @@ export default class GameState {
         this.currentStep = step;
     }
 
+    getConstant(type: ValueTypeName, name: string) {
+        return this.constants[type][name];
+    }
+
     /**
      * Retrieves a variable value from the game state.
      * @param type - The type of the variable.
@@ -379,7 +458,19 @@ export default class GameState {
      * @param value - The value to set.
      */
     setVariable(type: ValueTypeName, name: string, value: ValueTypeValues): void {
-        this.variables[type][name] = value;
+        if (!type || !name) return;
+
+        if (this.variables[type]) {
+            this.variables[type][name] = value;
+        } else {
+            this.variables[type] = {};
+            this.variables[type][name] = value;
+        }
+    }
+
+    sendPopup(message: string, player?: null | PlayerID) {
+        player ??= null;
+        this.popups.push({message, player});
     }
 
     getAutoActionCount(){

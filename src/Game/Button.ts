@@ -56,7 +56,7 @@ export default class Button {
      * @returns A newly constructed button.
      */
     static fromDefinition(definition: ButtonDefinition, gameLabels: GameLabels, playerId?: number): Button {
-        const label = typeof playerId !== 'undefined' ? definition.label + playerId : definition.label;
+        const label = typeof playerId !== 'undefined' && playerId !== -1 ? definition.label + playerId : definition.label;
 
         return new Button(
             label,

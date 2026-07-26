@@ -2,6 +2,7 @@ import { parentPort, workerData } from "node:worker_threads";
 import Game from "../Game/Game.js";
 import ClientView from "../Client/ClientView.js";
 import { buildGameFromJSON } from "../Client/GameBuilder.js";
+import { PlayerID } from "../schemas/types.js";
 
 // This is the worker thread that owns and runs the game instance.
 // It receives messages from the parent thread (Room.ts) via postMessage()
@@ -24,6 +25,10 @@ function buildViews(game: Game): { playerId: number; view: ClientView; }[] {
     }));
 }
 
+function updateGameState(): void {
+    parentPort?.postMessage({type: "GAME_STATE", views: buildViews(game)});
+}
+
 /**
  * Handles messages from the parent thread.
  * 
@@ -37,19 +42,23 @@ parentPort?.on("message", (msg) => {
         case "START_GAME":
             game.startGame();
             if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
-            parentPort?.postMessage({type: "GAME_STATE", views: buildViews(game)});
+            updateGameState();
             break;
         case "PLAYER_CLICK":
-            let actionTaken = game.clickAction(msg.label, msg.cardId, msg.playerId);
+            let actionTaken = game.clickAction(msg.label, msg.cardId, msg.playerId, msg.buttonValue);
             if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
             if (actionTaken) {
                 // Update clients with new gamestate
-                parentPort?.postMessage({type: "GAME_STATE", views: buildViews(game)});
+                updateGameState();
+            }
+            if (game.gameState.popups.length > 0) {
+                parentPort?.postMessage({ type: "SEND_POPUPS", popups: game.gameState.popups });
+                game.gameState.popups.splice(0);
             }
             
             break;
         case "JOIN_ROOM":
-            const player = game.handlePlayerJoin(msg.playerType);
+            const player = game.handlePlayerJoin(msg.playerType, msg.playerName);
             if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
             parentPort?.postMessage({
                 type: "PLAYER_JOINED",

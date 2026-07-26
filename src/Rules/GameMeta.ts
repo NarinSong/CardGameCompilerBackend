@@ -1,7 +1,7 @@
 import ValueMap, { CardValueMap, DEFAULT_CARD_RANK_MAP, DEFAULT_CLIENT_VIEW_RANK_MAP, DEFAULT_CLIENT_VIEW_SUIT_MAP, DEFAULT_VALUE_MAP } from "../Components/ValueMap.js";
 import { ValueTypeName } from "../schemas/Blocks.js";
-import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
-import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DefaultLocation, Location } from "../schemas/types.js";
+import { ConstantArg, GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
+import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DEFAULT_TEXT_LOCATION, DefaultLocation, Location } from "../schemas/types.js";
 
 
 /**
@@ -17,6 +17,7 @@ export default class GameMeta {
     cardValueMap: CardValueMap;
     clientSuitMap: ValueMap<string, number>;
     clientRankMap: ValueMap<string, number>;
+    constants: Record<string, ConstantArg>;
     variables: Record<string, ValueTypeName>;
     locations: Record<string, DefaultLocation>;
     parentGameId?: number | undefined;
@@ -36,19 +37,32 @@ export default class GameMeta {
         this.maps = { 'CARD_RANK_MAP': DEFAULT_CARD_RANK_MAP }
         this.clientSuitMap = obj.clientSuitMap ? new ValueMap<string, number>(obj.clientSuitMap) : DEFAULT_CLIENT_VIEW_SUIT_MAP;
         this.clientRankMap = obj.clientRankMap ? new ValueMap<string, number>(obj.clientRankMap) : DEFAULT_CLIENT_VIEW_RANK_MAP;
+        this.constants = obj.constants ?? {};
         this.variables = obj.variables ?? {};
         this.parentGameId = obj.parentGameId;
         this.description = obj.description || obj.name;
         this.private = obj.private ?? true;
         this.id = obj.id;
 
+        this.addMaps(obj.maps);
+
         this.locations = {
             'DEFAULT_PILE': DEFAULT_PILE_LOCATION,
             'DEFAULT_BUTTON': DEFAULT_BUTTON_LOCATION,
             'DEFAULT_COUNTER': DEFAULT_COUNTER_LOCATION,
+            'DEFAULT_TEXT': DEFAULT_TEXT_LOCATION
         };
 
         this.addLocations(obj.locations ?? {});
+    }
+
+    addMaps(maps: Record<string, Record<string, number>> | undefined): void {
+        if (!maps) return;
+
+        for (let i in maps) {
+            if (!maps[i]) continue;
+            this.maps[i] = new ValueMap<string, number>(maps[i]);
+        }
     }
 
     addLocations(locations: Record<string, DefaultLocation>): void {
@@ -69,7 +83,7 @@ export default class GameMeta {
     static locationOffset(current: number, offset: number, threshold: number, wrapTo: number): { value: number, wrapped: boolean } {
         current += offset;
         let wrapped = false;
-        if (current > threshold) {
+        if ((offset > 0 && current > threshold) || (offset < 0 && current < threshold)) {
             current = wrapTo;
             wrapped = true;
         }

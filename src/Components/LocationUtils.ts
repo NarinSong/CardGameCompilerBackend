@@ -7,7 +7,7 @@ import { LocationResolver } from "../schemas/types.js";
  * @param type - The type of component ('PILE', 'COUNTER', or 'BUTTON').
  * @returns A valid LocationResolver.
  */
-export function coerceLocation(location: LocationResolver | undefined, type: 'PILE' | 'COUNTER' | 'BUTTON'): LocationResolver {
+export function coerceLocation(location: LocationResolver | undefined, type: 'PILE' | 'COUNTER' | 'BUTTON' | 'TEXT'): LocationResolver {
     if (!location) {
         location = {
             locationType: 'relative',
