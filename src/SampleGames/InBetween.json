@@ -39,7 +39,7 @@
             "center": {
                 "anchor": {
                     "x": -250,
-                    "y": -100
+                    "y": -50
                 },
                 "direction": "HORIZONTAL",
                 "verticalOffset": -180,
@@ -50,7 +50,7 @@
             "deck": {
                 "anchor": {
                     "x": -75,
-                    "y": 100
+                    "y": 150
                 },
                 "direction": "HORIZONTAL",
                 "verticalOffset": -180,
