@@ -30,6 +30,10 @@ describe("buildGameFromJSON", () => {
     expect(result).toBeNull();
   });
 
+  // Checking instanceof here (not just truthiness) because buildGameFromJSON
+  // is supposed to hand back a real GameDefinition with all its methods -
+  // a plain object that just happens to have minPlayers/maxPlayers on it
+  // wouldn't actually work anywhere else it gets used.
   it("creates a game definition from valid JSON", () => {
     vi.mocked(verifyClientGameDefintion).mockReturnValue({
       gameMeta: {
@@ -114,6 +118,10 @@ describe("buildGameFromJSON", () => {
     });
   });
 
+  // Phases/steps/actions have to get wired up in order (phase, then its
+  // steps, then each step's actions) since later calls reference labels
+  // returned by the earlier ones - spying on all three at once to confirm
+  // that chain actually happens.
   it("creates phases, steps, and actions", () => {
     const phaseSpy = vi.spyOn(GameDefinition.prototype, "addPhase");
 
@@ -174,6 +182,9 @@ describe("buildGameFromDatabase", () => {
     expect(result).toBeNull();
   });
 
+  // Same reasoning as the buildGameFromJSON instanceof check above - this
+  // goes through the DB round-trip (stringify -> parse) so it's worth
+  // re-confirming the result still comes out as a real GameDefinition.
   it("builds game from database JSON", async () => {
     vi.mocked(Database.getGameFromId).mockResolvedValue([
       {

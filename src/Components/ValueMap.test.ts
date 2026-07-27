@@ -44,6 +44,9 @@ describe("ValueMap", () => {
   });
 });
 
+// CalculationMap is the "lazy" counterpart to ValueMap - instead of a plain
+// lookup table it holds a ValueNode and runs it through the tree evaluator
+// against whatever game/ctx you give it, so the value can depend on game state.
 describe("CalculationMap", () => {
   it("evaluates stored ValueNode using game context", () => {
     const evaluatorNode = {
@@ -93,7 +96,11 @@ describe("Default suit map", () => {
 });
 
 describe("DEFAULT_VALUE_MAP", () => {
-  it("is a CalculationMap instance", () => {
+  // This matters because CalculationMap and ValueMap aren't interchangeable -
+  // if DEFAULT_VALUE_MAP were accidentally swapped for a plain ValueMap it'd
+  // be missing .get(game, ctx)'s evaluation step, and callers expecting it
+  // to reflect live game state would silently get a static value instead.
+  it("is a CalculationMap instance, not a plain ValueMap", () => {
     expect(DEFAULT_VALUE_MAP).toBeInstanceOf(CalculationMap);
   });
 });

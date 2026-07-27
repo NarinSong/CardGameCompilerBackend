@@ -21,6 +21,9 @@ vi.mock("../GameManager.js", () => ({
     }
 }));
 
+// Most of these tests just need "a client that looks authenticated" with
+// one or two fields tweaked, so this saves repeating the same object shape
+// everywhere.
 function makeFakeClient(overrides = {}){
     return {
         isAuthenticated: true,      
@@ -43,16 +46,6 @@ beforeEach(() => {
     vi.mocked(GameManager.getAvailableGameNames).mockResolvedValue([{name:"TestGame", id: 1}]);
 });
 
-/**
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */
 
 describe("clientRequestSignOut", () => {
     it("calls callback(true) when sign out succeeds", async () => {
@@ -91,17 +84,10 @@ describe("clientRequestSignOut", () => {
 
 });
 
-/**
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */
 
+// A bunch of these are just checking that bad input gets rejected before
+// we ever touch GameManager/the DB - password/username/displayName all get
+// validated up front, so garbage in should mean callback(null) out.
 describe("clientRequestSignUp", () => {
     it("does nothing if callback is not a function", async () => {
         expect(() => clientRequestSignUp(1, "dadawdawasdwadaw", "dadawdawasdwadaw", "dadawdawasdwadaw", "ddwadaw")).not.toThrow();
@@ -175,16 +161,6 @@ describe("clientRequestSignUp", () => {
     });
 });
 
-/**
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */
 describe("clientRequestSignIn", () => {
     it("does nothing if callback is not a function", async () => {
         expect(() => clientRequestSignIn(1, "dadawdawasdwadaw", "dadawdawasdwadaw",  "ddwadaw")).not.toThrow();
@@ -241,6 +217,9 @@ describe("clientRequestSignIn", () => {
         expect(callback).toHaveBeenCalledWith(null);
     });
     
+    // displayName missing is its own case since sign-in returns it back to
+    // the caller on success (see the "success" test below) - if it's null
+    // we shouldn't even get that far.
     it("calls callback(null) if client.displayName is null", async () => {
         const fakeClient = makeFakeClient({isAuthenticated: false, displayName: null});
         vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
@@ -252,6 +231,8 @@ describe("clientRequestSignIn", () => {
         expect(callback).toHaveBeenCalledWith(null);
     });
     
+    // Note the second arg here - a successful sign in hands back the
+    // displayName along with the token, not just the token by itself.
     it("calls callback(success) when sign in succeeds", async () => {
         const fakeClient = makeFakeClient({isAuthenticated: false, signIn: vi.fn().mockResolvedValue("success")});
         vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
@@ -280,16 +261,6 @@ describe("clientRequestGetAvailableGames", () => {
     });
 });
 
-/**
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */
 
 const validGame = {
     gameMeta: {
@@ -315,6 +286,13 @@ vi.mock("../Components/Database.js", () => ({
     }
 }));
 
+// Commented out because clientRequestSaveGame's signature changed - it used
+// to take separate gameName/parentId/description/isPrivate args (7 total,
+// matching the calls below), but it's down to (clientId, json, callback) now
+// with all that info folded into the json blob and checked via
+// ClientGameDefinitionSchema. Left as-is instead of guessing at a rewrite -
+// needs someone who knows the new schema's validation rules to redo this
+// properly rather than porting the old args in blind.
 /*
 describe("clientRequestSaveGame", () => {
     it("does nothing if callback is not a function", async () => {
@@ -418,16 +396,6 @@ describe("clientRequestSaveGame", () => {
 });
 
 */
-/**
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */
 
 describe("clientRequestGetAvailableBlocks", () => {
     it("does nothing if callback is not a function", async () => {

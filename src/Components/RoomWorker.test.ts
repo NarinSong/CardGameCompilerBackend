@@ -61,6 +61,11 @@ const mockGame = {
         id: 2,
       },
     },
+
+    // Worker checks this after every click to see if it needs to flush any
+    // popups out to the room - keep it empty so click tests don't have to
+    // deal with popups they're not testing.
+    popups: [] as any[],
   },
 };
 
@@ -78,6 +83,8 @@ describe("RoomWorker", () => {
     vi.clearAllMocks();
   });
 
+  // START_GAME should kick off the game and immediately push a full state
+  // snapshot back out - one view per player currently in gameState.
   it("starts game and sends GAME_STATE", () => {
     mockState.messageHandler({
       type: "START_GAME",
@@ -115,13 +122,18 @@ describe("RoomWorker", () => {
       type: "PLAYER_CLICK",
 
       label: "PILE",
+      cardId: 5,
+      playerId: 42,
+      buttonValue: undefined,
     });
 
-    expect(mockGame.clickAction).toHaveBeenCalledWith("PILE");
+    expect(mockGame.clickAction).toHaveBeenCalledWith("PILE", 5, 42, undefined);
 
     expect(mockState.postMessage).toHaveBeenCalled();
   });
 
+  // If the click didn't actually do anything (e.g. it wasn't a valid move),
+  // there's no updated state worth sending - the worker should stay quiet.
   it("does not send state when player click fails", () => {
     mockState.postMessage.mockClear();
 
@@ -131,6 +143,9 @@ describe("RoomWorker", () => {
       type: "PLAYER_CLICK",
 
       label: "PILE",
+      cardId: 5,
+      playerId: 42,
+      buttonValue: undefined,
     });
 
     expect(mockState.postMessage).not.toHaveBeenCalled();
@@ -145,9 +160,10 @@ describe("RoomWorker", () => {
       type: "JOIN_ROOM",
 
       playerType: "HUMAN",
+      playerName: "Alice",
     });
 
-    expect(mockGame.handlePlayerJoin).toHaveBeenCalledWith("HUMAN");
+    expect(mockGame.handlePlayerJoin).toHaveBeenCalledWith("HUMAN", "Alice");
 
     expect(mockState.postMessage).toHaveBeenCalledWith({
       type: "PLAYER_JOINED",
@@ -156,6 +172,8 @@ describe("RoomWorker", () => {
     });
   });
 
+  // handlePlayerJoin can come back empty (room full, bad player type, etc) -
+  // worker should still respond, just with a null playerId instead of erroring.
   it("returns null when join fails", () => {
     mockGame.handlePlayerJoin.mockReturnValue(undefined);
 

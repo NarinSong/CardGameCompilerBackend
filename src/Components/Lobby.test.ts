@@ -21,7 +21,8 @@ describe("Lobby", () => {
       identifier: id,
       username,
       displayName: username + " Display",
-      color: "red",
+      // Client.color is always a hex string (see Client.ts), never a named color
+      color: "#ff0000",
 
       isAuthenticated: true,
 
@@ -88,5 +89,61 @@ describe("Lobby", () => {
 
     expect(player.inLobby).toBe(false);
     expect(player.lobby).toBe(null);
+  });
+
+  // These two were marked "NEEDS TESTING" right in the source - nobody had
+  // gotten around to it yet, so adding coverage here instead of just noting it.
+
+  it("promotes another player to host when the host leaves", () => {
+    const host = createMockClient(1, "host");
+    const player = createMockClient(2, "player");
+
+    GameManager.clients[host.identifier] = host;
+    GameManager.clients[player.identifier] = player;
+
+    const lobby = new Lobby(host, Lobby.createRandomJoinCode());
+    lobby.joinGame(player);
+
+    lobby.removeFromLobbyById(host.identifier);
+
+    expect(lobby.host).toBe(player.identifier);
+    expect(lobby.hostName).toBe("player");
+  });
+
+  it("deletes the lobby once the last player leaves", () => {
+    const host = createMockClient(1, "host");
+    GameManager.clients[host.identifier] = host;
+
+    const lobby = new Lobby(host, Lobby.createRandomJoinCode());
+    const deleteSpy = vi.spyOn(GameManager, "deleteLobby");
+
+    lobby.removeFromLobbyById(host.identifier);
+
+    expect(deleteSpy).toHaveBeenCalledWith(lobby.joinCode);
+  });
+
+  it("removeFromLobby finds a player by username and removes them", () => {
+    const host = createMockClient(1, "host");
+    const player = createMockClient(2, "player");
+
+    GameManager.clients[host.identifier] = host;
+    GameManager.clients[player.identifier] = player;
+
+    const lobby = new Lobby(host, Lobby.createRandomJoinCode());
+    lobby.joinGame(player);
+
+    const result = lobby.removeFromLobby("player");
+
+    expect(result).toBe(true);
+    expect(player.inLobby).toBe(false);
+  });
+
+  it("removeFromLobby returns false for a username that isn't in the lobby", () => {
+    const host = createMockClient(1, "host");
+    GameManager.clients[host.identifier] = host;
+
+    const lobby = new Lobby(host, Lobby.createRandomJoinCode());
+
+    expect(lobby.removeFromLobby("nobody")).toBe(false);
   });
 });

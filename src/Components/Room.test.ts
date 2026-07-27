@@ -122,23 +122,33 @@ describe("Room", () => {
     expect(worker.postMessage).toHaveBeenCalledTimes(1);
   });
 
+  // handlePlayerClick just forwards everything straight to the worker as a
+  // PLAYER_CLICK message - nothing fancy, just checking the shape is right.
   it("handles player click when game started", () => {
     room.started = true;
 
-    room.handlePlayerClick("PILE", 5);
+    room.handlePlayerClick("PILE", 5, 42, undefined);
 
     expect(worker.postMessage).toHaveBeenCalledWith({
       type: "PLAYER_CLICK",
       label: "PILE",
+      cardId: 5,
+      playerId: 42,
+      buttonValue: undefined,
     });
   });
 
+  // Clicks shouldn't do anything until the game's actually started, so the
+  // worker should never even hear about it.
   it("ignores player click before game starts", () => {
-    room.handlePlayerClick("PILE", 5);
+    room.handlePlayerClick("PILE", 5, 42, undefined);
 
     expect(worker.postMessage).not.toHaveBeenCalled();
   });
 
+  // handleJoinRoom returns a Promise that only resolves once the worker
+  // thread emits back a PLAYER_JOINED message - so we fake that message
+  // coming back before awaiting the promise, same as the worker would.
   it("joins player successfully", async () => {
     const client = {
       identifier: 10,
@@ -173,7 +183,7 @@ describe("Room", () => {
   });
 
   it("fails joining missing client", async () => {
-    vi.mocked(GameManager.clientFromId).mockReturnValue(undefined);
+    vi.mocked(GameManager.clientFromId).mockReturnValue(null);
 
     expect(await room.handleJoinRoom(10 as any)).toBe(false);
   });

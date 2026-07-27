@@ -9,10 +9,12 @@ describe("Card.numberRank", () => {
         expect(Card.numberRank(card)).toBe(1);
     });
 
-    //it("returns -1 if rank isnt found", () => {
-    //    const card = new Card({rank: "adawdawd", suit:"Clubs"});
-    //    expect(Card.numberRank(card)).toBe(-1);
-    //});
+    // Turns out this actually works fine (numberRank's docstring even says so) -
+    // it was just commented out, not broken. Un-commenting it since it's free coverage.
+    it("returns -1 if rank isnt found", () => {
+        const card = new Card({rank: "adawdawd" as any, suit: "Clubs"});
+        expect(Card.numberRank(card)).toBe(-1);
+    });
 });
 
 
@@ -46,6 +48,8 @@ describe("Card.isBigger", () => {
         expect(Card.isBigger(card1, card2)).toBe(false);
     });
 
+    // Piles can be empty, so isBigger needs to handle a missing card on
+    // either side without blowing up - just treat it as "not bigger".
     it("returns false if either card is undefined", () => {
         const card = new Card({rank: "King", suit: "Clubs"});
 
@@ -78,6 +82,8 @@ describe("Card.dealCards", () => {
         expect(to.cards.length).toBe(5);
     });
 
+    // Asking for more cards than the pile has shouldn't error out - it
+    // should just hand over whatever's left.
     it("deals all remaining cards if it exceeds pile size", () => {
         const from = { cards: [new Card({rank: "Ace", suit: "Clubs"})] } as any;
         const to   = { cards: [] as Card[] } as any;

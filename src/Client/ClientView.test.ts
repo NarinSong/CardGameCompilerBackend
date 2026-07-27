@@ -28,6 +28,7 @@ describe("ClientView", () => {
     type: PlayerType.HUMAN,
   } as any;
 
+  // Invisible stuff just shouldn't show up in what gets sent to the client at all.
   it("returns null for invisible pile", () => {
     const pile = {
       visibility: Visibility.INVISIBLE,
@@ -38,6 +39,8 @@ describe("ClientView", () => {
     ).toBeNull();
   });
 
+  // Face down cards shouldn't leak the real suit/rank/id to the client, so
+  // pileView is supposed to replace each card with a zeroed-out placeholder.
   it("creates face down pile view hiding cards", () => {
     const pile = {
       visibility: Visibility.FACE_DOWN,
@@ -84,6 +87,8 @@ describe("ClientView", () => {
     ]);
   });
 
+  // Same setup as above but face up this time - suit/rank should come
+  // through as the real mapped numbers instead of getting zeroed out.
   it("maps visible pile cards", () => {
     const pile = {
       visibility: Visibility.FACE_UP,
@@ -138,6 +143,8 @@ describe("ClientView", () => {
     expect(ClientView.counterView(counter, 1, player, {}, gameMeta)).toBeNull();
   });
 
+  // Counters get the same face-down treatment as cards - the number itself
+  // gets hidden (replaced with 0), not just marked as face down.
   it("hides face down counter value", () => {
     const counter = {
       visibility: Visibility.FACE_DOWN,
@@ -202,7 +209,7 @@ describe("ClientView", () => {
 
       actionRoles: [],
 
-      type: "ACTION",
+      type: "CLICK",
 
       range: undefined,
 
@@ -220,6 +227,9 @@ describe("ClientView", () => {
     expect(result?.label).toBe("draw");
   });
 
+  // This is the "wire it all together" test - piles/counters/buttons/texts
+  // are all empty here on purpose, we just care that a real player in
+  // gameState comes out the other end as a proper ClientPlayerType.
   it("creates ClientView from game state", () => {
     const game = {
       gameState: {
@@ -229,10 +239,15 @@ describe("ClientView", () => {
 
         buttons: {},
 
+        texts: {},
+
         players: {
           1: {
             id: 1,
             type: PlayerType.HUMAN,
+            displayName: "Alice",
+            score: 10,
+            state: "Active",
           },
         },
       },
@@ -254,6 +269,9 @@ describe("ClientView", () => {
       {
         playerId: 1,
         type: PlayerType.HUMAN,
+        displayName: "Alice",
+        score: 10,
+        status: "Active",
       },
     ]);
   });
