@@ -799,6 +799,11 @@
                                                     "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
                                                 },
                                                 {
+                                                    "type": "SET_BUTTON_VISIBILITY",
+                                                    "primary": { "type": "LITERAL", "primary": "All In" },
+                                                    "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
+                                                },
+                                                {
                                                     "type": "SET_RANGE",
                                                     "primary": { "type": "LITERAL", "primary": "Bet" },
                                                     "secondary": {
