@@ -76,7 +76,7 @@
             {
                 "label": "Chips",
                 "actionRoles": ["Chips"],
-                "initialValue": 500,
+                "number": 500,
                 "visibility": "FACE_UP",
                 "location": { "locationType": "relative", "location": "opponent", "ownerLocation": "yours" }
             }
@@ -138,7 +138,7 @@
         "counters": [
             {
                 "label": "Pot",
-                "initialValue": 2000,
+                "number": 2000,
                 "visibility": "FACE_UP",
                 "location": { "locationType": "relative", "location": "center" }
             }
@@ -461,6 +461,81 @@
                                 "type":  "SEQUENCE",
                                 "primary": [
                                     {
+                                        "type": "IF",
+                                        "primary": {
+                                            "type": "OR",
+                                            "primary": {
+                                                "type": "EQUAL",
+                                                "primary": {
+                                                    "type": "MAP",
+                                                    "primary": {
+                                                        "type": "RANK",
+                                                        "primary": {
+                                                            "type": "CARD_OF_PILE",
+                                                            "primary": { "type": "LITERAL", "primary": "flip" },
+                                                            "secondary": { "type": "UNDEFINED" }
+                                                        }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                },
+                                                "secondary": {
+                                                    "type": "MAP",
+                                                    "primary": {
+                                                        "type": "RANK",
+                                                        "primary": {
+                                                            "type": "CARD_OF_PILE",
+                                                            "primary": { "type": "LITERAL", "primary": "card" },
+                                                            "secondary": { "type": "UNDEFINED" }
+                                                        }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                }
+                                            },
+                                            "secondary": {
+                                                "type": "EQUAL",
+                                                "primary": {
+                                                    "type": "MAP",
+                                                    "primary": {
+                                                        "type": "RANK",
+                                                        "primary": {
+                                                            "type": "CARD_OF_PILE",
+                                                            "primary": { "type": "LITERAL", "primary": "flop" },
+                                                            "secondary": { "type": "UNDEFINED" }
+                                                        }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                },
+                                                "secondary": {
+                                                    "type": "MAP",
+                                                    "primary": {
+                                                        "type": "RANK",
+                                                        "primary": {
+                                                            "type": "CARD_OF_PILE",
+                                                            "primary": { "type": "LITERAL", "primary": "card" },
+                                                            "secondary": { "type": "UNDEFINED" }
+                                                        }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                }
+                                            }
+                                        },
+                                        "secondary": {
+                                            "type": "UPDATE_VARIABLE",
+                                            "variableType": "Number",
+                                            "name": { "type": "LITERAL", "primary": "bet" },
+                                            "value": {
+                                                "type": "TIMES",
+                                                "primary": {
+                                                    "type": "GET_VARIABLE",
+                                                    "variableType": "Number",
+                                                    "name": { "type": "LITERAL", "primary": "bet" }
+                                                },
+                                                "secondary": { "type": "LITERAL", "primary": 2 }
+                                            }
+                                        },
+                                        "tertiary": { "type": "UNDEFINED" }
+                                    },
+                                    {
                                         "type": "SET_COUNTER_VALUE",
                                         "primary": {
                                             "type": "COUNTER_OF",
@@ -511,7 +586,7 @@
                                     {
                                         "type": "IF",
                                         "primary": {
-                                            "type": "EQUAL",
+                                            "type": "LESS_THAN",
                                             "primary": {
                                                 "type": "VALUE_OF",
                                                 "primary": {
@@ -524,7 +599,7 @@
                                                     "secondary": { "type": "LITERAL", "primary": "Chips" }
                                                 }
                                             },
-                                            "secondary": { "type": "LITERAL", "primary": 0 }
+                                            "secondary": { "type": "LITERAL", "primary": 5 }
                                         },
                                         "secondary": {
                                             "type": "LOSE",
@@ -639,6 +714,34 @@
                                                     "type": "SET_BUTTON_VISIBILITY",
                                                     "primary": { "type": "LITERAL", "primary": "Bet" },
                                                     "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
+                                                },
+                                                {
+                                                    "type": "SET_RANGE",
+                                                    "primary": { "type": "LITERAL", "primary": "Bet" },
+                                                    "secondary": {
+                                                        "type": "BUTTON_RANGE",
+                                                        "primary": { "type": "LITERAL", "primary": 5 },
+                                                        "secondary": {
+                                                            "type": "MAX",
+                                                            "primary": {
+                                                                "type": "VALUE_OF",
+                                                                "primary": {
+                                                                    "type": "COUNTER_OF",
+                                                                    "primary": {
+                                                                        "type": "GET_ID_FROM_ROLE",
+                                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                                        "index": { "type": "UNDEFINED" }
+                                                                    },
+                                                                    "secondary": { "type": "LITERAL", "primary": "Chips" }
+                                                                }
+                                                            },
+                                                            "secondary": {
+                                                                "type": "VALUE_OF",
+                                                                "primary": { "type": "LITERAL", "primary": "Pot" }
+                                                            }
+                                                        },
+                                                        "tertiary": { "type": "LITERAL", "primary": 5 }
+                                                    }
                                                 }
                                             ]
                                         },

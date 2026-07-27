@@ -368,6 +368,60 @@ const MINUS = defineBlock({
     ]
 });
 
+const MIN = defineBlock({
+    "name": NODE_NAMES.Min,
+    "displayName": "Min",
+    "returnType": "Number",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Left",
+            "type": "Number",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Right",
+            "type": "Number",
+            "optional": false
+        }
+    ]
+});
+
+const MAX = defineBlock({
+    "name": NODE_NAMES.Max,
+    "displayName": "Max",
+    "returnType": "Number",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Left",
+            "type": "Number",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Right",
+            "type": "Number",
+            "optional": false
+        }
+    ]
+});
+
+const RANDOM = defineBlock({
+    "name": NODE_NAMES.Random,
+    "displayName": "Random",
+    "returnType": "Number",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Ceiling",
+            "type": "Number",
+            "optional": false
+        },
+    ]
+});
+
 const DIV = defineBlock({
     "name": NODE_NAMES.Div,
     "displayName": "Divide",
@@ -1830,6 +1884,9 @@ export const BLOCKS = {
     TIMES,
     MINUS,
     DIV,
+    MIN,
+    MAX,
+    RANDOM,
     STRING_EQ,
     TERNARY,
     CTX_CARD,

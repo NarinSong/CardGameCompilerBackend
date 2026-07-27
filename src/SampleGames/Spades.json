@@ -130,7 +130,7 @@
         "counters": [
             {
                 "label": "Score",
-                "initialValue": 0,
+                "number": 0,
                 "visibility": "FACE_UP",
                 "location": { "locationType": "relative", "location": "opponentright", "ownerLocation": "yoursright" }
             }
