@@ -4,7 +4,7 @@ import pickupJson from "./Pickup.json" with { type: "json" };
 import buttonCounterJson from "./ButtonCounter.json" with { type: "json" };
 import crazyEightsJson from "./CrazyEights.json" with { type: "json" };
 import spadesJson from "./Spades.json" with { type: "json" };
-import inBetweenJson from "./Spades.json" with { type: "json" };
+import inBetweenJson from "./InBetween.json" with { type: "json" };
 import GameManager from "../GameManager.js";
 
 const PickupGame = buildGameFromJSON(pickupJson);
