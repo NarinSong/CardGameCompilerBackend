@@ -757,7 +757,7 @@ const WHILE = defineBlock({
 const NEXT_PLAYER = defineBlock({
     "name": NODE_NAMES.NextPlayer,
     "displayName": "Next Player",
-    "returnType": "Player",
+    "returnType": "Boolean",
     "arguments": [
         {
             "name": "primary",
@@ -1231,6 +1231,26 @@ const LOSE = defineBlock({
         },
     ]
 });
+
+const END_GAME = defineBlock({
+    name: NODE_NAMES.EndGame,
+    displayName: "End Game",
+    returnType: "Void",
+    arguments: [
+        {
+            "name": "primary",
+            "displayName": "Remaining Players Win?",
+            "type": "Boolean",
+            "optional": true
+        },
+        {
+            "name": "secondary",
+            "displayName": "Score",
+            "type": "Number",
+            "optional": true
+        },
+    ]
+})
 
 const BUTTON_VALUE = defineBlock({
     "name": NODE_NAMES.ButtonValue,
@@ -1844,6 +1864,7 @@ export const BLOCKS = {
     CREATE_BUTTON,
     WIN,
     LOSE,
+    END_GAME,
     BUTTON_RANGE,
     SET_RANGE,
     BUTTON_VALUE,

@@ -696,10 +696,20 @@ function evaluateNextPlayer(g: Game, c: ActionContext, node: ValueNode) {
     if (typeof pn === 'undefined') pn = evaluateFirstPlayer(g, c, { type: NODE_NAMES.FirstPlayer } );
 
     // Assign next player the role
-    const newPlayer = (pn + 1) % playerCount;
-    g.gameState.roles[role] = [newPlayer];
+    for (let i=(pn + 1) % playerCount; i != pn; i = (i+1) % playerCount) {
+        if (g.gameState.players[i] && g.gameState.players[i]?.state === 'Active') {
+            g.gameState.roles[role] = [i];
+            return true;
+        }
+    }
 
-    return newPlayer;
+    // Edge case: there's only one player
+    if (g.gameState.players[pn] && g.gameState.players[pn]?.state === 'Active') {
+        g.gameState.roles[role] = [pn];
+        return true;
+    }
+   
+    return false;
 }
 
 /**
@@ -1204,6 +1214,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         // Game ending
         case NODE_NAMES.Win: executeWin(g, c, node); return;
         case NODE_NAMES.Lose: executeLose(g, c, node); return;
+        case NODE_NAMES.EndGame: executeEndGame(g, c, node); return;
         // Informing players
         case NODE_NAMES.SendPopup: executeSendPopup(g, c, node); return;
         case NODE_NAMES.BroadcastPopup: executeBroadcastPopup(g, c, node); return;

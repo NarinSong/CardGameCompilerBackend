@@ -77,6 +77,7 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.SetText,
   NODE_NAMES.SendPopup,
   NODE_NAMES.SetScore,
+  NODE_NAMES.EndGame,
 ]);
 
 const TernaryOperatorsSchema = z.enum([

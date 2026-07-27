@@ -54,6 +54,7 @@ export const NODE_NAMES = {
   CreateText: "CREATE_TEXT",
   Win: "WIN",
   Lose: "LOSE",
+  EndGame: "END_GAME",
   ButtonRange: "BUTTON_RANGE",
   ButtonValue: "BUTTON_VALUE",
   CardOfPile: "CARD_OF_PILE",
