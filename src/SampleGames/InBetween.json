@@ -722,7 +722,7 @@
                                                         "type": "BUTTON_RANGE",
                                                         "primary": { "type": "LITERAL", "primary": 5 },
                                                         "secondary": {
-                                                            "type": "MAX",
+                                                            "type": "MIN",
                                                             "primary": {
                                                                 "type": "VALUE_OF",
                                                                 "primary": {
