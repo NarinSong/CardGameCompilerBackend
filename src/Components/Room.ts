@@ -73,7 +73,7 @@ export default class Room {
                     this.emitGameOverResults(msg.players);
                     this.timeouts.set("gameOverDelay", setTimeout(() => {
                         GameManager.closeRoom(this, msg.players);
-                    }, 3000));
+                    }, 5000));
                     break;
             }
         });

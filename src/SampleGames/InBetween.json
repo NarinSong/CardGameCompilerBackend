@@ -248,9 +248,7 @@
                                             },
                                             "secondary": {
                                                 "type": "STRING_JOIN",
-                                                "primary": {
-                                                    "type": { "type": "LITERAL", "primary": " bet " }
-                                                },
+                                                "primary": { "type": "LITERAL", "primary": " bet " },
                                                 "secondary": {
                                                     "type": "NUMBER_TO_STRING",
                                                     "primary": {
