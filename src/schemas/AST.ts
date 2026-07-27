@@ -45,6 +45,7 @@ const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.ButtonOwner,
   NODE_NAMES.TextOwner,
   NODE_NAMES.Comment,
+  NODE_NAMES.Random,
 ]);
 const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.And,
@@ -52,6 +53,8 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.Plus,
   NODE_NAMES.Times,
   NODE_NAMES.Div,
+  NODE_NAMES.Min,
+  NODE_NAMES.Max,
   NODE_NAMES.Minus,
   NODE_NAMES.StringEq,
   NODE_NAMES.StringJoin,

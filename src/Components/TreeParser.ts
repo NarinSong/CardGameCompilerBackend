@@ -1159,6 +1159,9 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.Times: return zn(evaluate(g, c, node.primary)) * zn(evaluate(g, c, node.secondary));
         case NODE_NAMES.Minus: return zn(evaluate(g, c, node.primary)) - zn(evaluate(g, c, node.secondary));
         case NODE_NAMES.Div: return zn(evaluate(g, c, node.primary)) / zn(evaluate(g, c, node.secondary));
+        case NODE_NAMES.Min: return Math.min(zn(evaluate(g, c, node.primary)), zn(evaluate(g, c, node.secondary)));
+        case NODE_NAMES.Max: return Math.max(zn(evaluate(g, c, node.primary)), zn(evaluate(g, c, node.secondary)));
+        case NODE_NAMES.Random: return Math.floor(Math.random() * (zn(evaluate(g, c, node.primary))));
         // Strings
         case NODE_NAMES.StringEq: return zs(evaluate(g, c, node.primary)) == zs(evaluate(g, c, node.secondary));
         case NODE_NAMES.StringJoin: return zs(evaluate(g, c, node.primary)) + zs(evaluate(g, c, node.secondary));

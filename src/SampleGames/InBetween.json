@@ -39,7 +39,7 @@
             "center": {
                 "anchor": {
                     "x": -250,
-                    "y": -100
+                    "y": -50
                 },
                 "direction": "HORIZONTAL",
                 "verticalOffset": -180,
@@ -47,10 +47,21 @@
                 "wraptAt": 800,
                 "wrapTo": -800
             },
+            "deck": {
+                "anchor": {
+                    "x": -75,
+                    "y": 150
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 150,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
             "actions": {
                 "anchor": {
                     "x": 0,
-                    "y": -200
+                    "y": -250
                 },
                 "direction": "HORIZONTAL",
                 "verticalOffset": -180,
@@ -74,9 +85,9 @@
     "playerDefinition": {
         "counters": [
             {
-                "label": "Hand",
-                "actionRoles": ["Hand"],
-                "initialValue": 500,
+                "label": "Chips",
+                "actionRoles": ["Chips"],
+                "number": 500,
                 "visibility": "FACE_UP",
                 "location": { "locationType": "relative", "location": "opponent", "ownerLocation": "yours" }
             }
@@ -88,7 +99,7 @@
                 "label": "Deck",
                 "initialState": "SHUFFLED",
                 "visibility": "FACE_DOWN",
-                "location": { "locationType": "absolute", "location": { "x": 0, "y": 100 } }
+                "location": { "locationType": "relative", "location": "deck" }
             },
             {
                 "label": "Discard",
@@ -133,14 +144,20 @@
                 "visibility": "FACE_UP",
                 "range": { "min": 5, "max": 500, "increment": 5 },
                 "location": { "locationType": "relative", "location": "actions" }
+            },
+            {
+                "label": "All In", 
+                "type": "CLICK",
+                "visibility": "FACE_UP",
+                "location": { "locationType": "relative", "location": "actions" }
             }
         ],
         "counters": [
             {
                 "label": "Pot",
-                "initialValue": 2000,
+                "number": 2000,
                 "visibility": "FACE_UP",
-                "location": { "locationType": "relative", "location": "center" }
+                "location": { "locationType": "relative", "location": "deck" }
             }
         ]
     },
@@ -208,16 +225,77 @@
                                 "type":  "SEQUENCE",
                                 "primary": [
                                     {
-                                        "type": "DEAL_CARDS",
-                                        "primary": { "type": "LITERAL", "primary": "Deck" },
-                                        "secondary": { "type": "LITERAL", "primary": "card" },
-                                        "tertiary": { "type": "LITERAL", "primary": 1 }
-                                    },
-                                    {
                                         "type": "UPDATE_VARIABLE",
                                         "variableType": "Number",
                                         "name": { "type": "LITERAL", "primary": "bet" },
                                         "value": { "type": "BUTTON_VALUE" }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "evaluate" }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "trigger": { "type": "CLICK", "target": "All In" },
+                            "filter": {
+                                "type":  "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "UPDATE_VARIABLE",
+                                        "variableType": "Number",
+                                        "name": { "type": "LITERAL", "primary": "bet" },
+                                        "value": {
+                                            "type": "MIN",
+                                            "primary": {
+                                                "type": "VALUE_OF",
+                                                "primary": {
+                                                    "type": "COUNTER_OF",
+                                                    "primary": {
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "Chips" }
+                                                }
+                                            },
+                                            "secondary": {
+                                                "type": "VALUE_OF",
+                                                "primary": { "type": "LITERAL", "primary": "Pot" }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "evaluate" }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "evaluate",
+                    "actions": [
+                        {
+                            "trigger": { "type": "AUTO" },
+                            "filter": null,
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": { "type": "LITERAL", "primary": "card" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
                                     },
                                     {
                                         "type": "IF",
@@ -355,6 +433,11 @@
                                         "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
                                     },
                                     {
+                                        "type": "SET_BUTTON_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "All In" },
+                                        "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
                                         "type": "SET_STEP",
                                         "primary": { "type": "LITERAL", "primary": "settle" }
                                     }
@@ -382,11 +465,12 @@
                                         "type": "SET_COUNTER_VALUE",
                                         "primary": {
                                             "type": "COUNTER_OF",
-                                            "id": {
+                                            "primary": {
                                                 "type": "GET_ID_FROM_ROLE",
                                                 "role": { "type": "LITERAL", "primary": "active" },
                                                 "index": { "type": "UNDEFINED" }
-                                            }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": "Chips" }
                                         },
                                         "secondary": {
                                             "type": "PLUS",
@@ -394,11 +478,12 @@
                                                 "type": "VALUE_OF",
                                                 "primary": {
                                                     "type": "COUNTER_OF",
-                                                    "id": {
+                                                    "primary": {
                                                         "type": "GET_ID_FROM_ROLE",
                                                         "role": { "type": "LITERAL", "primary": "active" },
                                                         "index": { "type": "UNDEFINED" }
-                                                    }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "Chips" }
                                                 }
                                             },
                                             "secondary": {
@@ -459,14 +544,90 @@
                                 "type":  "SEQUENCE",
                                 "primary": [
                                     {
+                                        "type": "IF",
+                                        "primary": {
+                                            "type": "OR",
+                                            "primary": {
+                                                "type": "EQUAL",
+                                                "primary": {
+                                                    "type": "MAP",
+                                                    "primary": {
+                                                        "type": "RANK",
+                                                        "primary": {
+                                                            "type": "CARD_OF_PILE",
+                                                            "primary": { "type": "LITERAL", "primary": "flip" },
+                                                            "secondary": { "type": "UNDEFINED" }
+                                                        }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                },
+                                                "secondary": {
+                                                    "type": "MAP",
+                                                    "primary": {
+                                                        "type": "RANK",
+                                                        "primary": {
+                                                            "type": "CARD_OF_PILE",
+                                                            "primary": { "type": "LITERAL", "primary": "card" },
+                                                            "secondary": { "type": "UNDEFINED" }
+                                                        }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                }
+                                            },
+                                            "secondary": {
+                                                "type": "EQUAL",
+                                                "primary": {
+                                                    "type": "MAP",
+                                                    "primary": {
+                                                        "type": "RANK",
+                                                        "primary": {
+                                                            "type": "CARD_OF_PILE",
+                                                            "primary": { "type": "LITERAL", "primary": "flop" },
+                                                            "secondary": { "type": "UNDEFINED" }
+                                                        }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                },
+                                                "secondary": {
+                                                    "type": "MAP",
+                                                    "primary": {
+                                                        "type": "RANK",
+                                                        "primary": {
+                                                            "type": "CARD_OF_PILE",
+                                                            "primary": { "type": "LITERAL", "primary": "card" },
+                                                            "secondary": { "type": "UNDEFINED" }
+                                                        }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                }
+                                            }
+                                        },
+                                        "secondary": {
+                                            "type": "UPDATE_VARIABLE",
+                                            "variableType": "Number",
+                                            "name": { "type": "LITERAL", "primary": "bet" },
+                                            "value": {
+                                                "type": "TIMES",
+                                                "primary": {
+                                                    "type": "GET_VARIABLE",
+                                                    "variableType": "Number",
+                                                    "name": { "type": "LITERAL", "primary": "bet" }
+                                                },
+                                                "secondary": { "type": "LITERAL", "primary": 2 }
+                                            }
+                                        },
+                                        "tertiary": { "type": "UNDEFINED" }
+                                    },
+                                    {
                                         "type": "SET_COUNTER_VALUE",
                                         "primary": {
                                             "type": "COUNTER_OF",
-                                            "id": {
+                                            "primary": {
                                                 "type": "GET_ID_FROM_ROLE",
                                                 "role": { "type": "LITERAL", "primary": "active" },
                                                 "index": { "type": "UNDEFINED" }
-                                            }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": "Chips" }
                                         },
                                         "secondary": {
                                             "type": "MINUS",
@@ -474,11 +635,12 @@
                                                 "type": "VALUE_OF",
                                                 "primary": {
                                                     "type": "COUNTER_OF",
-                                                    "id": {
+                                                    "primary": {
                                                         "type": "GET_ID_FROM_ROLE",
                                                         "role": { "type": "LITERAL", "primary": "active" },
                                                         "index": { "type": "UNDEFINED" }
-                                                    }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "Chips" }
                                                 }
                                             },
                                             "secondary": {
@@ -507,19 +669,20 @@
                                     {
                                         "type": "IF",
                                         "primary": {
-                                            "type": "EQUAL",
+                                            "type": "LESS_THAN",
                                             "primary": {
                                                 "type": "VALUE_OF",
                                                 "primary": {
                                                     "type": "COUNTER_OF",
-                                                    "id": {
+                                                    "primary": {
                                                         "type": "GET_ID_FROM_ROLE",
                                                         "role": { "type": "LITERAL", "primary": "active" },
                                                         "index": { "type": "UNDEFINED" }
-                                                    }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "Chips" }
                                                 }
                                             },
-                                            "secondary": { "type": "LITERAL", "primary": 0 }
+                                            "secondary": { "type": "LITERAL", "primary": 5 }
                                         },
                                         "secondary": {
                                             "type": "LOSE",
@@ -634,6 +797,34 @@
                                                     "type": "SET_BUTTON_VISIBILITY",
                                                     "primary": { "type": "LITERAL", "primary": "Bet" },
                                                     "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
+                                                },
+                                                {
+                                                    "type": "SET_RANGE",
+                                                    "primary": { "type": "LITERAL", "primary": "Bet" },
+                                                    "secondary": {
+                                                        "type": "BUTTON_RANGE",
+                                                        "primary": { "type": "LITERAL", "primary": 5 },
+                                                        "secondary": {
+                                                            "type": "MIN",
+                                                            "primary": {
+                                                                "type": "VALUE_OF",
+                                                                "primary": {
+                                                                    "type": "COUNTER_OF",
+                                                                    "primary": {
+                                                                        "type": "GET_ID_FROM_ROLE",
+                                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                                        "index": { "type": "UNDEFINED" }
+                                                                    },
+                                                                    "secondary": { "type": "LITERAL", "primary": "Chips" }
+                                                                }
+                                                            },
+                                                            "secondary": {
+                                                                "type": "VALUE_OF",
+                                                                "primary": { "type": "LITERAL", "primary": "Pot" }
+                                                            }
+                                                        },
+                                                        "tertiary": { "type": "LITERAL", "primary": 5 }
+                                                    }
                                                 }
                                             ]
                                         },
@@ -651,35 +842,46 @@
                     "name": "end",
                     "actions": [
                         {
-                            "type": "WHILE",
-                            "primary": {
-                                "type": "NEXT_PLAYER",
-                                "primary": {
-                                    "type": "WIN",
-                                    "primary": {
-                                        "type": "GET_ID_FROM_ROLE",
-                                        "role": { "type": "LITERAL", "primary": "active" },
-                                        "index": { "type": "UNDEFINED" }
-                                    },
-                                    "secondary": {
-                                        "type": "VALUE_OF",
-                                        "primary": {
-                                            "type": "COUNTER_OF",
-                                            "id": {
+                            "trigger": { "type": "AUTO" },
+                            "filter": null,
+                            "result": {
+                                "type": "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "WHILE",
+                                        "primary":{
+                                            "type": "NEXT_PLAYER",
+                                            "primary": { "type": "LITERAL", "primary": "active" }
+                                        },
+                                        "secondary": {
+                                            "type": "WIN",
+                                            "primary": {
                                                 "type": "GET_ID_FROM_ROLE",
                                                 "role": { "type": "LITERAL", "primary": "active" },
                                                 "index": { "type": "UNDEFINED" }
-                                            }
-                                        },
-                                        "tertiary": { "type": "LITERAL", "primary": false }
+                                            },
+                                            "secondary": {
+                                                "type": "VALUE_OF",
+                                                "primary": {
+                                                    "type": "COUNTER_OF",
+                                                    "primary": {
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "Chips" }
+                                                }
+                                            },
+                                            "tertiary": { "type": "LITERAL", "primary": false }
+                                        }
+                                    },
+                                    {
+                                        "type": "END_GAME",
+                                        "primary": { "type": "UNDEFINED" },
+                                        "secondary": { "type": "UNDEFINED" }
                                     }
-                                }
+                                ]
                             }
-                        },
-                        {
-                            "type": "END_GAME",
-                            "primary": { "type": "UNDEFINED" },
-                            "secondary": { "type": "UNDEFINED" }
                         }
                     ]
                 }
