@@ -47,10 +47,21 @@
                 "wraptAt": 800,
                 "wrapTo": -800
             },
+            "deck": {
+                "anchor": {
+                    "x": -75,
+                    "y": 100
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 150,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
             "actions": {
                 "anchor": {
                     "x": 0,
-                    "y": -200
+                    "y": -250
                 },
                 "direction": "HORIZONTAL",
                 "verticalOffset": -180,
@@ -88,7 +99,7 @@
                 "label": "Deck",
                 "initialState": "SHUFFLED",
                 "visibility": "FACE_DOWN",
-                "location": { "locationType": "exact", "location": { "x": 0, "y": 100 } }
+                "location": { "locationType": "relative", "location": "deck" }
             },
             {
                 "label": "Discard",
@@ -140,7 +151,7 @@
                 "label": "Pot",
                 "number": 2000,
                 "visibility": "FACE_UP",
-                "location": { "locationType": "relative", "location": "center" }
+                "location": { "locationType": "relative", "location": "deck" }
             }
         ]
     },
