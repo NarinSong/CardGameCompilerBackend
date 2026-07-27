@@ -144,6 +144,12 @@
                 "visibility": "FACE_UP",
                 "range": { "min": 5, "max": 500, "increment": 5 },
                 "location": { "locationType": "relative", "location": "actions" }
+            },
+            {
+                "label": "All In", 
+                "type": "CLICK",
+                "visibility": "FACE_UP",
+                "location": { "locationType": "relative", "location": "actions" }
             }
         ],
         "counters": [
@@ -219,16 +225,77 @@
                                 "type":  "SEQUENCE",
                                 "primary": [
                                     {
-                                        "type": "DEAL_CARDS",
-                                        "primary": { "type": "LITERAL", "primary": "Deck" },
-                                        "secondary": { "type": "LITERAL", "primary": "card" },
-                                        "tertiary": { "type": "LITERAL", "primary": 1 }
-                                    },
-                                    {
                                         "type": "UPDATE_VARIABLE",
                                         "variableType": "Number",
                                         "name": { "type": "LITERAL", "primary": "bet" },
                                         "value": { "type": "BUTTON_VALUE" }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "evaluate" }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "trigger": { "type": "CLICK", "target": "All In" },
+                            "filter": {
+                                "type":  "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "UPDATE_VARIABLE",
+                                        "variableType": "Number",
+                                        "name": { "type": "LITERAL", "primary": "bet" },
+                                        "value": {
+                                            "type": "MIN",
+                                            "primary": {
+                                                "type": "VALUE_OF",
+                                                "primary": {
+                                                    "type": "COUNTER_OF",
+                                                    "primary": {
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "Chips" }
+                                                }
+                                            },
+                                            "secondary": {
+                                                "type": "VALUE_OF",
+                                                "primary": { "type": "LITERAL", "primary": "Pot" }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "evaluate" }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "evaluate",
+                    "actions": [
+                        {
+                            "trigger": { "type": "AUTO" },
+                            "filter": null,
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": { "type": "LITERAL", "primary": "card" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
                                     },
                                     {
                                         "type": "IF",
@@ -363,6 +430,11 @@
                                     {
                                         "type": "SET_BUTTON_VISIBILITY",
                                         "primary": { "type": "LITERAL", "primary": "Bet" },
+                                        "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type": "SET_BUTTON_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "All In" },
                                         "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
                                     },
                                     {
