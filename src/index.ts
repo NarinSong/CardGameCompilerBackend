@@ -121,14 +121,14 @@ function sendClientGamestate(clientId: ClientID, gamestate: ClientView): void {
     socket.emit('gamestate', gamestate);
 }
 
-function sendGameEnded(clientId: ClientID): void {
+function sendGameEnded(clientId: ClientID, players?: { playerId: number; status: string; score: number }[]): void {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendGameEnded()');
         return;
     }
 
-    socket.emit('gameEnded');
+    socket.emit('gameEnded', players);
 }
 
 function sendLobbyStatus(clientId: ClientID, lobbyStatus: LobbyView): void {

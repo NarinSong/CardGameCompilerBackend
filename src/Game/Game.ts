@@ -24,6 +24,7 @@ export default class Game {
     gameState: GameState;
 
     aborted = false;
+    gameOver= false;
 
     // Player handling
     #nextPlayerId: number = 0;
@@ -41,6 +42,8 @@ export default class Game {
     runAutoActions(): void {
         try {
             while(true) {
+                if (this.gameOver) return;
+
                 const action = this.currentActions.find(a=>a.trigger.type == TriggerType.AUTO && evaluate(this, this.buildAutoContext(), a.filter));
                 if (!action) return;
 
@@ -123,9 +126,11 @@ export default class Game {
      * @param label - The label of the clicked game object.
      * @param cardId - (Optional) the card Id clicked if passed
      * @param playerId
+     * @param buttonValue
      * @returns True if a valid action was found and executed, false if no valid action was found or if the label does not map to a game object.
      */
     clickAction(label: string, cardId: number|undefined, playerId: PlayerID, buttonValue: number | undefined): boolean {
+        if (this.gameOver) return false;
         const actions = this.currentActions;
         if (!actions) return false;
 

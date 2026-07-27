@@ -1047,11 +1047,20 @@ function executeSetStep(g: Game, c: ActionContext, node: ValueNode) {
 function executeWin(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.Win) throw new Error("Called executeWin with invalid node");
 
-    const player = evaluate(g, c, node.primary);
-    const score = evaluate(g, c, node.secondary);
-    const endGame = evaluate(g, c, node.tertiary);
+    const playerId = zn(evaluate(g, c, node.primary));
+    const score = zmn(evaluate(g, c, node.secondary));
+    const endGame = (evaluate(g, c, node.tertiary) as boolean | undefined) ?? true;
 
-    // TODO: end the game
+    const player = g.players[playerId];
+    if (!player) return;
+
+    player.state = 'Won';
+    if (score !== undefined) player.score = score;
+
+    if (endGame) {
+        g.gameOver = true;
+    }
+
 }
 
 /**
@@ -1066,11 +1075,20 @@ function executeWin(g: Game, c: ActionContext, node: ValueNode) {
 function executeLose(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.Lose) throw new Error("Called executeLose with invalid node");
 
-    const player = evaluate(g, c, node.primary);
-    const score = evaluate(g, c, node.secondary);
-    const endGame = evaluate(g, c, node.tertiary);
+    const playerId = zn(evaluate(g, c, node.primary));
+    const score = zmn(evaluate(g, c, node.secondary));
+    const endGame = (evaluate(g, c, node.tertiary) as boolean | undefined) ?? true;
 
-    // TODO: end the game
+    const player = g.players[playerId];
+    if (!player) return;
+
+    player.state = 'Lost';
+    if (score !== undefined) player.score = score;
+
+    if (endGame) {
+        g.gameOver = true;
+    }
+
 }
 
 function executeSendPopup(g: Game, c: ActionContext, node: ValueNode) {

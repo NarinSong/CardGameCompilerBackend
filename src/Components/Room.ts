@@ -69,12 +69,34 @@ export default class Room {
                 case "SEND_POPUPS":
                     this.emitPopups(msg.popups);
                     break;
+                case "GAME_OVER":
+                    this.emitGameOverResults(msg.players);
+                    this.timeouts.set("gameOverDelay", setTimeout(() => {
+                        GameManager.closeRoom(this, msg.players);
+                    }, 3000));
+                    break;
             }
         });
 
         this.worker.on("error", (err) => {
             console.error(`Room ${this.name} worker error:`, err);
         });
+    }
+
+    emitGameOverResults(players: { playerId: number; status: string; score: number }[]): void {
+        for (const clientId in this.clients) {
+            const playerId = this.clients[clientId];
+            const result = players.find(p => p.playerId === playerId);
+            if (!result) continue;
+
+            const message = result.status === 'Won'
+                ? `You win! Final score: ${result.score}`
+                : result.status === 'Lost'
+                    ? `You lost! Final score: ${result.score}`
+                    : `Game over! Final score: ${result.score}`;
+
+            sendPopup(+clientId, message);
+        }
     }
 
     /**
