@@ -9,9 +9,11 @@ import {
     clientRequestClickLabel,
     clientRequestStartNewGame,
     clientRequestSaveGame,
+    clientRequestGetSavedGameBlocks,
 } from "./ClientRequestParser.js";
 import GameManager from "../GameManager.js";
 import { buildGameFromJSON } from "./GameBuilder.js";
+import Database from "../Components/Database.js";
 
 vi.mock("../GameManager.js", () => ({
     default: {
@@ -283,16 +285,18 @@ vi.mock("./GameBuilder.js", () => ({
 vi.mock("../Components/Database.js", () => ({
     default: {
         saveGameJson: vi.fn().mockResolvedValue(undefined),
+        getFullSavedEditorBlocksById: vi.fn(),
     }
 }));
 
-// Commented out because clientRequestSaveGame's signature changed - it used
+// clientRequestSaveGame's signature changed since this was written. It used
 // to take separate gameName/parentId/description/isPrivate args (7 total,
-// matching the calls below), but it's down to (clientId, json, callback) now
-// with all that info folded into the json blob and checked via
-// ClientGameDefinitionSchema. Left as-is instead of guessing at a rewrite -
-// needs someone who knows the new schema's validation rules to redo this
-// properly rather than porting the old args in blind.
+// matching the calls below); now it's just (clientId, json, callback), with
+// all that info folded into the json blob and checked via
+// ClientGameDefinitionSchema. Leaving this commented out rather than
+// guessing at a rewrite. Someone who actually knows the new schema's
+// validation rules should redo this properly instead of porting the old
+// args in blind.
 /*
 describe("clientRequestSaveGame", () => {
     it("does nothing if callback is not a function", async () => {
@@ -418,5 +422,71 @@ describe("clientRequestStartNewGame", () => {
     });
 
 
+});
+
+// Zero coverage existed for this one before, which probably explains how it
+// shipped with two bugs: it validated clientId instead of the gameId
+// argument, so the game you actually asked for was never looked up, and on
+// success it did a bare `return` instead of `callback(...)` - a client would
+// never hear back even when the lookup worked. Both fixed here.
+describe("clientRequestGetSavedGameBlocks", () => {
+    const savedGame = {
+        gameMeta: { name: "SavedGame", private: false },
+        playerDefinition: {},
+        boardDefinition: {},
+        phases: [],
+    };
+
+    it("does nothing if callback is not a function", async () => {
+        expect(() => clientRequestGetSavedGameBlocks(1, 5, "ddwadaw")).not.toThrow();
+    });
+
+    it("calls callback(false) if the client is not found", async () => {
+        vi.mocked(GameManager.clientFromId).mockReturnValue(null);
+
+        const callback = vi.fn();
+        await clientRequestGetSavedGameBlocks(1, 5, callback);
+
+        expect(callback).toHaveBeenCalledWith(false);
+    });
+
+    it("looks up the requested gameId, not the clientId", async () => {
+        const fakeClient = makeFakeClient({ databaseId: 42 });
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+        vi.mocked(Database.getFullSavedEditorBlocksById).mockResolvedValue([
+            { blockeditorstate: JSON.stringify(savedGame), creator: 42 },
+        ]);
+
+        const callback = vi.fn();
+        await clientRequestGetSavedGameBlocks(999, 5, callback);
+
+        expect(Database.getFullSavedEditorBlocksById).toHaveBeenCalledWith(5);
+    });
+
+    it("calls callback(false) for a private game the client doesn't own", async () => {
+        const fakeClient = makeFakeClient({ databaseId: 1 });
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+        vi.mocked(Database.getFullSavedEditorBlocksById).mockResolvedValue([
+            { blockeditorstate: JSON.stringify({ ...savedGame, gameMeta: { name: "SavedGame", private: true } }), creator: 999 },
+        ]);
+
+        const callback = vi.fn();
+        await clientRequestGetSavedGameBlocks(1, 5, callback);
+
+        expect(callback).toHaveBeenCalledWith(false);
+    });
+
+    it("calls callback with the game data on success", async () => {
+        const fakeClient = makeFakeClient({ databaseId: 42 });
+        vi.mocked(GameManager.clientFromId).mockReturnValue(fakeClient as any);
+        vi.mocked(Database.getFullSavedEditorBlocksById).mockResolvedValue([
+            { blockeditorstate: JSON.stringify(savedGame), creator: 42 },
+        ]);
+
+        const callback = vi.fn();
+        await clientRequestGetSavedGameBlocks(1, 5, callback);
+
+        expect(callback).toHaveBeenCalledWith(expect.objectContaining({ gameMeta: expect.objectContaining({ name: "SavedGame" }) }));
+    });
 });
 

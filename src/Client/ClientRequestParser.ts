@@ -421,7 +421,9 @@ export async function clientRequestGetSavedGameBlocks(clientId: number, gameId: 
     if (!databaseId) return callback(false);
 
     // GameID check
-    const gameIdCheck = z.number().safeParse(clientId);
+    // (was validating clientId here instead of gameId - meant the requested
+    // game was never actually looked up, see fix + tests in ClientRequestParser.test.ts)
+    const gameIdCheck = z.number().safeParse(gameId);
 
     if (!gameIdCheck.success) return callback(false);
 
@@ -444,7 +446,9 @@ export async function clientRequestGetSavedGameBlocks(clientId: number, gameId: 
     // Private game that the player doesn't have permission to view
     if (g.gameMeta.private && creator != databaseId) return callback(false);
 
-    return gameCheck.data;
+    // Was a bare `return gameCheck.data` here - the client's callback never
+    // fired on success, only on the failure branches above.
+    return callback(gameCheck.data);
 }
 
 /**

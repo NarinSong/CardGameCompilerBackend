@@ -117,12 +117,11 @@ describe("GameMeta.locationOffset", () => {
 });
 
 describe("GameMeta.nextLocation", () => {
-    // The very first call (no currentLocation) should return the anchor
-    // coordinate itself, untouched by any offset — a placed item's first
-    // slot should sit exactly on the anchor, not one step past it.
-    // (This used to be off-by-one; fixed upstream in "Fix skipping the
-    // anchor on locations".) Deriving from the constant, not hardcoded
-    // numbers, so this doesn't go stale again if the layout grid changes.
+    // First call (no currentLocation) should land exactly on the anchor,
+    // no offset applied. This used to be off-by-one; fixed upstream in
+    // "Fix skipping the anchor on locations". Pulling values from the
+    // constant instead of hardcoding numbers so this doesn't rot again
+    // next time the layout grid changes.
     it("returns the anchor untouched when no current location is given", () => {
         const meta = new GameMeta({ name: "Poker" });
 
