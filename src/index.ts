@@ -2,9 +2,14 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
-import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestChangeProfileDescription, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestGetSavedEditorGameList, clientRequestGetSavedGameBlocks, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestReactWithEmote, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 import { LobbyView } from './Components/Lobby.js';
 import { ClientID } from './schemas/types.js';
+
+// import pickup so that it loads. Temporary until we put it in the live DB
+import PickupGame from './SampleGames/JsonReader.js';
+console.log('Pickup game id? ' + PickupGame.gameMeta.id);
+
 
 // Execution begins here
 // All socket connections come through here. Incoming AND outgoing.
@@ -52,11 +57,15 @@ io.on('connection', (socket: Socket) => {
     socket.on('getColor', (callback) => {clientRequestGetColor(id, callback);});
     socket.on('setColor', (color, callback) => {clientRequestChangeColor(id, color, callback);});
     socket.on('setDisplayName', (displayName, callback) => {clientRequestChangeDisplayName(id, displayName, callback);});
+    socket.on('setDescription', (description, callback) => {clientRequestChangeProfileDescription(id, description, callback);});
+    socket.on('setProfilePicture', (profileUrl, callback) => {clientRequestChangeDisplayName(id, profileUrl, callback);});
 
 
     // Game Builder
     socket.on('getAvailableBlocks', (callback) => {clientRequestGetAvailableBlocks(id, callback);});
-    socket.on('saveGame', (json, gameName, parentGameId, gameDescription, isPrivate, callback) => {clientRequestSaveGame(id, json, gameName, parentGameId, gameDescription, isPrivate, callback);});
+    socket.on('saveGame', (json, callback) => {clientRequestSaveGame(id, json, callback);});
+    socket.on('getSavedGameList', (callback) => {clientRequestGetSavedEditorGameList(id, callback);});
+    socket.on('getSavedGameBlocks', (gameId, callback) => {clientRequestGetSavedGameBlocks(id, gameId, callback);});
 
     // Lobby handling
     socket.on('hostLobby', (callback) => {clientRequestHostLobby(id, callback);});
@@ -70,6 +79,9 @@ io.on('connection', (socket: Socket) => {
 
     // Game play
     socket.on('playerClickEvent', (label, cardId, callback) => {clientRequestClickLabel(id, label, cardId, callback);});
+
+    // Emotes and chat
+    socket.on('emoteReaction', (emote, callback) => {clientRequestReactWithEmote(id, emote, callback);});
 
     // Game scene buttons
     socket.on('leaveGame', (callback) => {clientRequestLeaveGame(id, callback);});
@@ -88,7 +100,7 @@ io.on('connection', (socket: Socket) => {
  * @param clientId - Client id that was supposed to receive.
  * @param functionName - Function name that it failed on.
  */
-function failedSend(clientId: ClientID, functionName: string) {
+function failedSend(clientId: ClientID, functionName: string): void {
     Logger.log(`Failed emit: ${clientId} attempted ${functionName}`);
 }
 
@@ -99,7 +111,7 @@ function failedSend(clientId: ClientID, functionName: string) {
  * @param gamestate - Game state to send to client.
  * @returns void
  */
-function sendClientGamestate(clientId: ClientID, gamestate: ClientView) {
+function sendClientGamestate(clientId: ClientID, gamestate: ClientView): void {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendClientGamestate()');
@@ -109,17 +121,17 @@ function sendClientGamestate(clientId: ClientID, gamestate: ClientView) {
     socket.emit('gamestate', gamestate);
 }
 
-function sendGameEnded(clientId: ClientID) {
+function sendGameEnded(clientId: ClientID, players?: { playerId: number; status: string; score: number }[]): void {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendGameEnded()');
         return;
     }
 
-    socket.emit('gameEnded');
+    socket.emit('gameEnded', players);
 }
 
-function sendLobbyStatus(clientId: ClientID, lobbyStatus: LobbyView) {
+function sendLobbyStatus(clientId: ClientID, lobbyStatus: LobbyView): void {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendClientGamestate()');
@@ -129,7 +141,7 @@ function sendLobbyStatus(clientId: ClientID, lobbyStatus: LobbyView) {
     socket.emit('lobbyStatus', lobbyStatus);
 }
 
-function sendLobbyClosed(clientId: ClientID) {
+function sendLobbyClosed(clientId: ClientID): void {
     const socket = SOCKETS[clientId];
     if (!socket) {
         failedSend(clientId, 'sendLobbyClosed()');
@@ -139,5 +151,25 @@ function sendLobbyClosed(clientId: ClientID) {
     socket.emit('lobbyClosed');
 }
 
+function sendReaction(clientId: ClientID, from: string, reaction: string): void {
+    const socket = SOCKETS[clientId];
+    if (!socket) {
+        failedSend(clientId, 'sendReaction()');
+        return;
+    }
+
+    socket.emit('reaction', from, reaction);
+}
+
+function sendPopup(clientId: ClientID, text: string): void {
+    const socket = SOCKETS[clientId];
+    if (!socket) {
+        failedSend(clientId, 'sendPopup()');
+        return;
+    }
+
+    socket.emit('popup', text);
+}
+
 // Exports. Note: socket is not exported
-export { sendClientGamestate, sendGameEnded, sendLobbyStatus, sendLobbyClosed };
+export { sendClientGamestate, sendGameEnded, sendLobbyStatus, sendLobbyClosed, sendReaction, sendPopup };

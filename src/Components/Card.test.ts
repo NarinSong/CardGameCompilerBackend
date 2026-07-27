@@ -20,14 +20,14 @@ describe("Card.defaultDeck", () => {
     it("creates one card for every rank/suit combination", () => {
         const deck = Card.defaultDeck();
 
-        expect(deck.length).toBe(RANK.length * SUIT.length);
+        expect(deck.length).toBe(52);
     });
 
     it("contains unique rank/suit combinations", () => {
         const deck = Card.defaultDeck();
         const unique = new Set(deck.map(c => `${c.suit}-${c.rank}`));
 
-        expect(unique.size).toBe(RANK.length * SUIT.length);
+        expect(unique.size).toBe(52);
     });
 });
 
@@ -58,7 +58,7 @@ describe("Card.fromInitialState", () => {
     it("returns a shuffled default deck for SHUFFLED state", () => {
     	const cards = Card.fromInitialState(PileState.SHUFFLED);
 
-    	expect(cards.length).toBe(RANK.length * SUIT.length);
+    	expect(cards.length).toBe(52);
     });
 
     it("returns an empty array for non-SHUFFLED states", () => {
@@ -74,7 +74,7 @@ describe("Card.dealCards", () => {
 
         Card.dealCards(from, to, 5);
 
-        expect(from.cards.length).toBe(RANK.length * SUIT.length - 5);
+        expect(from.cards.length).toBe(52 - 5);
         expect(to.cards.length).toBe(5);
     });
 

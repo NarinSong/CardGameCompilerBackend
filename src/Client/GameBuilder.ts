@@ -19,16 +19,21 @@ export function buildGameFromJSON(clientJson: unknown) {
 
     // JSON is verified, let's build a game
 
-    const game = new GameDefinition();
+    const game = new GameDefinition(data.gameMeta);
 
+    /*
     // Define the game meta (it's already built, so we just override if we have any changes to make)
+
     if (typeof data.gameMeta.minPlayers !== 'undefined')
         game.minPlayers = data.gameMeta.minPlayers;
     if (typeof data.gameMeta.maxPlayers !== 'undefined')
         game.maxPlayers = data.gameMeta.maxPlayers;
+    if (typeof data.gameMeta.locations !== 'undefined')
+        game.gameMeta.addLocations(data.gameMeta.locations);
 
     // TODO: the remaining game meta :)
     // It isn't implemented in GameDefinition yet, so we'll have to make getters for it
+    */
 
     // Define the players
     if (typeof data.playerDefinition.piles !== 'undefined')
@@ -44,6 +49,13 @@ export function buildGameFromJSON(clientJson: unknown) {
 
             game.addPlayerCounter(counter); // TODO: verify labels, actionRoles, etc.
         }
+
+    if (typeof data.playerDefinition.buttons !== 'undefined')
+        for (let button of data.playerDefinition.buttons) {
+            if (!button) continue;
+
+            game.addPlayerButton(button);
+        }
     
     // Define the board
     if (typeof data.boardDefinition.piles !== 'undefined')
@@ -58,6 +70,13 @@ export function buildGameFromJSON(clientJson: unknown) {
             if (!counter) continue;
 
             game.addBoardCounter(counter); // TODO: verify labels, actionRoles, etc.
+        }
+
+    if (typeof data.boardDefinition.buttons !== 'undefined')
+        for (let button of data.boardDefinition.buttons) {
+            if (!button) continue;
+
+            game.addBoardButton(button);
         }
     
     // Create the game phases

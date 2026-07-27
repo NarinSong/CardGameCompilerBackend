@@ -7,7 +7,7 @@ import { Worker } from "node:worker_threads";
 
 import GameManager from "../GameManager.js";
 import { ClientID, LobbyID, PlayerID, PlayerType, RoomID, GameID } from "../schemas/types.js";
-import { sendClientGamestate } from "../index.js";
+import { sendClientGamestate, sendPopup, sendReaction } from "../index.js";
 import ClientView from "../Client/ClientView.js";
 
 
@@ -36,6 +36,7 @@ export default class Room {
     name: RoomID;
     lobby: LobbyID;
     started: boolean;
+    private timeouts: Map<string, NodeJS.Timeout>;
 
     /**
      * Creates a room.
@@ -49,6 +50,8 @@ export default class Room {
         this.name = name;
         this.lobby = lobby;
         this.started = false;
+        this.timeouts = new Map();
+        this.resetInactivityTimeout();
 
 
         this.worker = new Worker(new URL("./RoomWorker.js", import.meta.url), {
@@ -60,7 +63,18 @@ export default class Room {
                 case "GAME_STATE":
                     this.emitGameState(msg.views);
                     break;
-        
+                case "GAME_ABORTED":
+                    GameManager.closeRoom(this);
+                    break;
+                case "SEND_POPUPS":
+                    this.emitPopups(msg.popups);
+                    break;
+                case "GAME_OVER":
+                    this.emitGameOverResults(msg.players);
+                    this.timeouts.set("gameOverDelay", setTimeout(() => {
+                        GameManager.closeRoom(this, msg.players);
+                    }, 3000));
+                    break;
             }
         });
 
@@ -69,12 +83,41 @@ export default class Room {
         });
     }
 
+    emitGameOverResults(players: { playerId: number; status: string; score: number }[]): void {
+        for (const clientId in this.clients) {
+            const playerId = this.clients[clientId];
+            const result = players.find(p => p.playerId === playerId);
+            if (!result) continue;
+
+            const message = result.status === 'Won'
+                ? `You win! Final score: ${result.score}`
+                : result.status === 'Lost'
+                    ? `You lost! Final score: ${result.score}`
+                    : `Game over! Final score: ${result.score}`;
+
+            sendPopup(+clientId, message);
+        }
+    }
+
     /**
-     *  
-     * Send the updated game state to all clients.
-     * 
+     * Resets the inactivity timeout for the room.
+     * If the room is inactive for 30 minutes, it will be destroyed.
      */
-    emitGameState(views: {playerId: number, view: ClientView}[]) {
+    resetInactivityTimeout(): void {
+        const existing = this.timeouts.get("inactivity");
+        if (existing) clearTimeout(existing);
+        
+        this.timeouts.set("inactivity", setTimeout(() => {
+            console.log(`Room ${this.name} timed out due to inactivity`);
+            GameManager.closeRoom(this);
+        }, 30 * 60 * 1000));
+    }
+
+    /**
+     * Sends the updated game state to all clients in the room.
+     * @param views - Array of player id and view pairs to send to each client.
+     */
+    emitGameState(views: {playerId: number, view: ClientView}[]): void {
         
         for(const clientId in this.clients)
         {
@@ -87,39 +130,65 @@ export default class Room {
 
             sendClientGamestate(client.identifier,  playerView.view );
         }
+    }
 
-        // for (let c in this.clients) {
-        //     if (!this.game.players[0]) continue;
-            
-        //     const client = GameManager.clientFromId(+c);
-        //     if (!client) continue;
+    emitOnePopup(popup: { message: string, player: number | null }) {
+        for (const clientId in this.clients) {
+            const playerId = this.clients[clientId];
+            const client = GameManager.clientFromId(+clientId);
+            if(!client) continue;
 
-        //     client.updateGamestate(state);
-        // }
+            if (popup.player === null || popup.player == playerId)
+
+            sendPopup(+clientId, popup.message);
+        }
+    }
+
+    emitPopups(popups: { message: string, player: number | null }[]){
+        for (const popup of popups) {
+            if (!popup) continue;
+            this.emitOnePopup(popup);
+        }
     }
 
     /**
      * Handles the action whenever a player clicks an object (Pile, Card, etc.).
      * @param label - The object that the user clicked.
-     * @todo use cardId and player number to build action context
+     * @param cardId
+     * @param playerId
      */
-    handlePlayerClick(label: string, cardId: number) {
+    handlePlayerClick(label: string, cardId: number|undefined, playerId: number, buttonValue: number|undefined): void {
         if (!this.started) return;
-        this.worker.postMessage({type: "PLAYER_CLICK", label})
-        // let actionTaken = this.game.clickAction(label); // TODO: player number?
+        this.resetInactivityTimeout();
+        this.worker.postMessage({type: "PLAYER_CLICK", label, cardId, playerId, buttonValue})
 
-        // if (actionTaken) {
-        //     // Update clients with new gamestate
-        //     this.emitGameState();
-        // }
     }
 
-    // This function should *only* be called by the parent lobby, and *only* during room creation, before the game begins
-    handleJoinRoom(clientId: ClientID) {
+    /**
+     * Broadcasts an emote reaction from a client to all other clients in the room.
+     * @param clientId - The id of the client sending the emote.
+     * @param username - The username of the client sending the emote.
+     * @param emote - The emote string to broadcast.
+     */
+    handleEmote(clientId: ClientID, username: string, emote: string): void {
+        for (const client in this.clients) {
+            if (+client == clientId) continue;
+
+            sendReaction(+client, username, emote);
+        }
+    }
+
+    /**
+     * Handles a client joining the room before the game starts.
+     * Should only be called by the parent lobby during room creation.
+     * @param clientId - The id of the client joining the room.
+     * @returns Promise resolving to true if the player successfully joined, else false.
+     */
+    handleJoinRoom(clientId: ClientID): false | Promise<boolean> {
         if (this.started) return false;
         const client = GameManager.clientFromId(clientId);
         if (!client) return false;
-
+        this.resetInactivityTimeout();
 
 
          
@@ -133,7 +202,7 @@ export default class Room {
             const listener = (msg: any) => {
                 if (msg.type !== "PLAYER_JOINED") return;
                 this.worker.off("message", listener);
-                if (!msg.playerId) return resolve(false);
+                if (msg.playerId == null) return resolve(false);
 
                 this.clients[client.identifier] = msg.playerId;
                 client.inGame = true;
@@ -142,25 +211,50 @@ export default class Room {
                 resolve(true)
             };
             this.worker.on("message", listener);
-            this.worker.postMessage({ type: "JOIN_ROOM", playerType: PlayerType.HUMAN });
+            this.worker.postMessage({ type: "JOIN_ROOM", playerType: PlayerType.HUMAN, playerName: client.displayName });
         });
        
     }
 
-    startGame() {
+    /**
+     * Starts the game in the worker thread.
+     * @returns True if the game was started successfully, false if the game has already started.
+     */
+    startGame(): boolean {
         if (this.started) return false;
         this.started = true;
+        this.resetInactivityTimeout();
         this.worker.postMessage({type: "START_GAME"});
         return true;
+    }   
+
+    /**
+     * Clears all active timeouts for the room.
+     */
+    clearTimeouts(): void {
+        for (const t of this.timeouts.values()){
+            clearTimeout(t);
+        }
+        this.timeouts.clear();
     }
 
-    clearTimeouts() {
-        // TODO: As timeouts are added, remove them here.
-        
+    /**
+     * Clears a specific timeout by name.
+     * @param name - The name of the timeout to clear.
+     */
+    clearTimeoutByName(name: string): void {
+        const exists = this.timeouts.get(name);
+        if (exists){
+            clearTimeout(exists);
+            this.timeouts.delete(name);
+        }
     }
 
-    //Terminate the thread after the room is done
-    destroy(){
+    /**
+     * Destroys the room by clearing all timeouts and terminating the worker thread.
+     */
+    destroy(): void {
+        this.clearTimeouts();
         this.worker.terminate();
     }
 }

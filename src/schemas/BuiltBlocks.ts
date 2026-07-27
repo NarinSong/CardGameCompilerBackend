@@ -28,8 +28,18 @@ export type BlockNode = {
   args: Record<string, ClientNode>;
 };
 
+export type VariableNode = {
+  kind: "variable";
+  block: "UPDATE_VARIABLE" | "GET_VARIABLE";
+  variableType: ValueTypeName;
+  args: {
+    name: ClientNode;
+    value?: ClientNode | undefined;
+  };
+};
+
 // ClientNode is any block or literal sent by the client
-export type ClientNode = LiteralNode | BlockNode | SequenceNode | ArrayNode;
+export type ClientNode = LiteralNode | BlockNode | SequenceNode | ArrayNode | VariableNode;
 
 
 // These Zod schemas verify structure only. That they are blocks, rather than what blocks they are.
@@ -45,7 +55,7 @@ const ClientNodeSchema: z.ZodType<ClientNode> = z.lazy(() =>
     z.object({
       kind: z.literal("block"),
       block: z.enum(BlockNames),
-      args: z.record(z.string(), ClientNodeSchema as z.ZodType<BlockNode>),
+      args: z.record(z.string(), ClientNodeSchema as z.ZodType<ClientNode>),
     }),
     z.object({
       kind: z.literal("sequence"),
@@ -55,6 +65,15 @@ const ClientNodeSchema: z.ZodType<ClientNode> = z.lazy(() =>
       kind: z.literal("array"),
       valueType: ValueTypeNameSchema,
       value: z.array(ClientNodeSchema),
+    }),
+    z.object({
+      kind: z.literal("variable"),
+      block: z.literal("UPDATE_VARIABLE").or(z.literal("GET_VARIABLE")),
+      variableType: ValueTypeNameSchema,
+      args: z.object({
+        name: ClientNodeSchema as z.ZodType<ClientNode>,
+        value: (ClientNodeSchema as z.ZodType<ClientNode>).optional(),
+      })
     })
   ])
 );
@@ -71,6 +90,11 @@ function inferNodeType(node: ClientNode): ValueTypeName {
   if (node.kind === "array") {
     return "Array";
   }
+  if (node.kind === "variable") {
+    const variableTypeCheck = ValueTypeNameSchema.parse(node.variableType);
+
+    return variableTypeCheck;
+  }
 
   const block = BLOCKS[node.block as BlockName];
 
@@ -81,44 +105,37 @@ function inferNodeType(node: ClientNode): ValueTypeName {
   return block.returnType;
 }
 
-// Throws an error if something is invalid, otherwise does not throw
-export function validateNode(node: ClientNode): void {
-  if (node.kind === "literal") {
-    const schema = ValueTypes[node.valueType];
+function validateLiteral(node: LiteralNode): void {
+  const schema = ValueTypes[node.valueType];
+  schema.parse(node.value);
+}
 
-    schema.parse(node.value);
-
-    return;
+function validateSequence(node: SequenceNode): void {
+  for (const block of node.blocks) {
+    // Sequence doesn't care about the return types of the child nodes
+    validateNode(block);
   }
-  if (node.kind === "sequence") {
-    for (const block of node.blocks) {
-      // Sequence doesn't care about the return types of the child nodes
-      validateNode(block);
+}
+
+function validateArray(node: ArrayNode): void {
+  for (const value of node.value) {
+    if (typeof value === 'undefined') {
+        throw new Error(`Undefined array value`);
     }
 
-    return;
-  }
-  if (node.kind === "array") {
-    for (const value of node.value) {
-      if (typeof value === 'undefined') {
-          throw new Error(`Undefined array value`);
-      }
+    validateNode(value);
 
-      validateNode(value);
+    const actualType = inferNodeType(value);
 
-      const actualType = inferNodeType(value);
-
-      if (actualType !== node.valueType) {
-        throw new Error(
-          `Type mismatch for array: expected ${node.valueType}, got ${actualType}`
-        );
-      }
+    if (actualType !== node.valueType) {
+      throw new Error(
+        `Type mismatch for array: expected ${node.valueType}, got ${actualType}`
+      );
     }
-
-
-    return;
   }
+}
 
+function validateBlock(node: BlockNode): void {
   const block = BLOCKS[node.block as BlockName];
 
   if (!block) {
@@ -139,12 +156,64 @@ export function validateNode(node: ClientNode): void {
 
     const actualType = inferNodeType(provided);
 
-    if (actualType !== argDef.type) {
+    if (argDef.type === 'Void' || argDef.type === 'Unknown') {
+      // If the block doesn't care about the return type, neither should we
+      continue;
+    }
+
+    // Kind of a loose comparison but it'll allow any "string" to match with any other "string" and vice-versa
+    if (ValueTypes[actualType].type !== ValueTypes[argDef.type].type) {
       throw new Error(
         `Type mismatch for ${argDef.name}: expected ${argDef.type}, got ${actualType}`
       );
     }
   }
+}
+
+function validateVariable(node: VariableNode): void {
+  // Validate variable name
+  const name = node.args['name'];
+
+  if (!name) {
+      throw new Error(`Missing variable name`);
+  }
+
+  validateNode(name);
+
+  const nameType = inferNodeType(name);
+  if (nameType !== 'String') throw new Error('Variable name is not a string');
+
+  // If UPDATE_VARIABLE, validate the value
+
+  if (node.block === 'GET_VARIABLE') return;
+  
+  const variableType = inferNodeType(node);
+  
+  const value = node.args['value'];
+  if (!value) throw new Error('UPDATE_VARIABLE missing a value');
+
+  validateNode(value);
+
+  const valueType = inferNodeType(value);
+  if (valueType !== variableType) throw new Error(`Variable type mismatch. Tried to set ${variableType} variable to a ${valueType}`);
+}
+
+// Throws an error if something is invalid, otherwise does not throw
+export function validateNode(node: ClientNode): void {
+  if (node.kind === "literal") {
+    return validateLiteral(node);
+  }
+  if (node.kind === "sequence") {
+    return validateSequence(node);
+  }
+  if (node.kind === "array") {
+    return validateArray(node);
+  }
+  if (node.kind === "variable") {
+    return validateVariable(node);
+  }
+
+  return validateBlock(node);
 }
 
 const ClientActionSchema = z.object({
@@ -169,3 +238,5 @@ export const ClientBuiltBlocksSchema = z.object({
   boardDefinition: BoardSchema,
   phases: z.array(ClientPhaseSchema),
 });
+
+export type ClientBuiltBlocks = z.infer<typeof ClientBuiltBlocksSchema>;

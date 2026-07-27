@@ -1,6 +1,7 @@
 import ValueMap, { CardValueMap, DEFAULT_CARD_RANK_MAP, DEFAULT_CLIENT_VIEW_RANK_MAP, DEFAULT_CLIENT_VIEW_SUIT_MAP, DEFAULT_VALUE_MAP } from "../Components/ValueMap.js";
-import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
-import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DefaultLocation, Location } from "../schemas/types.js";
+import { ValueTypeName } from "../schemas/Blocks.js";
+import { ConstantArg, GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
+import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DEFAULT_TEXT_LOCATION, DefaultLocation, Location } from "../schemas/types.js";
 
 
 /**
@@ -16,8 +17,13 @@ export default class GameMeta {
     cardValueMap: CardValueMap;
     clientSuitMap: ValueMap<string, number>;
     clientRankMap: ValueMap<string, number>;
-    variables: Record<string, number>;
+    constants: Record<string, ConstantArg>;
+    variables: Record<string, ValueTypeName>;
     locations: Record<string, DefaultLocation>;
+    parentGameId?: number | undefined;
+    description: string;
+    private: boolean;
+    id?: number | undefined;
 
     /**
      * Creates a new GameMeta configuration.
@@ -31,29 +37,65 @@ export default class GameMeta {
         this.maps = { 'CARD_RANK_MAP': DEFAULT_CARD_RANK_MAP }
         this.clientSuitMap = obj.clientSuitMap ? new ValueMap<string, number>(obj.clientSuitMap) : DEFAULT_CLIENT_VIEW_SUIT_MAP;
         this.clientRankMap = obj.clientRankMap ? new ValueMap<string, number>(obj.clientRankMap) : DEFAULT_CLIENT_VIEW_RANK_MAP;
+        this.constants = obj.constants ?? {};
         this.variables = obj.variables ?? {};
+        this.parentGameId = obj.parentGameId;
+        this.description = obj.description || obj.name;
+        this.private = obj.private ?? true;
+        this.id = obj.id;
+
+        this.addMaps(obj.maps);
+
         this.locations = {
             'DEFAULT_PILE': DEFAULT_PILE_LOCATION,
             'DEFAULT_BUTTON': DEFAULT_BUTTON_LOCATION,
             'DEFAULT_COUNTER': DEFAULT_COUNTER_LOCATION,
+            'DEFAULT_TEXT': DEFAULT_TEXT_LOCATION
         };
 
-        for (let i in obj.locations) {
-            if (!obj.locations[i]) continue;
-            this.locations[i] = obj.locations[i];
+        this.addLocations(obj.locations ?? {});
+    }
+
+    addMaps(maps: Record<string, Record<string, number>> | undefined): void {
+        if (!maps) return;
+
+        for (let i in maps) {
+            if (!maps[i]) continue;
+            this.maps[i] = new ValueMap<string, number>(maps[i]);
         }
     }
 
+    addLocations(locations: Record<string, DefaultLocation>): void {
+        for (let i in locations) {
+            if (!locations[i]) continue;
+            this.locations[i] = locations[i];
+        }
+    }
+
+    /**
+     * Calculates the next offset value and whether it wrapped around the threshold.
+     * @param current - The current position value.
+     * @param offset - The amount to offset by.
+     * @param threshold - The maximum value before wrapping.
+     * @param wrapTo - The value to wrap back to.
+     * @returns An object containing the new value and whether wrapping occurred.
+     */
     static locationOffset(current: number, offset: number, threshold: number, wrapTo: number): { value: number, wrapped: boolean } {
         current += offset;
         let wrapped = false;
-        if (current > threshold) {
+        if ((offset > 0 && current > threshold) || (offset < 0 && current < threshold)) {
             current = wrapTo;
             wrapped = true;
         }
         return { value: current, wrapped: wrapped };
     }
 
+    /**
+     * Computes the next location for a game component based on a named default layout.
+     * @param locationName - The name of the default location configuration to use.
+     * @param currentLocation - The current location to offset from, if any.
+     * @returns The next computed location.
+     */
     nextLocation(locationName: string, currentLocation?: Location | undefined): Location {
         const defaultLocation: DefaultLocation | undefined = this.locations[locationName];
         if (!defaultLocation) return {x:0, y:0};
@@ -64,7 +106,11 @@ export default class GameMeta {
                 x: defaultLocation.anchor.x,
                 y: defaultLocation.anchor.y
             }
+
+            return currentLocation;
         }
+
+        currentLocation = JSON.parse(JSON.stringify(currentLocation)) as Location;
 
         if (defaultLocation.direction === 'HORIZONTAL') {
             const base = GameMeta.locationOffset(currentLocation.x, defaultLocation.horizontalOffset, defaultLocation.wraptAt, defaultLocation.wrapTo);

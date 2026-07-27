@@ -15,10 +15,11 @@ const UndefinedSchema = z.literal(NODE_NAMES.Undefined);
 
 const OperatorlessSchema = z.enum([
   NODE_NAMES.ClickedLabel,
-  NODE_NAMES.CtxId,
+  NODE_NAMES.CtxPlayer,
   NODE_NAMES.CtxCard,
   NODE_NAMES.FirstPlayer,
   NODE_NAMES.ButtonValue,
+  NODE_NAMES.NumPlayers,
 ]);
 const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.Not,
@@ -29,7 +30,21 @@ const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.NextPlayer,
   NODE_NAMES.NumCardsInPile,
   NODE_NAMES.ValueOf,
+  NODE_NAMES.TextValueOf,
   NODE_NAMES.RemoveButton,
+  NODE_NAMES.RemoveText,
+  NODE_NAMES.RelativeLocation,
+  NODE_NAMES.BroadcastPopup,
+  NODE_NAMES.NumberToString,
+  NODE_NAMES.DisplayName,
+  NODE_NAMES.PlayerScore,
+  NODE_NAMES.PlayerStatus,
+  NODE_NAMES.Revive,
+  NODE_NAMES.PileOwner,
+  NODE_NAMES.CounterOwner,
+  NODE_NAMES.ButtonOwner,
+  NODE_NAMES.TextOwner,
+  NODE_NAMES.Comment,
 ]);
 const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.And,
@@ -39,6 +54,7 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.Div,
   NODE_NAMES.Minus,
   NODE_NAMES.StringEq,
+  NODE_NAMES.StringJoin,
   NODE_NAMES.Map,
   NODE_NAMES.While,
   NODE_NAMES.LessThan,
@@ -52,20 +68,36 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.SetCounterVisibility,
   NODE_NAMES.SetButtonVisisibility,
   NODE_NAMES.SetPileVisibility,
+  NODE_NAMES.SetTextVisibility,
   NODE_NAMES.RemoveCounter,
   NODE_NAMES.CounterOf,
   NODE_NAMES.ButtonOf,
+  NODE_NAMES.TextOf,
+  NODE_NAMES.PileRun,
+  NODE_NAMES.SetText,
+  NODE_NAMES.SendPopup,
+  NODE_NAMES.SetScore,
+  NODE_NAMES.EndGame,
 ]);
 
 const TernaryOperatorsSchema = z.enum([
   NODE_NAMES.Ternary,
   NODE_NAMES.DealCards,
+  NODE_NAMES.MoveCard,
   NODE_NAMES.If,
   NODE_NAMES.MoveCounterValue,
   NODE_NAMES.IsBetween,
   NODE_NAMES.Win,
   NODE_NAMES.Lose,
   NODE_NAMES.ButtonRange,
+  NODE_NAMES.PileSet,
+  NODE_NAMES.PileFlush,
+]);
+
+const QuarnaryOperatorsSchema = z.enum([
+  NODE_NAMES.PileSetOfRank,
+  NODE_NAMES.PileFlushOfSuit,
+  NODE_NAMES.PileRunFrom,
 ]);
 
 const RoleOperatorsSchema = z.enum([
@@ -75,8 +107,12 @@ const RoleOperatorsSchema = z.enum([
   NODE_NAMES.HasRole,
 ]);
 
+const VariableGetterSchema = z.enum([
+  NODE_NAMES.GetVariable,
+  NODE_NAMES.GetConstant,
+])
+
 const VariableOperatorsSchema = z.enum([
-  NODE_NAMES.AddVariable,
   NODE_NAMES.UpdateVariable,
 ])
 
@@ -87,7 +123,9 @@ type UnaryOperatorsNames = z.infer<typeof UnaryOperatorsSchema>;
 type OperatorlessNames = z.infer<typeof OperatorlessSchema>;
 type BinaryOperatorsNames = z.infer<typeof BinaryOperatorsSchema>;
 type TernaryOperatorsNames = z.infer<typeof TernaryOperatorsSchema>;
+type QuarnaryOperatorsNames = z.infer<typeof QuarnaryOperatorsSchema>;
 type RoleOperatorsNames = z.infer<typeof RoleOperatorsSchema>;
+type VariableGetterNames = z.infer<typeof VariableGetterSchema>;
 type VariableOperatorsNames = z.infer<typeof VariableOperatorsSchema>;
 
 // Typescript type structure
@@ -112,6 +150,12 @@ export type AST_Node =
   primary: AST_Node;
   secondary: AST_Node;
   tertiary: AST_Node;
+} | {
+  type: QuarnaryOperatorsNames;
+  primary: AST_Node;
+  secondary: AST_Node;
+  tertiary: AST_Node;
+  fourth: AST_Node;
 } | {
   type: RoleOperatorsNames;
   id: AST_Node;
@@ -140,9 +184,11 @@ export type AST_Node =
   type: VariableOperatorsNames;
   name: AST_Node;
   value: AST_Node;
+  variableType: string;
 } | {
-  type: typeof NODE_NAMES.GetVariable;
+  type: VariableGetterNames;
   name: AST_Node;
+  variableType: string;
 } | {
   type: typeof NODE_NAMES.Sequence;
   primary: AST_Node[];
@@ -170,6 +216,15 @@ export type AST_Node =
   location: AST_Node;
   buttonType: AST_Node;
   range: AST_Node;
+} | {
+  type: typeof NODE_NAMES.CreateText;
+  text: AST_Node;
+  name: AST_Node;
+  visibility: AST_Node;
+  actionRoles: AST_Node;
+  displayName: AST_Node;
+  owner: AST_Node;
+  location: AST_Node;
 };
 
 export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
@@ -204,6 +259,14 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
       primary: ValueNodeSchema,
       secondary: ValueNodeSchema,
       tertiary: ValueNodeSchema
+    }),
+
+    z.object({
+      type: QuarnaryOperatorsSchema,
+      primary: ValueNodeSchema,
+      secondary: ValueNodeSchema,
+      tertiary: ValueNodeSchema,
+      fourth: ValueNodeSchema,
     }),
 
     z.object({
@@ -247,6 +310,17 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
     }),
 
     z.object({
+      type: z.literal(NODE_NAMES.CreateText),
+      text: ValueNodeSchema,
+      name: ValueNodeSchema,
+      visibility: ValueNodeSchema,
+      actionRoles: ValueNodeSchema,
+      displayName: ValueNodeSchema,
+      owner: ValueNodeSchema,
+      location: ValueNodeSchema,
+    }),
+
+    z.object({
       type: z.literal(NODE_NAMES.GetIdFromRole),
       role: ValueNodeSchema,
       index: ValueNodeSchema
@@ -270,11 +344,13 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
       type: VariableOperatorsSchema,
       name: ValueNodeSchema,
       value: ValueNodeSchema,
+      variableType: z.string(),
     }),
 
     z.object({
-    type: z.literal(NODE_NAMES.GetVariable),
-    name: ValueNodeSchema,
+      type: VariableGetterSchema,
+      name: ValueNodeSchema,
+      variableType: z.string(),
     }),
 
     /* Logic */
@@ -297,7 +373,7 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
 
 export const ActionContextSchema = z.object({
   trigger: TriggerSchema,
-  id: z.number().optional(),
+  player: z.number(),
   label: LabelSchema.optional(),
   card: CardSchema.optional(),
   buttonValue: z.number().optional(),

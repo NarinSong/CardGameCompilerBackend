@@ -4,11 +4,15 @@ import Client from "../Client/Client.js";
 import GameManager from "../GameManager.js";
 import { sendLobbyClosed, sendLobbyStatus } from "../index.js";
 import Room from "./Room.js";
-import GameDefinition from "../Rules/GameDefinition.js";
 import { ClientID, GameID, LobbyID, RoomID } from "../schemas/types.js";
 
 const A = "A".charCodeAt(0);
 
+/**
+ * A snapshot of the lobby state sent to clients.
+ * 
+ * Contains the host info, player list, join code, and selected game details.
+ */
 export class LobbyView {
     readonly host: {
         username: string;
@@ -23,6 +27,10 @@ export class LobbyView {
     readonly game: string;
     readonly gameDescription: string;
 
+    /**
+     * Creates a LobbyView from a Lobby instance.
+     * @param lobby - The lobby to generate a view from.
+     */
     constructor(lobby: Lobby) {
         this.host = {
             username: lobby.hostName,
@@ -31,10 +39,15 @@ export class LobbyView {
         this.players = lobby.playerDetails;
         this.code = lobby.joinCode;
         this.game = lobby.gameName; // defaults to "No Game Selected"
-        this.gameDescription = 'Game description';
+        this.gameDescription = lobby.gameDescription;
     }
 }
 
+/**
+ * Represents a lobby that holds players before and during a game.
+ * 
+ * A Lobby manages the host, player list, join code, selected game, and associated rooms.
+ */
 export default class Lobby {
     #host: ClientID;
     #hostName: string;
@@ -44,6 +57,12 @@ export default class Lobby {
     #joinCode: string;
     #rooms: RoomID[];
 
+    /**
+     * Creates a new lobby.
+     * @param host - The client hosting the lobby.
+     * @param joinCode - The unique join code for the lobby.
+     * @throws Error if the host is not authenticated.
+     */
     constructor(host: Client, joinCode: LobbyID) {
         if (!host.isAuthenticated || !host.username) throw new Error("Unauthenticated host created lobby");
 
@@ -60,7 +79,10 @@ export default class Lobby {
         this.update();
     }
 
-    update() {
+    /**
+     * Sends the current lobby state to all players in the lobby.
+     */
+    update(): void {
         const view = new LobbyView(this);
 
         for (let p in this.#players) {
@@ -71,7 +93,12 @@ export default class Lobby {
         }
     }
 
-    joinGame(client: Client) {
+    /**
+     * Adds a client to the lobby.
+     * @param client - The client joining the lobby.
+     * @returns True if the client successfully joined, false if the lobby is full.
+     */
+    joinGame(client: Client): boolean {
         if (this.#players.length >= this.#maxPlayers) return false;
 
         this.#players.push(client.identifier);
@@ -84,12 +111,21 @@ export default class Lobby {
         return true;
     }
 
-    selectGame(gameId: GameID) {
+    /**
+     * Sets the selected game for the lobby.
+     * @param gameId - The id of the game to select.
+     */
+    selectGame(gameId: GameID): void {
         this.#game = gameId;
         this.update();
     }
 
-    async startGame() {
+    /**
+     * Starts the game for all available players in the lobby.
+     * Creates a room and assigns players to it.
+     * @returns Promise resolving to true if the game started successfully, false otherwise.
+     */
+    async startGame(): Promise<boolean> {
         if (!this.#game) return false;
         const gameDefinition = GameManager.getRegisteredGameDefinition(this.#game);
         if (!gameDefinition) return false;
@@ -118,14 +154,25 @@ export default class Lobby {
         this.#rooms.push(room.name);
 
         this.update();
+
+        return true;
     }
 
-    isHost(clientId: ClientID) {
+    /**
+     * Checks if a client is the host of the lobby.
+     * @param clientId - The id of the client to check.
+     * @returns True if the client is the host, else false.
+     */
+    isHost(clientId: ClientID): boolean {
         return this.#host == clientId;
     }
 
     // NEEDS TESTING
-    assignNewHost() {
+    /**
+     * Assigns a new host from the remaining players.
+     * If no players remain, the lobby is deleted.
+     */
+    assignNewHost(): void {
         const hostId = this.#players[0];
         if (this.#players.length == 0 || !hostId) {
             GameManager.deleteLobby(this.#joinCode);
@@ -143,7 +190,11 @@ export default class Lobby {
         this.update();
     }
 
-    checkForHost() {
+    /**
+     * Checks if the current host is still in the lobby.
+     * @returns True if the host is present, else false.
+     */
+    checkForHost(): boolean {
         for (let i in this.#players) {
             if (this.#players[i] && this.isHost(this.#players[i]))
                 return true;
@@ -152,7 +203,12 @@ export default class Lobby {
         return false;
     }
 
-    removeFromLobbyById(clientId: number) {
+    /**
+     * Removes a player from the lobby by their client id.
+     * Also removes them from any active room, reassigns the host if needed, and deletes the lobby if empty.
+     * @param clientId - The id of the client to remove.
+     */
+    removeFromLobbyById(clientId: number): void {
         for (let p in this.#players) {
             const currentId = this.#players[p];
             if (!currentId) continue;
@@ -194,7 +250,12 @@ export default class Lobby {
     }
 
     // NEEDS TESTING
-    removeFromLobby(username: string) {
+    /**
+     * Removes a player from the lobby by their username.
+     * @param username - The username of the player to remove.
+     * @returns True if the player was found and removed, else false.
+     */
+    removeFromLobby(username: string): boolean {
         for (let p in this.#players) {
             const clientId = this.#players[p];
             if (!clientId) continue;
@@ -209,7 +270,11 @@ export default class Lobby {
         return false;
     }
 
-    static randomAlphaNumeric() {
+    /**
+     * Returns a random alphanumeric character (0-9 or A-Z).
+     * @returns A single character string.
+     */
+    static randomAlphaNumeric(): string {
         const number = Math.floor(Math.random() * 36);
         
         if (number < 10) return ''+number; //0-9
@@ -217,6 +282,10 @@ export default class Lobby {
         return String.fromCharCode( number - 10 + A ); //A-Z
     }
 
+    /**
+     * Generates a random 6-character alphanumeric join code.
+     * @returns A random lobby join code string.
+     */
     static createRandomJoinCode(): LobbyID {
         const LENGTH = 6;
         let code = '';
@@ -270,6 +339,13 @@ export default class Lobby {
         const game = GameManager.getRegisteredGameDefinition(this.#game);
 
         return game ? game.gameMeta.name : 'No Game Selected';
+    }
+
+    get gameDescription() {
+        if (!this.#game) return 'No Game Selected';
+        const game = GameManager.getRegisteredGameDefinition(this.#game);
+
+        return game ? game.gameMeta.description : 'No Game Selected';
     }
 
     get numAvailablePlayers() {

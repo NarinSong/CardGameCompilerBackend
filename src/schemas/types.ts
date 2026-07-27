@@ -29,7 +29,11 @@ export const ButtonTypeSchema = z.enum([
 export const VisibilitySchema = z.enum([
   "FACE_UP",
   "FACE_DOWN",
-  "INVISIBLE"
+  "FACE_UP_SPREAD",
+  "FACE_DOWN_SPREAD",
+  "INVISIBLE",
+  "PRIVATE", // FACE_DOWN for everyone except the owner, who it's FACE_UP for
+  "PRIVATE_SPREAD",
 ]);
 
 /**
@@ -104,13 +108,19 @@ export const LocationResolverSchema = z.discriminatedUnion('locationType', [
   }),
   z.object({
     locationType: z.literal('relative'),
-    location: z.string()
+    location: z.string(),
+    ownerLocation: z.string().optional().or(z.undefined()),
   })
 ]);
 export const ButtonRangeSchema = z.object({
   min: z.number().or(z.undefined()),
   max: z.number().or(z.undefined()),
   increment: z.number().or(z.undefined()),
+});
+export const ButtonRangeArgumentSchema = z.object({
+  min: z.number().or(z.undefined()).optional(),
+  max: z.number().or(z.undefined()).optional(),
+  increment: z.number().or(z.undefined()).optional(),
 });
 
 /* BoardID must equal -1 */
@@ -127,6 +137,13 @@ export const TriggerSchema = z.discriminatedUnion("type", [
     target: z.undefined().optional(),
   }),
 ]);
+
+// Deck constructs
+const DeckPartSchema = z.object({
+  ranks: z.array(RankSchema),
+  suits: z.array(SuitSchema),
+});
+const DeckDefinitionSchema = z.array(DeckPartSchema);
 
 // Enums
 export const Visibility = VisibilitySchema.enum;
@@ -153,6 +170,8 @@ export type Location = z.infer<typeof LocationSchema>;
 export type DefaultLocation = z.infer<typeof DefaultLocationSchema>;
 export type LocationResolver = z.infer<typeof LocationResolverSchema>;
 export type ButtonRange = z.infer<typeof ButtonRangeSchema>;
+export type ButtonRangeArgument = z.infer<typeof ButtonRangeArgumentSchema>;
+export type DeckDefinition = z.infer<typeof DeckDefinitionSchema>;
 
 // IDs
 export type ClientID = number;
@@ -160,39 +179,62 @@ export type GameID = number;
 export type RoomID = string;
 export type LobbyID = string;
 
+// Helper value
+export const NumericSchema = z.number().or(z.bigint());
+
 
 // Default locations
 
+// Screen is 1920 x 1080
 export const DEFAULT_PILE_LOCATION: DefaultLocation = {
     anchor: {
-        x: 0,
-        y: 50,
-    },
-    direction: "HORIZONTAL",
-    verticalOffset: 10,
-    horizontalOffset: 10,
-    wraptAt: 100,
-    wrapTo: -100,
-};
-export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
-    anchor: {
-        x: 0,
+        x: -800,
         y: 0,
     },
     direction: "HORIZONTAL",
-    verticalOffset: 10,
-    horizontalOffset: 10,
-    wraptAt: 100,
-    wrapTo: -100,
+    verticalOffset: -200,
+    horizontalOffset: 130,
+    wraptAt: 800,
+    wrapTo: -800,
+};
+export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
+    anchor: {
+        x: -800,
+        y: 450,
+    },
+    direction: "HORIZONTAL",
+    verticalOffset: -150,
+    horizontalOffset: 150,
+    wraptAt: 800,
+    wrapTo: -800,
 };
 export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
     anchor: {
-        x: 0,
-        y: -50,
+        x: -780,
+        y: -450,
     },
     direction: "HORIZONTAL",
-    verticalOffset: 10,
-    horizontalOffset: 10,
-    wraptAt: 100,
-    wrapTo: -100,
+    verticalOffset: 100,
+    horizontalOffset: 250,
+    wraptAt: 780,
+    wrapTo: -780,
 };
+export const DEFAULT_TEXT_LOCATION: DefaultLocation = {
+    anchor: {
+        x: -780,
+        y: 450,
+    },
+    direction: "VERTICAL",
+    verticalOffset: -100,
+    horizontalOffset: 250,
+    wraptAt: -450,
+    wrapTo: 450,
+};
+
+// Default deck. TODO: Switch to RANKENUM.ACE, etc. so that it's more readable
+export const DEFAULT_DECK_DEFINITION: DeckDefinition = [
+  {
+    ranks: [RANK[0], RANK[1], RANK[2], RANK[3], RANK[4], RANK[5], RANK[6], RANK[7], RANK[8], RANK[9], RANK[10], RANK[11], RANK[12], ],
+    suits: [SUIT[0], SUIT[1], SUIT[2], SUIT[3]],
+  }
+];

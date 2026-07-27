@@ -1,0 +1,689 @@
+{
+    "gameMeta": {
+        "minPlayers": 1,
+        "maxPlayers": 32,
+        "name": "InBetween",
+        "description": "Bet Big to win it all. Will the next card be in between?",
+        "variables": {
+            "bet": "Number"
+        },
+        "maps": {
+            "rank": {
+                "Two": 1,
+                "Three": 2,
+                "Four": 3,
+                "Five": 4,
+                "Six": 5,
+                "Seven": 6,
+                "Eight": 7,
+                "Nine": 8,
+                "Ten": 9,
+                "Jack": 10,
+                "Queen": 11,
+                "King": 12,
+                "Ace": 13
+            }
+        },
+        "locations": {
+            "opponent": {
+                "anchor": {
+                    "x": -800,
+                    "y": 410
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -100,
+                "horizontalOffset": 100,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
+            "center": {
+                "anchor": {
+                    "x": -250,
+                    "y": -100
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 250,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
+            "actions": {
+                "anchor": {
+                    "x": 0,
+                    "y": -200
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -180,
+                "horizontalOffset": 250,
+                "wraptAt": 800,
+                "wrapTo": -800
+            },
+            "yours": {
+                "anchor": {
+                    "x": 0,
+                    "y": -350
+                },
+                "direction": "HORIZONTAL",
+                "verticalOffset": -100,
+                "horizontalOffset": 100,
+                "wraptAt": 800,
+                "wrapTo": -800
+            }
+        }
+    },
+    "playerDefinition": {
+        "counters": [
+            {
+                "label": "Hand",
+                "actionRoles": ["Hand"],
+                "initialValue": 500,
+                "visibility": "FACE_UP",
+                "location": { "locationType": "relative", "location": "opponent", "ownerLocation": "yours" }
+            }
+        ]
+    },
+    "boardDefinition": {
+        "piles": [
+            {
+                "label": "Deck",
+                "initialState": "SHUFFLED",
+                "visibility": "FACE_DOWN",
+                "location": { "locationType": "absolute", "location": { "x": 0, "y": 100 } }
+            },
+            {
+                "label": "Discard",
+                "initialState": "EMPTY",
+                "visibility": "INVISIBLE"
+            },
+            {
+                "label": "flip",
+                "initialState": "EMPTY",
+                "visibility": "FACE_UP",
+                "location": { "locationType": "relative", "location": "center" }
+            },
+            {
+                "label": "card",
+                "initialState": "EMPTY",
+                "visibility": "FACE_UP",
+                "location": { "locationType": "relative", "location": "center" }
+            },
+            {
+                "label": "flop",
+                "initialState": "EMPTY",
+                "visibility": "FACE_UP",
+                "location": { "locationType": "relative", "location": "center" }
+            }
+        ],
+        "buttons": [
+            {
+                "label": "Collect", 
+                "type": "CLICK",
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "actions" }
+            },
+            {
+                "label": "Pay", 
+                "type": "CLICK",
+                "visibility": "INVISIBLE",
+                "location": { "locationType": "relative", "location": "actions" }
+            },
+            {
+                "label": "Bet", 
+                "type": "NUMBER",
+                "visibility": "FACE_UP",
+                "range": { "min": 5, "max": 500, "increment": 5 },
+                "location": { "locationType": "relative", "location": "actions" }
+            }
+        ],
+        "counters": [
+            {
+                "label": "Pot",
+                "initialValue": 2000,
+                "visibility": "FACE_UP",
+                "location": { "locationType": "relative", "location": "center" }
+            }
+        ]
+    },
+    "phases": [
+        {
+            "name": "Main",
+            "steps": [
+                {
+                    "name": "setup",
+                    "actions": [
+                        {
+                            "trigger": { "type": "AUTO" },
+                            "filter": null,
+                            "result": {
+                                "type": "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": { "type": "LITERAL", "primary": "flip" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": { "type": "LITERAL", "primary": "flop" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "ASSIGN_ROLE",
+                                        "role": { "type": "LITERAL", "primary": "active" },
+                                        "id": { "type": "FIRST_PLAYER" }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "play" }
+                                    },
+                                    {
+                                        "type": "SEND_POPUP",
+                                        "primary": { "type": "LITERAL", "primary": "Your turn!" },
+                                        "secondary": { 
+                                            "type": "GET_ID_FROM_ROLE",
+                                            "role": { "type": "LITERAL", "primary": "active" },
+                                            "index": { "type": "UNDEFINED" }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "play",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "Bet" },
+                            "filter": {
+                                "type":  "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                        "secondary": { "type": "LITERAL", "primary": "card" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "UPDATE_VARIABLE",
+                                        "variableType": "Number",
+                                        "name": { "type": "LITERAL", "primary": "bet" },
+                                        "value": { "type": "BUTTON_VALUE" }
+                                    },
+                                    {
+                                        "type": "IF",
+                                        "primary": {
+                                            "type": "OR",
+                                            "primary": {
+                                                "type": "AND",
+                                                "primary": {
+                                                    "type": "LESS_THAN",
+                                                    "primary": {
+                                                        "type": "MAP",
+                                                        "primary": {
+                                                            "type": "RANK",
+                                                            "primary": {
+                                                                "type": "CARD_OF_PILE",
+                                                                "primary": { "type": "LITERAL", "primary": "flip" },
+                                                                "secondary": { "type": "UNDEFINED" }
+                                                            }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                    },
+                                                    "secondary": {
+                                                        "type": "MAP",
+                                                        "primary": {
+                                                            "type": "RANK",
+                                                            "primary": {
+                                                                "type": "CARD_OF_PILE",
+                                                                "primary": { "type": "LITERAL", "primary": "card" },
+                                                                "secondary": { "type": "UNDEFINED" }
+                                                            }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                    }
+                                                },
+                                                "secondary": {
+                                                    "type": "GREATER_THAN",
+                                                    "primary": {
+                                                        "type": "MAP",
+                                                        "primary": {
+                                                            "type": "RANK",
+                                                            "primary": {
+                                                                "type": "CARD_OF_PILE",
+                                                                "primary": { "type": "LITERAL", "primary": "flop" },
+                                                                "secondary": { "type": "UNDEFINED" }
+                                                            }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                    },
+                                                    "secondary": {
+                                                        "type": "MAP",
+                                                        "primary": {
+                                                            "type": "RANK",
+                                                            "primary": {
+                                                                "type": "CARD_OF_PILE",
+                                                                "primary": { "type": "LITERAL", "primary": "card" },
+                                                                "secondary": { "type": "UNDEFINED" }
+                                                            }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                    }
+                                                }
+                                            },
+                                            "secondary": {
+                                                "type": "AND",
+                                                "primary": {
+                                                    "type": "GREATER_THAN",
+                                                    "primary": {
+                                                        "type": "MAP",
+                                                        "primary": {
+                                                            "type": "RANK",
+                                                            "primary": {
+                                                                "type": "CARD_OF_PILE",
+                                                                "primary": { "type": "LITERAL", "primary": "flip" },
+                                                                "secondary": { "type": "UNDEFINED" }
+                                                            }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                    },
+                                                    "secondary": {
+                                                        "type": "MAP",
+                                                        "primary": {
+                                                            "type": "RANK",
+                                                            "primary": {
+                                                                "type": "CARD_OF_PILE",
+                                                                "primary": { "type": "LITERAL", "primary": "card" },
+                                                                "secondary": { "type": "UNDEFINED" }
+                                                            }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                    }
+                                                },
+                                                "secondary": {
+                                                    "type": "LESS_THAN",
+                                                    "primary": {
+                                                        "type": "MAP",
+                                                        "primary": {
+                                                            "type": "RANK",
+                                                            "primary": {
+                                                                "type": "CARD_OF_PILE",
+                                                                "primary": { "type": "LITERAL", "primary": "flop" },
+                                                                "secondary": { "type": "UNDEFINED" }
+                                                            }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                    },
+                                                    "secondary": {
+                                                        "type": "MAP",
+                                                        "primary": {
+                                                            "type": "RANK",
+                                                            "primary": {
+                                                                "type": "CARD_OF_PILE",
+                                                                "primary": { "type": "LITERAL", "primary": "card" },
+                                                                "secondary": { "type": "UNDEFINED" }
+                                                            }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "secondary": {
+                                            "type": "SET_BUTTON_VISIBILITY",
+                                            "primary": { "type": "LITERAL", "primary": "Collect" },
+                                            "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
+                                        },
+                                        "tertiary": {
+                                            "type": "SET_BUTTON_VISIBILITY",
+                                            "primary": { "type": "LITERAL", "primary": "Pay" },
+                                            "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
+                                        }
+                                    },
+                                    {
+                                        "type": "SET_BUTTON_VISIBILITY",
+                                        "primary": { "type": "LITERAL", "primary": "Bet" },
+                                        "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "settle" }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "settle",
+                    "actions": [
+                        {
+                            "trigger": { "type": "CLICK", "target": "Collect" },
+                            "filter": {
+                                "type":  "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "SET_COUNTER_VALUE",
+                                        "primary": {
+                                            "type": "COUNTER_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            }
+                                        },
+                                        "secondary": {
+                                            "type": "PLUS",
+                                            "primary": {
+                                                "type": "VALUE_OF",
+                                                "primary": {
+                                                    "type": "COUNTER_OF",
+                                                    "id": {
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    }
+                                                }
+                                            },
+                                            "secondary": {
+                                                "type": "GET_VARIABLE",
+                                                "variableType": "Number",
+                                                "name": { "type": "LITERAL", "primary": "bet" }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "SET_COUNTER_VALUE",
+                                        "primary": { "type": "LITERAL", "primary": "Pot" },
+                                        "secondary": {
+                                            "type": "MINUS",
+                                            "primary": {
+                                                "type": "VALUE_OF",
+                                                "primary": { "type": "LITERAL", "primary": "Pot" }
+                                            },
+                                            "secondary": {
+                                                "type": "GET_VARIABLE",
+                                                "variableType": "Number",
+                                                "name": { "type": "LITERAL", "primary": "bet" }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "IF",
+                                        "primary": {
+                                            "type": "EQUAL",
+                                            "primary": {
+                                                "type": "VALUE_OF",
+                                                "primary": { "type": "LITERAL", "primary": "Pot" }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": 0 }
+                                        },
+                                        "secondary": {
+                                            "type": "SET_STEP",
+                                            "primary": { "type": "LITERAL", "primary": "end" }
+                                        },
+                                        "tertiary": {
+                                            "type": "SET_STEP",
+                                            "primary": { "type": "LITERAL", "primary": "reset" }
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "trigger": { "type": "CLICK", "target": "Pay" },
+                            "filter": {
+                                "type":  "HAS_ROLE",
+                                "id": {
+                                    "type":  "CTX_PLAYER"
+                                },
+                                "role":  { "type": "LITERAL", "primary":  "active" }
+                            },
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "SET_COUNTER_VALUE",
+                                        "primary": {
+                                            "type": "COUNTER_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            }
+                                        },
+                                        "secondary": {
+                                            "type": "MINUS",
+                                            "primary": {
+                                                "type": "VALUE_OF",
+                                                "primary": {
+                                                    "type": "COUNTER_OF",
+                                                    "id": {
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    }
+                                                }
+                                            },
+                                            "secondary": {
+                                                "type": "GET_VARIABLE",
+                                                "variableType": "Number",
+                                                "name": { "type": "LITERAL", "primary": "bet" }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "SET_COUNTER_VALUE",
+                                        "primary": { "type": "LITERAL", "primary": "Pot" },
+                                        "secondary": {
+                                            "type": "PLUS",
+                                            "primary": {
+                                                "type": "VALUE_OF",
+                                                "primary": { "type": "LITERAL", "primary": "Pot" }
+                                            },
+                                            "secondary": {
+                                                "type": "GET_VARIABLE",
+                                                "variableType": "Number",
+                                                "name": { "type": "LITERAL", "primary": "bet" }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "IF",
+                                        "primary": {
+                                            "type": "EQUAL",
+                                            "primary": {
+                                                "type": "VALUE_OF",
+                                                "primary": {
+                                                    "type": "COUNTER_OF",
+                                                    "id": {
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    }
+                                                }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": 0 }
+                                        },
+                                        "secondary": {
+                                            "type": "LOSE",
+                                            "primary": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": 0 },
+                                            "tertiary": { "type": "LITERAL", "primary": false }
+                                        },
+                                        "tertiary": { "type": "UNDEFINED" }
+                                    },
+                                    {
+                                        "type": "SET_STEP",
+                                        "primary": { "type": "LITERAL", "primary": "reset" }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "reset",
+                    "actions": [
+                        {
+                            "trigger": { "type": "AUTO" },
+                            "filter": null,
+                            "result": {
+                                "type":  "SEQUENCE",
+                                "primary": [
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "card" },
+                                        "secondary": { "type": "LITERAL", "primary": "Discard" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "flip" },
+                                        "secondary": { "type": "LITERAL", "primary": "Discard" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "DEAL_CARDS",
+                                        "primary": { "type": "LITERAL", "primary": "flop" },
+                                        "secondary": { "type": "LITERAL", "primary": "Discard" },
+                                        "tertiary": { "type": "LITERAL", "primary": 1 }
+                                    },
+                                    {
+                                        "type": "IF",
+                                        "primary": {
+                                            "type": "LESS_THAN",
+                                            "primary": {
+                                                "type": "NUM_CARDS_IN_PILE",
+                                                "primary": { "type": "LITERAL", "primary": "Deck" }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": 5 }
+                                        },
+                                        "secondary": {
+                                            "type": "SHUFFLE_INTO",
+                                            "primary": { "type": "LITERAL", "primary": "Discard" },
+                                            "secondary": { "type": "LITERAL", "primary": "Deck" }
+                                        },
+                                        "tertiary": { "type": "UNDEFINED" }
+                                    },
+                                    {
+                                        "type": "IF",
+                                        "primary": {
+                                            "type": "NEXT_PLAYER",
+                                            "primary": { "type": "LITERAL", "primary": "active" }
+                                        },
+                                        "secondary": {
+                                            "type":  "SEQUENCE",
+                                            "primary": [
+                                                {
+                                                    "type": "DEAL_CARDS",
+                                                    "primary": { "type": "LITERAL", "primary": "Deck" },
+                                                    "secondary": { "type": "LITERAL", "primary": "flip" },
+                                                    "tertiary": { "type": "LITERAL", "primary": 1 }
+                                                },
+                                                {
+                                                    "type": "DEAL_CARDS",
+                                                    "primary": { "type": "LITERAL", "primary": "Deck" },
+                                                    "secondary": { "type": "LITERAL", "primary": "flop" },
+                                                    "tertiary": { "type": "LITERAL", "primary": 1 }
+                                                },
+                                                {
+                                                    "type": "SET_STEP",
+                                                    "primary": { "type": "LITERAL", "primary": "play" }
+                                                },
+                                                {
+                                                    "type": "SEND_POPUP",
+                                                    "primary": { "type": "LITERAL", "primary": "Your turn!" },
+                                                    "secondary": { 
+                                                        "type": "GET_ID_FROM_ROLE",
+                                                        "role": { "type": "LITERAL", "primary": "active" },
+                                                        "index": { "type": "UNDEFINED" }
+                                                    }
+                                                },
+                                                {
+                                                    "type": "SET_BUTTON_VISIBILITY",
+                                                    "primary": { "type": "LITERAL", "primary": "Collect" },
+                                                    "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                                },
+                                                {
+                                                    "type": "SET_BUTTON_VISIBILITY",
+                                                    "primary": { "type": "LITERAL", "primary": "Pay" },
+                                                    "secondary": { "type": "LITERAL", "primary": "INVISIBLE" }
+                                                },
+                                                {
+                                                    "type": "SET_BUTTON_VISIBILITY",
+                                                    "primary": { "type": "LITERAL", "primary": "Bet" },
+                                                    "secondary": { "type": "LITERAL", "primary": "FACE_UP" }
+                                                }
+                                            ]
+                                        },
+                                        "tertiary": {
+                                            "type": "SET_STEP",
+                                            "primary": { "type": "LITERAL", "primary": "end" }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "end",
+                    "actions": [
+                        {
+                            "type": "WHILE",
+                            "primary": {
+                                "type": "NEXT_PLAYER",
+                                "primary": {
+                                    "type": "WIN",
+                                    "primary": {
+                                        "type": "GET_ID_FROM_ROLE",
+                                        "role": { "type": "LITERAL", "primary": "active" },
+                                        "index": { "type": "UNDEFINED" }
+                                    },
+                                    "secondary": {
+                                        "type": "VALUE_OF",
+                                        "primary": {
+                                            "type": "COUNTER_OF",
+                                            "id": {
+                                                "type": "GET_ID_FROM_ROLE",
+                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                "index": { "type": "UNDEFINED" }
+                                            }
+                                        },
+                                        "tertiary": { "type": "LITERAL", "primary": false }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "END_GAME",
+                            "primary": { "type": "UNDEFINED" },
+                            "secondary": { "type": "UNDEFINED" }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

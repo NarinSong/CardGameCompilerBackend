@@ -4,11 +4,12 @@ import StepDefinition from "../Rules/StepDefinition.js";
 import Button from "./Button.js";
 import Counter from "./Counter.js";
 import Pile from "./Pile.js";
+import Text from "./Text.js";
 
 /**
  * Runtime game objects that can be referenced by a label.
  */
-export type GamePiece = Pile | Counter | Button;
+export type GamePiece = Pile | Counter | Button | Text;
 
 /**
  * Manages labels for objects, phases, and steps in the game.
@@ -37,7 +38,7 @@ export default class GameLabels {
      * @param pile - The pile object.
      * @param label - The label of the pile.
      */
-    registerPile(pile: Pile, label: Label) {
+    registerPile(pile: Pile, label: Label): void {
         this.gameObjectLabels[label] = pile;
     }
 
@@ -46,19 +47,28 @@ export default class GameLabels {
      * @param counter - The counter object.
      * @param label - The label of the counter.
      */
-    registerCounter(counter: Counter, label: Label) {
+    registerCounter(counter: Counter, label: Label): void {
         this.gameObjectLabels[label] = counter;
     }
 
-    registerButton(button: Button, label: Label) {
+    /**
+     * Stores a button and its label.
+     * @param button - The button object.
+     * @param label - The label of the button.
+     */
+    registerButton(button: Button, label: Label): void {
         this.gameObjectLabels[label] = button;
+    }
+
+    registerText(text: Text, label: Label): void {
+        this.gameObjectLabels[label] = text;
     }
 
     /**
      * Removes a registered game object label.
      * @param label - The label to remove.
      */
-    unregister(label: Label) {
+    unregister(label: Label): void {
         delete this.gameObjectLabels[label];
     }
 
@@ -67,11 +77,16 @@ export default class GameLabels {
      * @param label - Label of the object.
      * @returns The game object associated with the label.
      */
-    getFromLabel(label: Label) {
+    getFromLabel(label: Label): GamePiece | undefined {
         return this.gameObjectLabels[label];
     }
 
-    getPhaseFromLabel(label: PhaseLabel) {
+    /**
+     * Returns the phase associated with a label.
+     * @param label - Label of the phase.
+     * @returns The phase associated with the label.
+     */
+    getPhaseFromLabel(label: PhaseLabel): GamePhaseDefinition | undefined {
         return this.gamePhaseLabels[label];
     }
 
@@ -80,14 +95,14 @@ export default class GameLabels {
      * @param label - Label of the step.
      * @returns The step associated with the label.
      */
-    getStepFromLabel(label: StepLabel) {
+    getStepFromLabel(label: StepLabel): StepDefinition | undefined {
         return this.gameStepLabels[label];
     }
 
     /**
      * Generates the next unique label identifier.
      */
-    get nextId() {
+    get nextId(): string {
         return '' + (++this.#nextId);
     }
 

@@ -24,11 +24,11 @@ export default class CounterDefinition {
         label?: string | undefined,
         displayName?: string | undefined,
         actionRoles?: string[] | undefined,
-        initialValue?: number | undefined,
+        number?: number | undefined,
         visibility?: Visibility | undefined,
         location: LocationResolver,
     }) {
-        this.number = definition.initialValue ?? 0;
+        this.number = definition.number ?? 0;
         this.label = definition.labelManager.createLabel(this, definition.label);
         this.displayName = definition.displayName ?? this.label;
         this.actionRoles = definition.actionRoles ?? [this.label];

@@ -6,17 +6,16 @@
 // Clients have a method of sending information to the user (sockets for prototype, whatever Unity uses for that)
 
 import Game from "../Game/Game.js";
-import Player from "../Game/Player.js";
-import Room from "../Components/Room.js";
-import GameDefinition from "../Rules/GameDefinition.js";
 import ClientView from "./ClientView.js";
-import { buildGameFromJSON } from "./GameBuilder.js";
 import { sendClientGamestate } from "../index.js";
 import Auth from "../Components/Auth.js";
 import { PlayerID } from "../schemas/types.js";
 
 /**
- * Client's state of authentication 
+ * Client's state of authentication.
+ * 
+ * When authenticated, holds the username, display name, session token, and database id.
+ * When unauthenticated, all fields are null or 0.
  */
 type AuthState =
   | {
@@ -24,19 +23,22 @@ type AuthState =
       displayName: string;
       username: string;
       token: string;
+      databaseId: number;
     }
   | {
       isAuthenticated: false;
       displayName: null;
       username: null;
       token: null;
+      databaseId: 0;
     };
 
 
 /**
  * Defines the properties of a client.
  * 
- * A Client consists of its id, room associated to (if any), and authState. 
+ * A Client consists of its identifier, auth state, lobby and room membership,
+ * player id (if in a game), and display color.
  */
 export default class Client {
     static #nextId : number = 1000;
@@ -52,7 +54,8 @@ export default class Client {
         isAuthenticated: false,
         displayName: null,
         username: null,
-        token: null
+        token: null,
+        databaseId: 0,
     };
 
     /**
@@ -62,7 +65,11 @@ export default class Client {
         this.identifier = Client.nextId;
     }
 
-    randomColor() {
+    /**
+     * Returns a random pastel color hex string.
+     * @returns A randomly selected hex color string.
+     */
+    randomColor(): string {
         let colors = [
             '#ffcccc',
             '#ffd9cc',
@@ -82,15 +89,13 @@ export default class Client {
     }
 
     /**
-     * 
      * Signs a client into his/her account.
-     * 
      * @param username - The client's username.
-     * @param password - The clients password.
+     * @param password - The client's password.
      * @returns A token if authentication is successful, otherwise null.
      */
-    async signIn(username: string, password: string) {
-        const success = await Auth.authenticateUser(username, password);
+    async signIn(username: string, password: string): Promise<string | null> {
+        const success = await Auth.authenticateUser(username, password); //{username: username, token: '1234', displayName: username, color: '#ffffff', databaseId: 1024 };
         if (!success) return null;
 
 
@@ -99,6 +104,7 @@ export default class Client {
             token: success.token,
             displayName: success.displayName,
             isAuthenticated: true,
+            databaseId: success.databaseId,
         };
 
         this.color = success.color;
@@ -113,16 +119,17 @@ export default class Client {
      * @param displayName - The clients name which is displayed to other users.
      * @returns If successful it returns a sessionId, otherwise null.
      */
-    async signUp(username: string, password: string, displayName: string) {
+    async signUp(username: string, password: string, displayName: string): Promise< { session: string, databaseId: number } | null> {
         let color = this.randomColor();
         const success = await Auth.createNewUser(username, password, displayName, color);
         if (!success) return null;
 
         this.authState = {
             username: username,
-            token: success,
+            token: success.session,
             displayName: displayName,
             isAuthenticated: true,
+            databaseId: success.databaseId,
         };
 
         this.color = color;
@@ -134,7 +141,7 @@ export default class Client {
      * Signs a client out of his/her account and clears the clients authState.
      * @returns True if sign out is successful, otherwise false.
      */
-    async signOut() {
+    async signOut(): Promise<boolean> {
         if (!this.isAuthenticated || !this.authState.token) return false;
 
         const success = await Auth.signOut(this.authState.token);
@@ -143,32 +150,17 @@ export default class Client {
             isAuthenticated: false,
             displayName: null,
             username: null,
-            token: null
+            token: null,
+            databaseId: 0,
         };
 
         return success;
     }
 
     /**
-     * Submiting the game rules that the client creates.
-     * @param rules - JSON containing game information and rules.
-     * @returns void, as the resulting game definition isnt used yet.
-     * @todo use the game definition somewhere
-     */
-    submitRulesFromEditor(rules: unknown) {
-        try {
-            const game: GameDefinition | null = buildGameFromJSON(rules);
-            if (game == null) return;
-
-            // TODO: use the game definition somewhere
-        } catch (error) {
-            console.debug(error);
-        }
-    }
-
-    /**
-     * Send the updated game state to the client.
-     * @param game - Current game instance.
+     * Sends the updated game state to the client.
+     * Resolves the player from the game using the client's stored player id.
+     * @param game - The current game instance.
      */
     updateGamestate(game: Game) {
         if (this.player === null) return;
@@ -177,6 +169,10 @@ export default class Client {
         sendClientGamestate(this.identifier, ClientView.fromGamestate(game, player));
     }
 
+    /**
+     * Updates the client's display name in the auth state.
+     * @param name - The new display name.
+     */
     updateDisplayName(name: string) {
         this.authState.displayName = name;
     }
@@ -199,5 +195,12 @@ export default class Client {
 
     get username() {
         return this.authState.username;
+    }
+
+    /**
+     * The database id of the authenticated user, or 0 if unauthenticated.
+     */
+    get databaseId() {
+        return this.authState.databaseId;
     }
 }

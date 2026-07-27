@@ -1,6 +1,6 @@
 import { Label } from "../Rules/LabelManager.js";
 import ButtonDefinition from "../Rules/ButtonDefinition.js";
-import { ActionRole, ButtonRange, ButtonType, DisplayName, Location, LocationResolver, PileState, Visibility } from "../schemas/types.js";
+import { ActionRole, ButtonRange, ButtonType, DisplayName, LocationResolver, Visibility } from "../schemas/types.js";
 import GameLabels from "./GameLabels.js";
 
 /**
@@ -20,11 +20,13 @@ export default class Button {
     /**
      * Creates a new Button
      * @param label - Name associated with the button.
+     * @param visibility - The visibility of the button.
      * @param gameLabels - Manages all the in game labels.
      * @param actionRoles - The action roles associated with the button.
      * @param displayName - In game name of the button.
      * @param type - Type of the button.
      * @param range - The numeric range configuration for the button, if applicable.
+     * @param location - The location of the button on the board.
      */
     private constructor(
         label: Label,
@@ -53,9 +55,11 @@ export default class Button {
      * @param gameLabels - The game's label manager.
      * @returns A newly constructed button.
      */
-    static fromDefinition(definition: ButtonDefinition, gameLabels: GameLabels) {
+    static fromDefinition(definition: ButtonDefinition, gameLabels: GameLabels, playerId?: number): Button {
+        const label = typeof playerId !== 'undefined' && playerId !== -1 ? definition.label + playerId : definition.label;
+
         return new Button(
-            definition.label,
+            label,
             definition.visibility,
             gameLabels,
             definition.actionRoles,
@@ -69,11 +73,13 @@ export default class Button {
     /**
      * Creates a new Button with explicit parameters
      * @param label - Name associated with the button.
+     * @param visibility - The visibility of the button.
      * @param gameLabels - Manages all the in game labels.
      * @param actionRoles - The action roles associated with the button.
      * @param displayName - In game name of the button.
      * @param type - Type of the button.
      * @param range - The numeric range configuration for the button, if applicable.
+     * @param location - The location of the button on the board.
      * @returns the newly constructed button.
      */
     static create(
@@ -85,7 +91,7 @@ export default class Button {
         type: ButtonType,
         range: ButtonRange | undefined,
         location: LocationResolver
-    ) {
+    ): Button {
         return new Button(label, visibility, gameLabels, actionRoles, displayName, type, range, location);
     }
 }

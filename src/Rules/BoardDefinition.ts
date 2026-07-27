@@ -5,17 +5,19 @@
 import ButtonDefinition from "./ButtonDefinition.js";
 import CounterDefinition from "./CounterDefinition.js";
 import PileDefinition from "./PileDefinition.js";
+import TextDefinition from "./TextDefinition.js";
 
 
 /**
  * Defines the piles and counters that make up the game board.
  * 
- *  A BoardDefinition contains the piles and counters associated with the game board itself rather than with an individual player.
+ *  A BoardDefinition contains the piles, counters, and buttons associated with the game board itself rather than with an individual player.
  */
 export default class BoardDefinition {
     piles: PileDefinition[];
     counters: CounterDefinition[];
     buttons: ButtonDefinition[];
+    texts: TextDefinition[];
 
     /**
      * Creates a new board definition.
@@ -24,5 +26,6 @@ export default class BoardDefinition {
         this.piles = [];
         this.counters = [];
         this.buttons = [];
+        this.texts = [];
     }
 }

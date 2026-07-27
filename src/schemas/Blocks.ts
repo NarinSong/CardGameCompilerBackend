@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { ButtonTypeSchema, CardSchema, LocationResolverSchema, PileStateSchema, VisibilitySchema } from "./types.js";
+import { ButtonTypeSchema, CardSchema, LocationResolverSchema, PileStateSchema, RankSchema, SuitSchema, VisibilitySchema } from "./types.js";
 import { NODE_NAMES } from "./Constants.js";
 
 // These are the values that can be used inside the blocks and their corresponding JS types
@@ -15,6 +15,8 @@ export const ValueTypes = {
   PileLabel: z.string(),
   CounterLabel: z.string(),
   ButtonLabel: z.string(),
+  TextLabel: z.string(),
+  Label: z.string(),
   ActionRole: z.string(),
   PileState: PileStateSchema,
   Visibility: VisibilitySchema,
@@ -30,8 +32,12 @@ export const ValueTypes = {
   Step: z.string(),
   Phase: z.string(),
   Location: LocationResolverSchema,
+  LocationName: z.string(),
   ButtonRange: z.object({ min: z.number().or(z.undefined()), max: z.number().or(z.undefined()), increment: z.number().or(z.undefined())}),
   ButtonType: ButtonTypeSchema,
+  Rank: RankSchema,
+  Suit: SuitSchema,
+  VariableType: z.string(),
 } as const;
 
 export const ValueTypeNameSchema = z.enum(
@@ -40,6 +46,8 @@ export const ValueTypeNameSchema = z.enum(
     ...(keyof typeof ValueTypes)[]
   ]
 );
+
+export const ValueTypeValuesSchema = z.union(Object.values(ValueTypes));
 
 export const ValueReturnSchema = z.union([
   z.unknown(),
@@ -55,6 +63,7 @@ export const ValueReturnSchema = z.union([
 ]);
 
 export type ValueTypeName = z.infer<typeof ValueTypeNameSchema>;
+export type ValueTypeValues = z.infer<typeof ValueTypeValuesSchema>;
 export type ValueReturn = z.infer<typeof ValueReturnSchema>;
 
 // Helper types and functions to define blocks
@@ -118,6 +127,29 @@ const DEAL_CARDS = defineBlock({
         },
     ] as const,
 });
+
+const MOVE_CARD = defineBlock({
+    name: NODE_NAMES.MoveCard,
+    displayName: "Move Card",
+    returnType: "Void",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "From",
+            type: "PileLabel"
+        },
+        {
+            name: "secondary",
+            displayName: "To",
+            type: "PileLabel",
+        },
+        {
+            name: "tertiary",
+            displayName: "Card",
+            type: "Card",
+        },
+    ]
+})
 
 const CREATE_PILE = defineBlock({
     name: NODE_NAMES.CreatePile,
@@ -376,6 +408,40 @@ const STRING_EQ = defineBlock({
     ]
 });
 
+const STRING_JOIN = defineBlock({
+    "name": NODE_NAMES.StringJoin,
+    "displayName": "String Join",
+    "returnType": "String",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Left",
+            "type": "String",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Right",
+            "type": "String",
+            "optional": false
+        }
+    ]
+});
+
+const NUMBER_TO_STRING = defineBlock({
+    "name": NODE_NAMES.NumberToString,
+    "displayName": "Number to String",
+    "returnType": "String",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Number",
+            "type": "Number",
+            "optional": false
+        }
+    ]
+});
+
 const TERNARY = defineBlock({
     "name": NODE_NAMES.Ternary,
     "displayName": "Ternary",
@@ -404,15 +470,15 @@ const TERNARY = defineBlock({
 
 const CTX_CARD = defineBlock({
     "name": NODE_NAMES.CtxCard,
-    "displayName": "Passed Card",
+    "displayName": "Clicked Card",
     "returnType": "Card",
     "arguments": []
 });
 
-const CTX_ID = defineBlock({
-    "name": NODE_NAMES.CtxId,
-    "displayName": "Clicked Card",
-    "returnType": "ID",
+const CTX_PLAYER = defineBlock({
+    "name": NODE_NAMES.CtxPlayer,
+    "displayName": "Current Player",
+    "returnType": "Player",
     "arguments": []
 });
 
@@ -451,6 +517,62 @@ const PILE_OF = defineBlock({
             "name": "actionRole",
             "displayName": "Pile's Action Role",
             "type": "ActionRole",
+            "optional": false
+        }
+    ]
+});
+
+const PILE_OWNER = defineBlock({
+    "name": NODE_NAMES.PileOwner,
+    "displayName": "Pile's Owner",
+    "returnType": "Player",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        }
+    ]
+});
+
+const COUNTER_OWNER = defineBlock({
+    "name": NODE_NAMES.CounterOwner,
+    "displayName": "Counter's Owner",
+    "returnType": "Player",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Counter",
+            "type": "CounterLabel",
+            "optional": false
+        }
+    ]
+});
+
+const BUTTON_OWNER = defineBlock({
+    "name": NODE_NAMES.ButtonOwner,
+    "displayName": "Button's Owner",
+    "returnType": "Player",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Button",
+            "type": "ButtonLabel",
+            "optional": false
+        }
+    ]
+});
+
+const TEXT_OWNER = defineBlock({
+    "name": NODE_NAMES.TextOwner,
+    "displayName": "Text's Owner",
+    "returnType": "Player",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Text",
+            "type": "TextLabel",
             "optional": false
         }
     ]
@@ -584,60 +706,6 @@ const MAP = defineBlock({
     ]
 });
 
-const ADD_VARIABLE = defineBlock({
-    "name": NODE_NAMES.AddVariable,
-    "displayName": "Add Variable",
-    "returnType": "Number",
-    "arguments": [
-        {
-            "name": "name",
-            "displayName": "Variable Name",
-            "type": "String",
-            "optional": false
-        },
-        {
-            "name": "value",
-            "displayName": "Value",
-            "type": "Number",
-            "optional": false
-        },
-    ]
-});
-
-const UPDATE_VARIABLE = defineBlock({
-    "name": NODE_NAMES.UpdateVariable,
-    "displayName": "Update Variable",
-    "returnType": "Number",
-    "arguments": [
-        {
-            "name": "name",
-            "displayName": "Variable Name",
-            "type": "String",
-            "optional": false
-        },
-        {
-            "name": "value",
-            "displayName": "Value",
-            "type": "Number",
-            "optional": false
-        },
-    ]
-});
-
-const GET_VARIABLE = defineBlock({
-    "name": NODE_NAMES.GetVariable,
-    "displayName": "Get Variable",
-    "returnType": "Number",
-    "arguments": [
-        {
-            "name": "name",
-            "displayName": "Variable Name",
-            "type": "String",
-            "optional": false
-        },
-    ]
-});
-
 const SET_STEP = defineBlock({
     "name": NODE_NAMES.SetStep,
     "displayName": "Set Step",
@@ -689,7 +757,7 @@ const WHILE = defineBlock({
 const NEXT_PLAYER = defineBlock({
     "name": NODE_NAMES.NextPlayer,
     "displayName": "Next Player",
-    "returnType": "Player",
+    "returnType": "Boolean",
     "arguments": [
         {
             "name": "primary",
@@ -808,6 +876,21 @@ const VALUE_OF = defineBlock({
     ]
 });
 
+const TEXT_VALUE_OF = defineBlock({
+    "name": NODE_NAMES.TextValueOf,
+    "displayName": "Value of Text",
+    "returnType": "String",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Text",
+            "type": "TextLabel",
+            "optional": false
+        },
+    ]
+});
+
+
 const MOVE_COUNTER_VALUE = defineBlock({
     "name": NODE_NAMES.MoveCounterValue,
     "displayName": "Move Counter Value",
@@ -867,6 +950,20 @@ const FIRST_PLAYER = defineBlock({
     "arguments": []
 });
 
+const DISPLAY_NAME = defineBlock({
+    "name": NODE_NAMES.DisplayName,
+    "displayName": "Player Name",
+    "returnType": "String",
+    "arguments": [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "Player",
+            optional: false
+        }
+    ]
+});
+
 const LOCATION = defineBlock({
     "name": NODE_NAMES.Location,
     "displayName": "Location",
@@ -886,6 +983,20 @@ const LOCATION = defineBlock({
         },
     ]
 });
+
+const RELATIVE_LOCATION = defineBlock({
+    "name": NODE_NAMES.RelativeLocation,
+    "displayName": "Location",
+    "returnType": "Location",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Resolver",
+            "type": "LocationName",
+            "optional": false,
+        }
+    ]
+})
 
 const CREATE_COUNTER = defineBlock({
     name: NODE_NAMES.CreateCounter,
@@ -993,6 +1104,56 @@ const CREATE_BUTTON = defineBlock({
     ] as const
 });
 
+const CREATE_TEXT = defineBlock({
+    name: NODE_NAMES.CreateText,
+    displayName: "Create Text",
+    returnType: "TextLabel",
+    arguments: [
+        {
+            name: "text",
+            displayName: "Initial Text",
+            type: "String",
+            optional: true
+        },
+        {
+            "name": "name",
+            "displayName": "Name",
+            "type": "PileLabel",
+            "optional": true
+        },
+        {
+            "name": "visibility",
+            "displayName": "Visibility",
+            "type": "Visibility",
+            "optional": true
+        },
+        {
+            "name": "displayName",
+            "displayName": "Display Name",
+            "type": "String",
+            "optional": true
+        },
+        {
+            "name": "actionRoles",
+            "displayName": "Action Roles",
+            "type": "Array",
+            "optional": true
+        },
+        {
+            "name": "owner",
+            "displayName": "Owner",
+            "type": "Number",
+            "optional": true
+        },
+        {
+            "name": "location",
+            "displayName": "Location",
+            "type": "Location",
+            "optional": true
+        }
+    ] as const
+});
+
 const BUTTON_RANGE = defineBlock({
     "name": NODE_NAMES.ButtonRange,
     "displayName": "Button Range",
@@ -1070,6 +1231,26 @@ const LOSE = defineBlock({
         },
     ]
 });
+
+const END_GAME = defineBlock({
+    name: NODE_NAMES.EndGame,
+    displayName: "End Game",
+    returnType: "Void",
+    arguments: [
+        {
+            "name": "primary",
+            "displayName": "Remaining Players Win?",
+            "type": "Boolean",
+            "optional": true
+        },
+        {
+            "name": "secondary",
+            "displayName": "Score",
+            "type": "Number",
+            "optional": true
+        },
+    ]
+})
 
 const BUTTON_VALUE = defineBlock({
     "name": NODE_NAMES.ButtonValue,
@@ -1198,6 +1379,26 @@ const SET_COUNTER_VISIBILITY = defineBlock({
     ]
 });
 
+const SET_TEXT_VISIBILITY = defineBlock({
+    "name": NODE_NAMES.SetTextVisibility,
+    "displayName": "Set Text Visibility",
+    "returnType": "TextLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Text",
+            "type": "TextLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Visibility",
+            "type": "Visibility",
+            "optional": true
+        },
+    ]
+});
+
 const REMOVE_COUNTER = defineBlock({
     "name": NODE_NAMES.RemoveCounter,
     "displayName": "Remove Counter",
@@ -1227,6 +1428,20 @@ const REMOVE_BUTTON = defineBlock({
             "name": "primary",
             "displayName": "Button",
             "type": "ButtonLabel",
+            "optional": false
+        },
+    ]
+});
+
+const REMOVE_TEXT = defineBlock({
+    "name": NODE_NAMES.RemoveText,
+    "displayName": "Remove Text",
+    "returnType": "TextLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Text",
+            "type": "TextLabel",
             "optional": false
         },
     ]
@@ -1272,10 +1487,338 @@ const BUTTON_OF = defineBlock({
     ]
 });
 
+const TEXT_OF = defineBlock({
+    "name": NODE_NAMES.TextOf,
+    "displayName": "Get a Player's Text",
+    "returnType": "TextLabel",
+    "arguments": [
+        {
+            "name": "id",
+            "displayName": "Player ID",
+            "type": "Player",
+            "optional": false
+        },
+        {
+            "name": "actionRole",
+            "displayName": "Text's Action Role",
+            "type": "ActionRole",
+            "optional": false
+        }
+    ]
+});
+
+const PILE_SET = defineBlock({
+    "name": NODE_NAMES.PileSet,
+    "displayName": "How Many in a Set of Cards",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Rank",
+            "type": "Rank",
+            "optional": true
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        }
+    ]
+});
+
+const PILE_SET_OF_RANK = defineBlock({
+    "name": NODE_NAMES.PileSetOfRank,
+    "displayName": "Contains Set of Cards",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Number",
+            "type": "Number",
+            "optional": true // defaults to if the pile has any (1)
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Rank",
+            "type": "Rank",
+            "optional": true
+        },
+        {
+            "name": "fourth",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        }
+    ]
+});
+
+const PILE_FLUSH = defineBlock({
+    "name": NODE_NAMES.PileFlush,
+    "displayName": "Pile Flush",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Rank",
+            "type": "Rank",
+            "optional": true
+        }
+    ]
+});
+
+const PILE_FLUSH_OF_SUIT = defineBlock({
+    "name": NODE_NAMES.PileFlushOfSuit,
+    "displayName": "Contains Flush of Cards",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Number",
+            "type": "Number",
+            "optional": true // defaults to if the pile has any (1)
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        },
+        {
+            "name": "fourth",
+            "displayName": "Rank",
+            "type": "Rank",
+            "optional": true
+        }
+    ]
+});
+
+const PILE_RUN = defineBlock({
+    "name": NODE_NAMES.PileRun,
+    "displayName": "Cards in a Row",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        }
+    ]
+});
+
+const PILE_RUN_FROM = defineBlock({
+    "name": NODE_NAMES.PileRunFrom,
+    "displayName": "Contains Run of Cards",
+    "returnType": "PileLabel",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Pile",
+            "type": "PileLabel",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Number",
+            "type": "Number",
+            "optional": true // defaults to if the pile has any (1)
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Rank",
+            "type": "Rank",
+            "optional": true
+        },
+        {
+            "name": "fourth",
+            "displayName": "Suit",
+            "type": "Suit",
+            "optional": true
+        }
+    ]
+});
+
+const COMMENT = defineBlock({
+    "name": NODE_NAMES.Comment,
+    "displayName": "Comment",
+    "returnType": "Void",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Comment",
+            "type": "Void",
+            "optional": true
+        }
+    ]
+});
+
+const SET_TEXT = defineBlock({
+    name: NODE_NAMES.SetText,
+    displayName: "Set Text",
+    returnType: "TextLabel",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Text",
+            type: "TextLabel",
+            optional: false
+        },
+        {
+            name: "secondary",
+            displayName: "String",
+            type: "String",
+            optional: false
+        }
+    ]
+});
+
+const SEND_POPUP = defineBlock({
+    name: NODE_NAMES.SendPopup,
+    displayName: "Send Popup",
+    returnType: "Void",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "String",
+            type: "String",
+            optional: false
+        },
+        {
+            name: "secondary",
+            displayName: "To",
+            type: "Player",
+            optional: false
+        }
+    ]
+});
+
+const BROADCAST_POPUP = defineBlock({
+    name: NODE_NAMES.BroadcastPopup,
+    displayName: "Broadcast Popup",
+    returnType: "Void",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "String",
+            type: "String",
+            optional: false
+        }
+    ]
+});
+
+const NUM_PLAYERS = defineBlock({
+    name: NODE_NAMES.NumPlayers,
+    displayName: "Number of Players",
+    returnType: "Number",
+    arguments: []
+});
+
+const PLAYER_SCORE = defineBlock({
+    name: NODE_NAMES.PlayerScore,
+    displayName: "Player's Score",
+    returnType: "Number",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "Player",
+            optional: false
+        }
+    ]
+});
+
+const PLAYER_STATUS = defineBlock({
+    name: NODE_NAMES.PlayerStatus,
+    displayName: "Player's Status",
+    returnType: "String",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "Player",
+            optional: false
+        }
+    ]
+});
+
+const SET_SCORE = defineBlock({
+    name: NODE_NAMES.SetScore,
+    displayName: "Set Score",
+    returnType: "Number",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "Player",
+            optional: false
+        },
+        {
+            name: "secondary",
+            displayName: "Score",
+            type: "Number",
+            optional: false
+        }
+    ]
+});
+
+const REVIVE = defineBlock({
+    name: NODE_NAMES.Revive,
+    displayName: "Revive",
+    returnType: "Player",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "Player",
+            optional: false
+        }
+    ]
+});
+
+
+
 // Put the blocks together in a registry to export them
 export const BLOCKS = {
     UNDEFINED,
     DEAL_CARDS,
+    MOVE_CARD,
     CREATE_PILE,
     REMOVE_PILE,
     IF,
@@ -1290,7 +1833,7 @@ export const BLOCKS = {
     STRING_EQ,
     TERNARY,
     CTX_CARD,
-    CTX_ID,
+    CTX_PLAYER,
     GET_ID_FROM_ROLE,
     PILE_OF,
     HAS_ROLE,
@@ -1300,9 +1843,6 @@ export const BLOCKS = {
     RANK,
     SUIT,
     MAP,
-    ADD_VARIABLE,
-    UPDATE_VARIABLE,
-    GET_VARIABLE,
     SET_PHASE,
     SET_STEP,
     WHILE,
@@ -1313,14 +1853,18 @@ export const BLOCKS = {
     SHUFFLE_INTO,
     NUM_CARDS_IN_PILE,
     VALUE_OF,
+    TEXT_VALUE_OF,
     MOVE_COUNTER_VALUE,
     IS_BETWEEN,
     FIRST_PLAYER,
+    DISPLAY_NAME,
     LOCATION,
+    RELATIVE_LOCATION,
     CREATE_COUNTER,
     CREATE_BUTTON,
     WIN,
     LOSE,
+    END_GAME,
     BUTTON_RANGE,
     SET_RANGE,
     BUTTON_VALUE,
@@ -1331,8 +1875,33 @@ export const BLOCKS = {
     SET_COUNTER_VISIBILITY,
     REMOVE_COUNTER,
     REMOVE_BUTTON,
+    PILE_OWNER,
+    COUNTER_OWNER,
+    BUTTON_OWNER,
+    TEXT_OWNER,
     COUNTER_OF,
     BUTTON_OF,
+    PILE_SET,
+    PILE_SET_OF_RANK,
+    PILE_FLUSH,
+    PILE_FLUSH_OF_SUIT,
+    PILE_RUN,
+    PILE_RUN_FROM,
+    COMMENT,
+    CREATE_TEXT,
+    SET_TEXT,
+    SET_TEXT_VISIBILITY,
+    REMOVE_TEXT,
+    TEXT_OF,
+    STRING_JOIN,
+    SEND_POPUP,
+    BROADCAST_POPUP,
+    NUMBER_TO_STRING,
+    NUM_PLAYERS,
+    PLAYER_SCORE,
+    PLAYER_STATUS,
+    SET_SCORE,
+    REVIVE,
 } as const;
 
 export type BlockName = keyof typeof BLOCKS;

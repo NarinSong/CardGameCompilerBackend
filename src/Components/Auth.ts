@@ -28,7 +28,7 @@ export default class Auth {
      */
     // all usernames are in lowercase before arriving here. Those are sanitized in the ClientRequestParser
     // verifyUser is for a client who is already signed in and just wants to reconnect
-    static verifyUser(username: string, token: string) {
+    static verifyUser(username: string, token: string): boolean | null {
         const account = ACTIVE_USERS[token];
 
         if (!account)
@@ -60,9 +60,9 @@ export default class Auth {
      * Authenticates user if username and password combination is correct and exists in the database.
      * @param username - username of the user.
      * @param password - password that user inputs.
-     * @returns an object with a token and display name of the user.
+     * @returns An object containing the token, display name, color, and database id of the user, or null on failure.
      */
-    static async authenticateUser(username: string, password: string): Promise<{token: string, displayName: string, color: string} | null> {
+    static async authenticateUser(username: string, password: string): Promise<{token: string, displayName: string, color: string, databaseId: number} | null> {
         const passwordHashArray = await Database.getHashByUsername(username);
         
         if (!passwordHashArray || !passwordHashArray[0]) return failureReason('authenticateUser() failed: no such user');
@@ -78,17 +78,18 @@ export default class Auth {
         const sessionId = buf.toString('hex');
         ACTIVE_USERS[sessionId] = username;
 
-        return { token: sessionId, displayName: passwordHashArray[0].displayName, color: passwordHashArray[0].color };
+        return { token: sessionId, displayName: passwordHashArray[0].displayName, color: passwordHashArray[0].color, databaseId: passwordHashArray[0].id };
     }
 
     /**
      * Creates a new user.
      * @param username - username of the new user.
      * @param password - password for the new user.
-     * @param displayName - display name for the new user.
-     * @returns a session id if successful else null if fails.
+     * @param displayName - Display name for the new user.
+     * @param color - The initial profile color for the new user.
+     * @returns An object containing the session id and database id if successful, else null.
      */
-    static async createNewUser(username: string, password: string, displayName: string, color: string): Promise<string | null> {
+    static async createNewUser(username: string, password: string, displayName: string, color: string): Promise<{ session: string, databaseId: number } | null> {
         const passwordHashArray = await Database.getHashByUsername(username);
         
         if (passwordHashArray && passwordHashArray[0]) return failureReason('createNewUser() failed: account already exists'); // User account already exists
@@ -111,7 +112,10 @@ export default class Auth {
         const sessionId = buf.toString('hex');
         ACTIVE_USERS[sessionId] = username;
 
-        return sessionId;
+        return {
+            session: sessionId,
+            databaseId: Number(saveSuccess.insertId)
+        };
     }
 
     /**

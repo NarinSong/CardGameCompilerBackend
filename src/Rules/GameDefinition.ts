@@ -11,11 +11,13 @@ import LabelManager, { PhaseLabel, StepLabel } from "./LabelManager.js";
 import PileDefinition from "./PileDefinition.js";
 import PlayerDefinition from "./PlayerDefinition.js";
 import StepDefinition from "./StepDefinition.js";
-import { ButtonRange, ButtonType, Location, LocationResolver, PileState, Visibility } from "../schemas/types.js";
+import { ButtonRangeArgument, ButtonType, LocationResolver, PileState, Visibility } from "../schemas/types.js";
 import Game from "../Game/Game.js";
 import Logger from "../Components/Logger.js";
 import ButtonDefinition from "./ButtonDefinition.js";
 import { coerceLocation } from "../Components/LocationUtils.js";
+import { GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
+import TextDefinition from "./TextDefinition.js";
 
 
 /**
@@ -34,12 +36,12 @@ export default class GameDefinition {
     /**
      * Creates a new game definition.
      */
-    constructor() {
+    constructor(obj?: GameMetaArgs) {
         this.phases = [];
         this.player = new PlayerDefinition();
         this.board = new BoardDefinition();
         this.labelManger = new LabelManager();
-        this.gameMeta = new GameMeta();
+        this.gameMeta = new GameMeta(obj);
         this.roles = [];
     }
 
@@ -48,7 +50,7 @@ export default class GameDefinition {
      * 
      * @returns A new game initialized from this definition.
      */
-    createGame() {
+    createGame(): Game {
         return new Game(this);
     }
 
@@ -56,14 +58,16 @@ export default class GameDefinition {
      *  Adds a pile definition to a player.
      * @param definition - Configuration for the pile, including its label, display name, action role, initial value, and visibility.
      */
-    addPlayerPile(definition: {
+    addPlayerPile(
+        definition: {
             label?: string | undefined,
             displayName?: string | undefined,
-            actionRole?: string | undefined,
+            actionRoles?: string[] | undefined,
             initialValue?: PileState | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
-        }) {
+        }
+    ): void {
 
         const dfn = {
             ... definition,
@@ -78,14 +82,16 @@ export default class GameDefinition {
      *  Adds a counter definition to a player
      * @param definition - Configuration for the counter, including its label, display name, action role, initial value, and visibility.
      */
-    addPlayerCounter(definition: {
+    addPlayerCounter(
+        definition: {
             label?: string | undefined,
             displayName?: string | undefined,
-            actionRole?: string | undefined,
-            initialValue?: number | undefined,
+            actionRoles?: string[] | undefined,
+            number?: number | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
-        }) {
+        }
+    ): void {
 
         const dfn = {
             ... definition,
@@ -96,15 +102,21 @@ export default class GameDefinition {
         this.player.counters.push(counter);
     }
 
-    addPlayerButton(definition: {
+    /**
+     * Adds a button definition to a player.
+     * @param definition - Configuration for the Button, including its label, display name, action roles, button type, and range if necessary.
+     */
+    addPlayerButton(
+        definition: {
             label?: string | undefined,
             displayName?: string | undefined,
-            actionRole?: string | undefined,
+            actionRoles?: string[] | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
             type?: ButtonType | undefined,
-            range?: ButtonRange | undefined,
-        }) {
+            range?: ButtonRangeArgument | undefined,
+        }
+    ): void {
 
         const dfn = {
             ... definition,
@@ -115,18 +127,40 @@ export default class GameDefinition {
         this.player.buttons.push(button);
     }
 
+    addPlayerText(
+        definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRoles?: string[] | undefined,
+            text?: string | undefined,
+            visibility?: Visibility | undefined,
+            location?: LocationResolver | undefined,
+        }
+    ): void {
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'TEXT')
+        };
+
+        const text = new TextDefinition({ labelManager: this.labelManger, ... dfn });
+        this.player.texts.push(text);
+    }
+
     /**
      *  Adds a pile definition to the board
      * @param definition - Configuration for the pile, including its label, display name, action role, initial value, and visibility.
      */
-    addBoardPile(definition: {
+    addBoardPile(
+        definition: {
             label?: string | undefined,
             displayName?: string | undefined,
-            actionRole?: string | undefined,
+            actionRoles?: string[] | undefined,
             initialValue?: PileState | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
-        }) {
+        }
+    ): void {
 
         const dfn = {
             ... definition,
@@ -141,14 +175,16 @@ export default class GameDefinition {
      *  Adds a counter definition to the board
      * @param definition - Configuration for the counter, including its label, display name, action role, initial value, and visibility.
      */
-    addBoardCounter(definition: {
+    addBoardCounter(
+        definition: {
             label?: string | undefined,
             displayName?: string | undefined,
-            actionRole?: string | undefined,
-            initialValue?: number | undefined,
+            actionRoles?: string[] | undefined,
+            number?: number | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
-        }) {
+        }
+    ): void {
 
         const dfn = {
             ... definition,
@@ -163,14 +199,17 @@ export default class GameDefinition {
      * Adds a button to the game definition.
      * @param definition - Configuration for the Button, including its label, display name, action roles, button type, and range if necessary.
      */
-    addBoardButton(definition: {
-        label?: string | undefined,
-        displayName?: string | undefined,
-        actionRoles?: string[] | undefined,
-        type?: ButtonType | undefined,
-        range?: { min?: number | undefined, max?: number | undefined, increment?: number | undefined } | undefined,
-        location?: LocationResolver | undefined,
-    }) {
+    addBoardButton(
+        definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRoles?: string[] | undefined,
+            type?: ButtonType | undefined,
+            range?: ButtonRangeArgument | undefined,
+            location?: LocationResolver | undefined,
+            visibility?: Visibility | undefined,
+        }
+    ): void {
 
         const dfn = {
             ... definition,
@@ -181,13 +220,33 @@ export default class GameDefinition {
         this.board.buttons.push(button);
     }
 
+    addBoardText(
+        definition: {
+            label?: string | undefined,
+            displayName?: string | undefined,
+            actionRoles?: string[] | undefined,
+            text?: string | undefined,
+            visibility?: Visibility | undefined,
+            location?: LocationResolver | undefined,
+        }
+    ): void {
+
+        const dfn = {
+            ... definition,
+            location: coerceLocation(definition.location, 'TEXT')
+        };
+
+        const text = new TextDefinition({ labelManager: this.labelManger, ... dfn });
+        this.board.texts.push(text);
+    }
+
     /**
      * Adds a phase to the game definition.
      * 
      * @param name - Optional name of the phase.
      * @returns The label assigned to the new phase.
      */
-    addPhase(name?: string) {
+    addPhase(name?: string): string {
         const phase = new GamePhaseDefinition(this.labelManger, name);
         this.phases.push(phase);
         return phase.label;
@@ -201,7 +260,7 @@ export default class GameDefinition {
      * @returns Label assigned to the new step.
      * @throws Error if the phase does not exist.
      */
-    addStepToPhase(phaseName: PhaseLabel, stepName?: string) {
+    addStepToPhase(phaseName: PhaseLabel, stepName?: string): string {
         const phase = this.labelManger.getPhaseFromLabel(phaseName);
         if (!phase)
             throw new Error("Failed to add step to nonexistent phase");
@@ -218,7 +277,7 @@ export default class GameDefinition {
      * @param action - An action to append to the step.
      * @throws Error if the step doesn't exist.
      */
-    addActionToStep(stepName: StepLabel, action: Action) {
+    addActionToStep(stepName: StepLabel, action: Action): void {
         const step = this.labelManger.getStepFromLabel(stepName);
         if (!step)
             throw new Error("Failed to add action to nonexistent step");
@@ -233,7 +292,7 @@ export default class GameDefinition {
      * 
      * @returns The starting step, or null if no valid starting step exists.
      */
-    getStartingStep() {
+    getStartingStep(): StepDefinition | null {
         if (this.phases.length != 0 && this.phases[0]?.steps.length != 0) {
             return this.phases[0]?.steps[0] || null;
         }
@@ -250,7 +309,7 @@ export default class GameDefinition {
      * @param role - Name of the role.
      * @returns The role name if successfully added, or null if the role already exists.
      */
-    addRole(role: string) {
+    addRole(role: string): string | null {
         if (this.roles.includes(role)) return null;
 
         this.roles.push(role);

@@ -1,0 +1,7 @@
+This project, all of its code, and all of its documentation, are licensed under the GNU AGPL v3.0, the full text of which is available here:
+
+https://www.gnu.org/licenses/agpl-3.0.txt
+
+The source code for this project is available online here:
+
+https://github.com/NarinSong/CardGameCompilerBackend
