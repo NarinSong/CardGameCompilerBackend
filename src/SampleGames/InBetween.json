@@ -675,6 +675,11 @@
                                     }
                                 }
                             }
+                        },
+                        {
+                            "type": "END_GAME",
+                            "primary": { "type": "UNDEFINED" },
+                            "secondary": { "type": "UNDEFINED" }
                         }
                     ]
                 }
