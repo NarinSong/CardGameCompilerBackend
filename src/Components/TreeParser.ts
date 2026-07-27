@@ -1070,7 +1070,6 @@ function executeWin(g: Game, c: ActionContext, node: ValueNode) {
  * @param c - The current action context.
  * @param node - LOSE node to execute.
  * @throws Error if the node is not a LOSE node.
- * @todo implement game ending logic.
  */
 function executeLose(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.Lose) throw new Error("Called executeLose with invalid node");
@@ -1088,7 +1087,24 @@ function executeLose(g: Game, c: ActionContext, node: ValueNode) {
     if (endGame) {
         g.gameOver = true;
     }
+}
 
+function executeEndGame(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.EndGame) throw new Error("Called executeEndGame with invalid node");
+
+    const remainingWin = !!(evaluate(g, c, node.primary)); // defaults to false, e.g remaining players LOSE
+    const score = zmn(evaluate(g, c, node.secondary));
+
+    for (let i in g.gameState.players) {
+        if (!g.gameState.players || g.gameState.players[i]?.state != 'Active') continue;
+
+        g.gameState.players[i].state = remainingWin ? 'Won' : 'Lost';
+        
+        if (typeof score !== 'undefined')
+            g.gameState.players[i].score = score;
+    }
+    
+    g.gameOver = true;
 }
 
 function executeSendPopup(g: Game, c: ActionContext, node: ValueNode) {
