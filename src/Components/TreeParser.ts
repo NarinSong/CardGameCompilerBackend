@@ -319,7 +319,7 @@ function executeSetCounterValue(g: Game, c: ActionContext, node: ValueNode) {
     const counter = g.gameState.counters[counterLabel];
     
     if (counter) {
-        counter.counter.value = (zn(evaluate(g, c, node.secondary)));
+        counter.counter.value = (zmn(evaluate(g, c, node.secondary)) ?? 0);
     }
 
     return counterLabel;
@@ -376,7 +376,7 @@ function executeSetCounterVisibility(g: Game, c: ActionContext, node: ValueNode)
     const counter = g.gameState.counters[counterLabel];
     
     if (counter) {
-        counter.counter.visibility = (evaluate(g, c, node.secondary) as Visibility);
+        counter.counter.visibility = (evaluate(g, c, node.secondary) as Visibility | undefined) ?? Visibility.FACE_DOWN;
     }
 
     return counterLabel;
@@ -398,7 +398,7 @@ function executeSetButtonVisibility(g: Game, c: ActionContext, node: ValueNode) 
     const button = g.gameState.buttons[buttonLabel];
     
     if (button) {
-        button.button.visibility = (evaluate(g, c, node.secondary) as Visibility);
+        button.button.visibility = (evaluate(g, c, node.secondary) as Visibility | undefined) ?? Visibility.FACE_DOWN;
     }
 
     return buttonLabel;
@@ -420,7 +420,7 @@ function executeSetPileVisibility(g: Game, c: ActionContext, node: ValueNode) {
     const pile = g.gameState.piles[pileLabel];
     
     if (pile) {
-        pile.pile.visibility = (evaluate(g, c, node.secondary) as Visibility);
+        pile.pile.visibility = (evaluate(g, c, node.secondary) as Visibility | undefined) ?? Visibility.FACE_DOWN;
     }
 
     return pileLabel;
@@ -433,7 +433,7 @@ function executeSetTextVisibility(g: Game, c: ActionContext, node: ValueNode) {
     const text = g.gameState.texts[textLabel];
     
     if (text) {
-        text.text.visibility = (evaluate(g, c, node.secondary) as Visibility);
+        text.text.visibility = (evaluate(g, c, node.secondary) as Visibility | undefined) ?? Visibility.FACE_DOWN;
     }
 
     return textLabel;
@@ -640,7 +640,7 @@ function evaluateUnassignRole(g: Game, c: ActionContext, node: ValueNode) {
         const idx = g.gameState.roles[role].indexOf(playerId);
         if (idx == -1) return false;
 
-        delete g.gameState.roles[role][idx];
+        g.gameState.roles[role].splice(idx,1);
         return true;
     }
 

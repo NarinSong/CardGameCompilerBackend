@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ArgDef, BlockName, BlockNames, BLOCKS, ValueTypeName, ValueTypeNameSchema, ValueTypes } from "./Blocks.js";
 import { BoardSchema, GameMetaArgsSchema, PlayerSchema } from "./GameDefinitionArgs.js";
 import { TriggerSchema } from "./types.js";
+import { NODE_NAMES } from "./Constants.js";
 
 type LiteralNode = {
   kind: "literal";
@@ -100,6 +101,14 @@ function inferNodeType(node: ClientNode): ValueTypeName {
 
   if (!block) {
     throw new Error(`Unknown block: ${node.block}`);
+  }
+
+  if (block.name === NODE_NAMES.Ternary) {
+    const first = inferNodeType(node.args[1] as ClientNode);
+    const second = inferNodeType(node.args[2] as ClientNode);
+
+    if (first === second) return first;
+    throw new Error("Ternary has invalid return type");
   }
 
   return block.returnType;

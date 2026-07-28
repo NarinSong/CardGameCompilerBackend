@@ -499,7 +499,7 @@ const NUMBER_TO_STRING = defineBlock({
 const TERNARY = defineBlock({
     "name": NODE_NAMES.Ternary,
     "displayName": "Ternary",
-    "returnType": "Number",
+    "returnType": "Unknown",
     "arguments": [
         {
             "name": "primary",
@@ -510,13 +510,13 @@ const TERNARY = defineBlock({
         {
             "name": "secondary",
             "displayName": "If true",
-            "type": "Void",
+            "type": "Unknown",
             "optional": false
         },
         {
             "name": "tertiary",
             "displayName": "If false",
-            "type": "Void",
+            "type": "Unknown",
             "optional": false
         }
     ]
@@ -897,7 +897,7 @@ const SHUFFLE_INTO = defineBlock({
             "name": "secondary",
             "displayName": "Destination Pile",
             "type": "PileLabel",
-            "optional": true
+            "optional": false
         },
     ]
 });
@@ -978,7 +978,7 @@ const IS_BETWEEN = defineBlock({
     "arguments": [
         {
             "name": "primary",
-            "displayName": "Card",
+            "displayName": "Number",
             "type": "Number",
             "optional": false
         },
@@ -1476,7 +1476,7 @@ const REMOVE_COUNTER = defineBlock({
 const REMOVE_BUTTON = defineBlock({
     "name": NODE_NAMES.RemoveButton,
     "displayName": "Remove Button",
-    "returnType": "ButtonLabel",
+    "returnType": "Void",
     "arguments": [
         {
             "name": "primary",
@@ -1490,7 +1490,7 @@ const REMOVE_BUTTON = defineBlock({
 const REMOVE_TEXT = defineBlock({
     "name": NODE_NAMES.RemoveText,
     "displayName": "Remove Text",
-    "returnType": "TextLabel",
+    "returnType": "Void",
     "arguments": [
         {
             "name": "primary",
@@ -1564,7 +1564,7 @@ const TEXT_OF = defineBlock({
 const PILE_SET = defineBlock({
     "name": NODE_NAMES.PileSet,
     "displayName": "How Many in a Set of Cards",
-    "returnType": "PileLabel",
+    "returnType": "Number",
     "arguments": [
         {
             "name": "primary",
@@ -1590,7 +1590,7 @@ const PILE_SET = defineBlock({
 const PILE_SET_OF_RANK = defineBlock({
     "name": NODE_NAMES.PileSetOfRank,
     "displayName": "Contains Set of Cards",
-    "returnType": "PileLabel",
+    "returnType": "Boolean",
     "arguments": [
         {
             "name": "primary",
@@ -1622,7 +1622,7 @@ const PILE_SET_OF_RANK = defineBlock({
 const PILE_FLUSH = defineBlock({
     "name": NODE_NAMES.PileFlush,
     "displayName": "Pile Flush",
-    "returnType": "PileLabel",
+    "returnType": "Number",
     "arguments": [
         {
             "name": "primary",
@@ -1648,7 +1648,7 @@ const PILE_FLUSH = defineBlock({
 const PILE_FLUSH_OF_SUIT = defineBlock({
     "name": NODE_NAMES.PileFlushOfSuit,
     "displayName": "Contains Flush of Cards",
-    "returnType": "PileLabel",
+    "returnType": "Boolean",
     "arguments": [
         {
             "name": "primary",
@@ -1680,7 +1680,7 @@ const PILE_FLUSH_OF_SUIT = defineBlock({
 const PILE_RUN = defineBlock({
     "name": NODE_NAMES.PileRun,
     "displayName": "Cards in a Row",
-    "returnType": "PileLabel",
+    "returnType": "Number",
     "arguments": [
         {
             "name": "primary",
@@ -1700,7 +1700,7 @@ const PILE_RUN = defineBlock({
 const PILE_RUN_FROM = defineBlock({
     "name": NODE_NAMES.PileRunFrom,
     "displayName": "Contains Run of Cards",
-    "returnType": "PileLabel",
+    "returnType": "Boolean",
     "arguments": [
         {
             "name": "primary",
