@@ -30,6 +30,8 @@ describe("GameState", () => {
         counters: [],
 
         buttons: [],
+
+        texts: [],
       },
 
       gameMeta: {},
@@ -43,7 +45,8 @@ describe("GameState", () => {
 
     expect(state.numPlayers).toBe(0);
 
-    expect(state.currentStep).toBeNull;
+    // Was missing the (), so this assertion never actually ran - fixed.
+    expect(state.currentStep).toBeNull();
   });
 
   it("creates a pile", () => {
@@ -55,7 +58,7 @@ describe("GameState", () => {
 
     expect(state.piles[label]).toBeDefined();
 
-    expect(state.piles[label].owner).toBe(-1);
+    expect(state.piles[label]!.owner).toBe(-1);
   });
 
   it("creates board pile", () => {
@@ -65,7 +68,7 @@ describe("GameState", () => {
 
     expect(state.piles[label]).toBeDefined();
 
-    expect(state.piles[label].owner).toBe(-1);
+    expect(state.piles[label]!.owner).toBe(-1);
   });
 
   it("creates counter", () => {
@@ -75,7 +78,7 @@ describe("GameState", () => {
       state: 10,
     });
 
-    expect(state.counters[label].counter.value).toBe(10);
+    expect(state.counters[label]!.counter.value).toBe(10);
   });
 
   it("creates button", () => {
@@ -111,7 +114,7 @@ describe("GameState", () => {
 
     state.removeCounterByLabel(first, second);
 
-    expect(state.counters[second].counter.value).toBe(15);
+    expect(state.counters[second]!.counter.value).toBe(15);
   });
 
   it("removes button", () => {
@@ -129,7 +132,7 @@ describe("GameState", () => {
       name: "draw",
     };
 
-    state.gameLabels.getStepFromLabel = vi.fn(() => step);
+    state.gameLabels.getStepFromLabel = vi.fn(() => step as any);
 
     state.moveToStep("draw");
 
@@ -145,7 +148,7 @@ describe("GameState", () => {
       steps: [step],
     };
 
-    state.gameLabels.getPhaseFromLabel = vi.fn(() => phase);
+    state.gameLabels.getPhaseFromLabel = vi.fn(() => phase as any);
 
     state.moveToPhase("main");
 

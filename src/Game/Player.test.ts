@@ -21,6 +21,7 @@ describe("Player", () => {
             "HUMAN" as any,
             gameLabels,
             1 as any,
+            "Alice",
         );
 
         expect(player.type)
@@ -36,6 +37,7 @@ describe("Player", () => {
             "AI" as any,
             gameLabels,
             5 as any,
+            "Bob",
         );
 
         expect(player.type)

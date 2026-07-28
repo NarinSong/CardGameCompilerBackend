@@ -25,9 +25,15 @@ vi.mock("./GameState.js", () => {
 
       currentStep: any = null;
 
+      popups: any[] = [];
+
       gameLabels = {
         getFromLabel: vi.fn(),
       };
+
+      resetAutoActionCount = vi.fn();
+
+      incrementAutoActionCount = vi.fn(() => false);
     },
   };
 });
@@ -47,6 +53,10 @@ describe("Game", () => {
         piles: [],
 
         counters: [],
+
+        buttons: [],
+
+        texts: [],
       },
 
       getStartingStep: vi.fn(() => ({
@@ -64,7 +74,7 @@ describe("Game", () => {
   });
 
   it("adds player successfully", () => {
-    const player = game.handlePlayerJoin(PlayerType.HUMAN);
+    const player = game.handlePlayerJoin(PlayerType.HUMAN, "Alice");
 
     expect(player).toBeInstanceOf(Player);
 
@@ -72,9 +82,9 @@ describe("Game", () => {
   });
 
   it("assigns increasing player ids", () => {
-    const p1 = game.handlePlayerJoin(PlayerType.HUMAN);
+    const p1 = game.handlePlayerJoin(PlayerType.HUMAN, "Alice");
 
-    const p2 = game.handlePlayerJoin(PlayerType.HUMAN);
+    const p2 = game.handlePlayerJoin(PlayerType.HUMAN, "Alice");
 
     expect(p1?.id).toBe(0);
 
@@ -84,9 +94,9 @@ describe("Game", () => {
   it("rejects players when full", () => {
     definition.maxPlayers = 1;
 
-    game.handlePlayerJoin(PlayerType.HUMAN);
+    game.handlePlayerJoin(PlayerType.HUMAN, "Alice");
 
-    const result = game.handlePlayerJoin(PlayerType.HUMAN);
+    const result = game.handlePlayerJoin(PlayerType.HUMAN, "Alice");
 
     expect(result).toBeNull();
   });
@@ -114,7 +124,7 @@ describe("Game", () => {
   it("returns false without actions", () => {
     game.currentStep = null;
 
-    expect(game.clickAction("test")).toBe(false);
+    expect(game.clickAction("test", undefined, 0, undefined)).toBe(false);
   });
 
   it("returns false for invalid label", () => {
@@ -132,7 +142,7 @@ describe("Game", () => {
 
     game.gameLabels.getFromLabel = vi.fn(() => undefined);
 
-    expect(game.clickAction("bad")).toBe(false);
+    expect(game.clickAction("bad", undefined, 0, undefined)).toBe(false);
   });
 
   it("executes click action", async () => {
@@ -156,9 +166,9 @@ describe("Game", () => {
       ],
     } as any;
 
-    game.gameLabels.getFromLabel = vi.fn(() => obj);
+    game.gameLabels.getFromLabel = vi.fn(() => obj as any);
 
-    const result = game.clickAction("button");
+    const result = game.clickAction("button", undefined, 0, undefined);
 
     expect(result).toBe(true);
   });
@@ -166,7 +176,7 @@ describe("Game", () => {
   it("gets player", () => {
     game.gameState.players[5] = {
       id: 5,
-    };
+    } as any;
 
     expect(game.getPlayer(5)).toEqual({
       id: 5,

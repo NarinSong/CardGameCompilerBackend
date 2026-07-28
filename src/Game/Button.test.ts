@@ -21,7 +21,7 @@ describe("Button", () => {
 
     it("creates a button", () => {
 
-        const location = vi.fn();
+        const location = vi.fn() as any;
 
         const button = Button.create(
             "draw" as any,
@@ -29,7 +29,7 @@ describe("Button", () => {
             gameLabels,
             ["DRAW"] as any,
             "Draw",
-            ButtonType.ACTION,
+            ButtonType.CLICK,
             undefined,
             location,
         );
@@ -47,7 +47,7 @@ describe("Button", () => {
             .toBe("Draw");
 
         expect(button.type)
-            .toBe(ButtonType.ACTION);
+            .toBe(ButtonType.CLICK);
 
         expect(button.range)
             .toBeUndefined();
@@ -69,7 +69,7 @@ describe("Button", () => {
             visibility: Visibility.FACE_DOWN,
             actionRoles: ["ROLL"],
             displayName: "Roll Dice",
-            type: ButtonType.RANGE,
+            type: ButtonType.NUMBER,
             range: {
                 min: 1,
                 max: 6,
@@ -95,7 +95,7 @@ describe("Button", () => {
             .toBe("Roll Dice");
 
         expect(button.type)
-            .toBe(ButtonType.RANGE);
+            .toBe(ButtonType.NUMBER);
 
         expect(button.range)
             .toEqual({

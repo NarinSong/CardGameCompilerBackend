@@ -23,7 +23,7 @@ describe("Pile", () => {
   });
 
   it("creates a pile", () => {
-    const location = vi.fn();
+    const location = vi.fn() as any;
 
     const pile = Pile.create(
       PileState.SHUFFLED,
