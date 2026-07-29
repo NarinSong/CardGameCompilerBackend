@@ -63,7 +63,7 @@ export default class GameDefinition {
             label?: string | undefined,
             displayName?: string | undefined,
             actionRoles?: string[] | undefined,
-            initialValue?: PileState | undefined,
+            initialState?: PileState | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
         }
@@ -156,7 +156,7 @@ export default class GameDefinition {
             label?: string | undefined,
             displayName?: string | undefined,
             actionRoles?: string[] | undefined,
-            initialValue?: PileState | undefined,
+            initialState?: PileState | undefined,
             visibility?: Visibility | undefined,
             location?: LocationResolver | undefined,
         }
