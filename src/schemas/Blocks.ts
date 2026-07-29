@@ -131,7 +131,7 @@ const DEAL_CARDS = defineBlock({
 const MOVE_CARD = defineBlock({
     name: NODE_NAMES.MoveCard,
     displayName: "Move Card",
-    returnType: "Void",
+    returnType: "PileLabel",
     arguments: [
         {
             name: "primary",

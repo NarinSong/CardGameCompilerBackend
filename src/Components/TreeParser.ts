@@ -112,11 +112,13 @@ function executeMoveCard(g: Game, c: ActionContext, node: ValueNode) {
     const fromPile = g.gameState.piles[fromLabel]?.pile;
     const toPile = g.gameState.piles[toLabel]?.pile;
 
-    if (!fromPile || !toPile) return;
+    if (!fromPile || !toPile) return undefined;
 
     if (Card.removeCard(fromPile.cards, card)) {
         toPile.cards.unshift(card);
     }
+
+    return toLabel;
 }
 
 /**
