@@ -1201,8 +1201,8 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.While: while (evaluate(g,c,node.primary)) {evaluate(g,c,node.secondary)}; return;
         //case 'FOR_EACH': executeForEach(g, c, node); return;
         // Game Actions
-        case NODE_NAMES.DealCards: executeDealCards(g, c, node); return;
-        case NODE_NAMES.MoveCard: executeMoveCard(g, c, node); return;
+        case NODE_NAMES.DealCards: return executeDealCards(g, c, node);
+        case NODE_NAMES.MoveCard:  return executeMoveCard(g, c, node);
         case NODE_NAMES.CreatePile: return executeCreatePile(g, c, node);
         case NODE_NAMES.CreateButton: return executeCreateButton(g, c, node);
         case NODE_NAMES.CreateCounter: return executeCreateCounter(g, c, node);
