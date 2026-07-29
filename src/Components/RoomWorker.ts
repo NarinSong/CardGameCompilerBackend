@@ -52,6 +52,10 @@ parentPort?.on("message", (msg) => {
             if (game.aborted) { parentPort?.postMessage({ type: "GAME_ABORTED" }); break; }
             updateGameState();
             if (game.gameOver) { parentPort?.postMessage({ type: "GAME_OVER", players: buildPlayerResults(game) }); }
+            if (game.gameState.popups.length > 0) {
+                parentPort?.postMessage({ type: "SEND_POPUPS", popups: game.gameState.popups });
+                game.gameState.popups.splice(0);
+            }
             break;
         case "PLAYER_CLICK":
             let actionTaken = game.clickAction(msg.label, msg.cardId, msg.playerId, msg.buttonValue);
