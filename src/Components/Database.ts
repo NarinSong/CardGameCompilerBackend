@@ -2,7 +2,6 @@ import * as mariadb from 'mariadb';
 import { config } from 'dotenv';
 import Logger from './Logger.js';
 import ClientGameDefinition from '../schemas/ClientGameDefinition.js';
-import z from 'zod';
 import { InsertResult, InsertSchema, SelectAllGameSaves, SelectAllGameSavesSchema, SelectFullGameSavesById, SelectFullGameSavesByIdSchema, SelectGameSavesById, SelectGameSavesByIdSchema, SelectHashByUsername, SelectHashByUsernameSchema, UpdateResult, UpdateSchema } from '../schemas/DatabaseSchemas.js';
 import GameDefinition from '../Rules/GameDefinition.js';
 
@@ -174,8 +173,6 @@ export default class Database {
 
         try {
             conn = await pool.getConnection();
-            // Was missing the VALUES (...) clause entirely - invalid SQL that
-            // would have failed on every call. Added it to match the 6 params below.
             const result = await conn.query(
                 "INSERT INTO blockeditorsaves (gamename, blockeditorstate, creator, parent, gameDescription, privateGame) VALUES (?, ?, ?, ?, ?, ?)",
                 [
