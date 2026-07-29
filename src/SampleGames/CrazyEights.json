@@ -149,18 +149,21 @@
                                                     "primary": { "type": "LITERAL", "primary": "active" }
                                                 },
                                                 {
-                                                    "type": "DEAL_CARDS",
-                                                    "primary": { "type": "LITERAL", "primary": "Deck" },
-                                                    "secondary": {
-                                                        "type": "PILE_OF",
-                                                        "id": {
-                                                            "type": "GET_ID_FROM_ROLE",
-                                                            "role": { "type": "LITERAL", "primary": "active" },
-                                                            "index": { "type": "UNDEFINED" }
+                                                    "type": "SORT_PILE",
+                                                    "primary": {
+                                                        "type": "DEAL_CARDS",
+                                                        "primary": { "type": "LITERAL", "primary": "Deck" },
+                                                        "secondary": {
+                                                            "type": "PILE_OF",
+                                                            "id": {
+                                                                "type": "GET_ID_FROM_ROLE",
+                                                                "role": { "type": "LITERAL", "primary": "active" },
+                                                                "index": { "type": "UNDEFINED" }
+                                                            },
+                                                            "actionRole": { "type": "LITERAL", "primary": "Hand" }
                                                         },
-                                                        "actionRole": { "type": "LITERAL", "primary": "Hand" }
-                                                    },
-                                                    "tertiary": { "type": "LITERAL", "primary": 7 }
+                                                        "tertiary": { "type": "LITERAL", "primary": 7 }
+                                                    }
                                                 }
                                             ]
                                         }
@@ -388,16 +391,19 @@
                                 "type":  "SEQUENCE",
                                 "primary": [
                                     {
-                                        "type":  "DEAL_CARDS",
-                                        "primary":  { "type": "LITERAL", "primary":  "Deck" },
-                                        "secondary": {
-                                            "type":  "PILE_OF",
-                                            "id": {
-                                                "type":  "CTX_PLAYER"
+                                        "type": "SORT_PILE",
+                                        "primary": {
+                                            "type":  "DEAL_CARDS",
+                                            "primary":  { "type": "LITERAL", "primary":  "Deck" },
+                                            "secondary": {
+                                                "type":  "PILE_OF",
+                                                "id": {
+                                                    "type":  "CTX_PLAYER"
+                                                },
+                                                "actionRole":  { "type": "LITERAL", "primary":  "Hand" }
                                             },
-                                            "actionRole":  { "type": "LITERAL", "primary":  "Hand" }
-                                        },
-                                        "tertiary":  { "type": "LITERAL", "primary": 1 }
+                                            "tertiary":  { "type": "LITERAL", "primary": 1 }
+                                        }
                                     },
                                     {
                                         "type": "BROADCAST_POPUP",
@@ -415,6 +421,32 @@
                                             "role": { "type": "LITERAL", "primary": "active" },
                                             "index": { "type": "UNDEFINED" }
                                         }
+                                    },
+                                    {
+                                        "type": "IF",
+                                        "primary": {
+                                            "type": "EQUAL",
+                                            "primary": {
+                                                "type": "NUM_CARDS_IN_PILE",
+                                                "primary": { "type": "LITERAL", "primary": "Deck" }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": 0 }
+                                        },
+                                        "secondary": {
+                                            "type": "REMOVE_PILE",
+                                            "pile": {
+                                                "type": "CREATE_PILE",
+                                                "visibility": {"type": "LITERAL", "primary": "INVISIBLE"},
+                                                "actionRoles": { "type": "UNDEFINED" },
+                                                "state": { "type": "LITERAL", "primary": "SHUFFLED" },
+                                                "name": { "type": "UNDEFINED" },
+                                                "displayName": { "type": "UNDEFINED" },
+                                                "owner": {"type": "LITERAL", "primary": -1},
+                                                "location": { "type": "UNDEFINED" }
+                                            },
+                                            "sendTo": { "type": "LITERAL", "primary": "Deck" }
+                                        },
+                                        "tertiary": { "type": "UNDEFINED" }
                                     }
                                 ]
                             }
