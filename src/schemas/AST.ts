@@ -46,6 +46,7 @@ const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.TextOwner,
   NODE_NAMES.Comment,
   NODE_NAMES.Random,
+  NODE_NAMES.SortPile,
 ]);
 const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.And,

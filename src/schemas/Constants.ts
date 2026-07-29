@@ -94,4 +94,5 @@ export const NODE_NAMES = {
   CounterOwner: "COUNTER_OWNER",
   ButtonOwner: "BUTTON_OWNER",
   TextOwner: "TEXT_OWNER",
+  SortPile: "SORT_PILE",
 } as const;

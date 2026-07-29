@@ -108,7 +108,7 @@ const UNDEFINED = defineBlock({
 const DEAL_CARDS = defineBlock({
     name: NODE_NAMES.DealCards,
     displayName: "Deal Cards",
-    returnType: "Void",
+    returnType: "PileLabel",
     arguments: [
         {
         name: "primary",
@@ -1866,6 +1866,20 @@ const REVIVE = defineBlock({
     ]
 });
 
+const SORT_PILE = defineBlock({
+    name: NODE_NAMES.SortPile,
+    displayName: "Sort",
+    returnType: "PileLabel",
+    arguments: [
+        {
+            name: "primary",
+            displayName: "Player",
+            type: "PileLabel",
+            optional: false
+        }
+    ]
+});
+
 
 
 // Put the blocks together in a registry to export them
@@ -1944,6 +1958,7 @@ export const BLOCKS = {
     PILE_FLUSH_OF_SUIT,
     PILE_RUN,
     PILE_RUN_FROM,
+    SORT_PILE,
     COMMENT,
     CREATE_TEXT,
     SET_TEXT,

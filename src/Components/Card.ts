@@ -302,4 +302,8 @@ export default class Card {
         
         return false;
     }
+
+    static sortCards(pile: Card[]) {
+        return pile.sort((a: Card, b: Card) => a.id - b.id);
+    }
 }

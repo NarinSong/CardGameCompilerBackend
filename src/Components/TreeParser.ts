@@ -94,8 +94,12 @@ function evaluateIsBetween(g: Game, c: ActionContext, node: ValueNode) {
  */
 function executeDealCards(g: Game, c: ActionContext, node: ValueNode) {
     if (node.type !== NODE_NAMES.DealCards) throw new Error("Called executeDealCards with an invalid node");
+
+    const second = evaluate(g, c, node.secondary) as Label
     
-    g.gameState.dealCards(evaluate(g, c, node.primary) as Label, evaluate(g, c, node.secondary) as Label, evaluate(g, c, node.tertiary) as number);
+    g.gameState.dealCards(evaluate(g, c, node.primary) as Label, second, evaluate(g, c, node.tertiary) as number);
+
+    return second;
 }
 
 function executeMoveCard(g: Game, c: ActionContext, node: ValueNode) {
@@ -982,6 +986,19 @@ function evaluatePileRunFrom(g: Game, c: ActionContext, node: ValueNode) {
     return Card.largestRunThatIncludes(pile.cards, rank, suit) >= number;
 }
 
+function evaluateSortPile(g: Game, c: ActionContext, node: ValueNode) {
+    if (node.type !== NODE_NAMES.SortPile) throw new Error("Called evaluateSortPile with invalid node");
+
+    const pileLabel = zs(evaluate(g, c, node.primary));
+
+    const pile = g.gameLabels.getFromLabel(pileLabel) as Pile | undefined;
+    if (!pile) return undefined;
+
+    pile.cards = Card.sortCards(pile.cards);
+
+    return pileLabel;
+}
+
 /**
  * Executes a "UPDATE_VARIABLE" value node.
  * @param g - The current game instance.
@@ -1242,6 +1259,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.PileFlushOfSuit: return evaluatePileFlushOfSuit(g, c, node);
         case NODE_NAMES.PileRun: return evaluatePileRun(g, c, node);
         case NODE_NAMES.PileRunFrom: return evaluatePileRunFrom(g, c, node);
+        case NODE_NAMES.SortPile: return evaluateSortPile(g, c, node);
         // Map usage
         case NODE_NAMES.Map: return (g.definition.gameMeta.maps[ zs(evaluate(g, c, node.secondary)) ]?.get( evaluate(g, c, node.primary) ));
         case NODE_NAMES.UpdateVariable: return executeUpdateVariable(g, c, node);
