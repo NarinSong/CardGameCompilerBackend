@@ -307,13 +307,6 @@ describe("evaluate: roles", () => {
     expect(game.gameState.roles["dealer"]).toEqual([1]);
   });
 
-  // Found this while writing these tests. UNASSIGN_ROLE uses
-  // `delete array[idx]` instead of `array.splice(idx, 1)`, and delete on an
-  // array just leaves a hole - the length never shrinks. HAS_ROLE still
-  // comes back correct (Array.includes treats a hole as undefined, which
-  // never matches a real id), but the roles array quietly piles up dead
-  // slots forever. Not fixing this one myself - lower severity than the
-  // Database.ts SQL bug, and worth a second opinion first.
   it("BUG: UNASSIGN_ROLE leaves a hole instead of shrinking the roles array", () => {
     const { game } = makeGame();
     const ctx = ctxFor(0);
@@ -323,7 +316,7 @@ describe("evaluate: roles", () => {
     evaluate(game, ctx, { type: NODE_NAMES.UnassignRole, role: lit("dealer"), id: lit(0) } as any);
 
     expect(evaluate(game, ctx, { type: NODE_NAMES.HasRole, role: lit("dealer"), id: lit(0) } as any)).toBe(false);
-    expect(game.gameState.roles["dealer"]).toHaveLength(1); // should be 0 if it actually removed the entry
+    expect(game.gameState.roles["dealer"]).toHaveLength(0);
   });
 
   it("FIRST_PLAYER always returns 0", () => {
