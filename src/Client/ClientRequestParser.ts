@@ -664,6 +664,7 @@ export function clientRequestClickLabel(clientId: number, label: unknown, cardId
 
     if (typeof client.player === "number") {
         // TODO: disambiguate between card id and button value :)
+        // Also TODO: if button value is given, validate that it's between MIN and MAX and allowed based on INCREMENT
         room.handlePlayerClick(labelCheck.data, cardIdCheck.data, client.player, cardIdCheck.data);
         callback(true);
     }
