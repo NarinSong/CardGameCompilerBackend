@@ -771,7 +771,8 @@ function evaluateSetScore(g: Game, c: ActionContext, node: ValueNode) {
     const player = g.players[playerId];
     const score = zn(evaluate(g, c, node.secondary));
 
-    player!.score = score;
+    if (player)
+        player.score = score;
 
     return score;
 }
@@ -781,8 +782,9 @@ function evaluateRevive(g: Game, c: ActionContext, node: ValueNode) {
 
     const playerId = zn(evaluate(g, c, node.primary)) as PlayerID;
     const player = g.players[playerId];
-
-    player!.state = 'Active';
+    
+    if (player)
+        player.state = 'Active';
 
     return playerId;
 }
