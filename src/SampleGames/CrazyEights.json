@@ -142,17 +142,27 @@
                                             }
                                         },
                                         "secondary": {
-                                            "type": "DEAL_CARDS",
-                                            "primary": { "type": "LITERAL", "primary": "Deck" },
-                                            "secondary": {
-                                                "type": "PILE_OF",
-                                                "id": {
+                                            "type": "SEQUENCE",
+                                            "primary": [
+                                                {
                                                     "type": "NEXT_PLAYER",
                                                     "primary": { "type": "LITERAL", "primary": "active" }
                                                 },
-                                                "actionRole": { "type": "LITERAL", "primary": "Hand" }
-                                            },
-                                            "tertiary": { "type": "LITERAL", "primary": 7 }
+                                                {
+                                                    "type": "DEAL_CARDS",
+                                                    "primary": { "type": "LITERAL", "primary": "Deck" },
+                                                    "secondary": {
+                                                        "type": "PILE_OF",
+                                                        "id": {
+                                                            "type": "GET_ID_FROM_ROLE",
+                                                            "role": { "type": "LITERAL", "primary": "active" },
+                                                            "index": { "type": "UNDEFINED" }
+                                                        },
+                                                        "actionRole": { "type": "LITERAL", "primary": "Hand" }
+                                                    },
+                                                    "tertiary": { "type": "LITERAL", "primary": 7 }
+                                                }
+                                            ]
                                         }
                                     },
                                     {
