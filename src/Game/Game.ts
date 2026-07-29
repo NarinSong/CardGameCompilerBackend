@@ -20,7 +20,7 @@ import Card from "../Components/Card";
  * A Game contains the game definition it was created from and the mutable game state used while the game is being played. 
  */
 export default class Game {
-    definition: GameDefinition;
+    readonly definition: GameDefinition;
     gameState: GameState;
 
     aborted = false;

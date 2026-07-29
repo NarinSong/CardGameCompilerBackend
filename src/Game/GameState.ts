@@ -42,12 +42,13 @@ export default class GameState {
     counters: Record<Label, {counter: Counter, owner: PlayerID | BoardID}>;
     buttons: Record<Label, {button: Button, owner: PlayerID | BoardID}>;
     texts: Record<Label, {text: Text, owner: PlayerID | BoardID}>;
-    gameMeta: GameMeta;
     #autoActionCount: number = 0;
     popups: { message: string, player: PlayerID | null }[] = [];
 
     constants: VariableArrayType;
     variables: VariableArrayType;
+    
+    readonly gameMeta: GameMeta;
 
 
     /**

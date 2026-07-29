@@ -18,8 +18,8 @@ export type GamePiece = Pile | Counter | Button | Text;
  */
 export default class GameLabels {
     gameObjectLabels: Record<Label, GamePiece>;
-    gamePhaseLabels: Record<Label, GamePhaseDefinition>;
-    gameStepLabels: Record<Label, StepDefinition>;
+    readonly gamePhaseLabels: Record<Label, GamePhaseDefinition>;
+    readonly gameStepLabels: Record<Label, StepDefinition>;
     #nextId: number;
 
     /**
