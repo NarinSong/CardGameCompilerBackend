@@ -323,7 +323,7 @@ export async function clientRequestGetGameInfo(clientId: number, gameId: unknown
     callback(
         {
             name: game.gameMeta.name,
-            description: 'A game'
+            description: game.gameMeta.description
         }
     );
 }
