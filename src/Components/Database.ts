@@ -174,8 +174,10 @@ export default class Database {
 
         try {
             conn = await pool.getConnection();
+            // Was missing the VALUES (...) clause entirely - invalid SQL that
+            // would have failed on every call. Added it to match the 6 params below.
             const result = await conn.query(
-                "INSERT INTO blockeditorsaves (gamename, blockeditorstate, creator, parent, gameDescription, privateGame)", 
+                "INSERT INTO blockeditorsaves (gamename, blockeditorstate, creator, parent, gameDescription, privateGame) VALUES (?, ?, ?, ?, ?, ?)",
                 [
                     game.gameMeta.name,
                     JSON.stringify(game), 
