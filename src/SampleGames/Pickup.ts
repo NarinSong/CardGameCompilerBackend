@@ -19,8 +19,8 @@ Pickup.maxPlayers = 4;
 
 // Step 3: Define the Board
 
-Pickup.addBoardPile({label: 'Deck', initialValue: PileState.SHUFFLED, visibility: Visibility.FACE_DOWN });
-Pickup.addBoardPile({label: 'Deck2', actionRoles: ['Deck'], initialValue: PileState.SHUFFLED, visibility: Visibility.FACE_DOWN });
+Pickup.addBoardPile({label: 'Deck', initialState: PileState.SHUFFLED, visibility: Visibility.FACE_DOWN });
+Pickup.addBoardPile({label: 'Deck2', actionRoles: ['Deck'], initialState: PileState.SHUFFLED, visibility: Visibility.FACE_DOWN });
 
 // Step 4: Create the Actions
 

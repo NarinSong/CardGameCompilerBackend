@@ -6,7 +6,7 @@ import { PileState, TriggerType, Visibility } from "../schemas/types.js";
 const CrazyEights = new GameDefinition();
 
 // Step 1: Define the players
-CrazyEights.addPlayerPile({ label: 'Hand', actionRoles: ['Hand'], initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
+CrazyEights.addPlayerPile({ label: 'Hand', actionRoles: ['Hand'], initialState: PileState.EMPTY, visibility: Visibility.FACE_UP });
 
 // Step 2: Set the game meta
 
@@ -19,8 +19,8 @@ CrazyEights.gameMeta.variables[currentSuitVariable] = 'Suit';
 
 // Step 3: Define the Board
 
-CrazyEights.addBoardPile({label: 'Deck', initialValue: PileState.SHUFFLED, visibility: Visibility.FACE_DOWN });
-CrazyEights.addBoardPile({label: 'Discard', initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
+CrazyEights.addBoardPile({label: 'Deck', initialState: PileState.SHUFFLED, visibility: Visibility.FACE_DOWN });
+CrazyEights.addBoardPile({label: 'Discard', initialState: PileState.EMPTY, visibility: Visibility.FACE_UP });
 CrazyEights.addBoardButton({label: 'Pass', type: 'CLICK'});
 
 // Suit selection buttons

@@ -19,10 +19,10 @@ Between.maxPlayers = 1;
 
 // Step 3: Define the Board
 
-Between.addBoardPile({label: 'Deck', initialValue: PileState.SHUFFLED, visibility: Visibility.FACE_DOWN });
-Between.addBoardPile({label: 'Discard', initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
-Between.addBoardPile({label: 'Play', initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
-Between.addBoardPile({label: 'Hit', initialValue: PileState.EMPTY, visibility: Visibility.FACE_UP });
+Between.addBoardPile({label: 'Deck', initialState: PileState.SHUFFLED, visibility: Visibility.FACE_DOWN });
+Between.addBoardPile({label: 'Discard', initialState: PileState.EMPTY, visibility: Visibility.FACE_UP });
+Between.addBoardPile({label: 'Play', initialState: PileState.EMPTY, visibility: Visibility.FACE_UP });
+Between.addBoardPile({label: 'Hit', initialState: PileState.EMPTY, visibility: Visibility.FACE_UP });
 
 Between.addBoardCounter({ label: 'Pot', number: 50 });
 
