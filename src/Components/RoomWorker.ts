@@ -56,6 +56,7 @@ parentPort?.on("message", (msg) => {
                 parentPort?.postMessage({ type: "SEND_POPUPS", popups: game.gameState.popups });
                 game.gameState.popups.splice(0);
             }
+            parentPort?.postMessage({ type: "REQUEST_DONE"});
             break;
         case "PLAYER_CLICK":
             let actionTaken = game.clickAction(msg.label, msg.cardId, msg.playerId, msg.buttonValue);
@@ -69,7 +70,7 @@ parentPort?.on("message", (msg) => {
                 game.gameState.popups.splice(0);
             }
             if (game.gameOver) { parentPort?.postMessage({ type: "GAME_OVER", players: buildPlayerResults(game) }); }
-            
+            parentPort?.postMessage({ type: "REQUEST_DONE"});
             break;
         case "JOIN_ROOM":
             const player = game.handlePlayerJoin(msg.playerType, msg.playerName);
@@ -78,6 +79,7 @@ parentPort?.on("message", (msg) => {
                 type: "PLAYER_JOINED",
                 playerId: player?.id ?? null
             });
+            parentPort?.postMessage({ type: "REQUEST_DONE"});
             break;
 
     }
