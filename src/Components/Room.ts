@@ -36,6 +36,7 @@ export default class Room {
     name: RoomID;
     lobby: LobbyID;
     started: boolean;
+    private in_flight: number;
     private timeouts: Map<string, NodeJS.Timeout>;
 
     /**
@@ -51,6 +52,7 @@ export default class Room {
         this.lobby = lobby;
         this.started = false;
         this.timeouts = new Map();
+        this.in_flight = 0;
         this.resetInactivityTimeout();
 
 
@@ -74,6 +76,9 @@ export default class Room {
                     this.timeouts.set("gameOverDelay", setTimeout(() => {
                         GameManager.closeRoom(this, msg.players);
                     }, 5000));
+                    break;
+                case "REQUEST_DONE":
+                    this.endInfiniteLoopTimeout();
                     break;
             }
         });
@@ -111,6 +116,33 @@ export default class Room {
             console.log(`Room ${this.name} timed out due to inactivity`);
             GameManager.closeRoom(this);
         }, 30 * 60 * 1000));
+    }
+
+    /**
+     * start the inf_loop timeout for the room.
+     * If the room is processing a message for more than 5 secs, it will be destroyed.
+     */
+    startInfiniteLoopTimeout(): void {
+        const existing = this.timeouts.get("inf_loop");
+        if (existing) clearTimeout(existing);
+
+        this.in_flight++;
+        this.timeouts.set("inf_loop", setTimeout(() => {
+            console.log(`Room ${this.name} timed out due to possible infinite loop`);
+            GameManager.closeRoom(this);
+        }, 5* 1000));
+    }
+
+    /**
+     * end the inf_loop timeout for the room.
+     * If the room is processing a message for more than 5 secs, it will be destroyed.
+     */
+    endInfiniteLoopTimeout(): void {
+        this.in_flight--;
+        if (this.in_flight === 0){
+            const existing = this.timeouts.get("inf_loop");
+            if (existing) clearTimeout(existing);
+        }
     }
 
     /**
@@ -161,6 +193,7 @@ export default class Room {
         if (!this.started) return;
         this.resetInactivityTimeout();
         this.worker.postMessage({type: "PLAYER_CLICK", label, cardId, playerId, buttonValue})
+        this.startInfiniteLoopTimeout();
 
     }
 
@@ -212,6 +245,7 @@ export default class Room {
             };
             this.worker.on("message", listener);
             this.worker.postMessage({ type: "JOIN_ROOM", playerType: PlayerType.HUMAN, playerName: client.displayName });
+            this.startInfiniteLoopTimeout();
         });
        
     }
@@ -225,6 +259,7 @@ export default class Room {
         this.started = true;
         this.resetInactivityTimeout();
         this.worker.postMessage({type: "START_GAME"});
+        this.startInfiniteLoopTimeout();
         return true;
     }   
 
