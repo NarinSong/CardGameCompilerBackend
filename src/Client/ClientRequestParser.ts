@@ -337,52 +337,52 @@ export async function clientRequestGetGameInfo(clientId: number, gameId: unknown
  * @returns void if callback is not a function, returns callback(true, gameId) if save was successful, else callback(false).
  */
 export async function clientRequestSaveGame(clientId: number, json: unknown, callback: unknown = noop) {
-    if (!fCheck(callback)) return;//(success: boolean, id?: number) => void
+    if (!fCheck(callback)) return;//(success: boolean, failureReason?: string, id?: number) => void
 
     // Auth check
     const client = GameManager.clientFromId(clientId);
-    if (!client) return callback(false);
+    if (!client) return callback(false, 'Client was disconnected');
     const username = client.username;
-    if (!username) return callback(false);
+    if (!username) return callback(false, 'Client has no username');
     const databaseId = client.databaseId;
-    if (!databaseId) return callback(false);
+    if (!databaseId) return callback(false, 'Client is not present in the database');
 
     // Verify client input
     const jsonCheck = 
         ClientGameDefinitionSchema
         .safeParse(json);
 
-    if (!jsonCheck.success) return callback(false);
+    if (!jsonCheck.success) return callback(false, JSON.stringify(jsonCheck.error));
 
     const game = jsonCheck.data;
     let gameId = game.gameMeta.id;
 
     if (!gameId) {
         const result = await Database.saveGameEditorBlocks(databaseId, game);
-        if (!result) return callback(false);
+        if (!result) return callback(false, 'Failed to store game in database');
         gameId = result;
     } else {
         // Try saving over the current one
         const owner = await Database.getSavedEditorBlocksById(gameId);
         if (!owner || !owner[0] || owner[0].creator != databaseId)
-            return callback(false);
+            return callback(false, 'Insufficient permission to overwrite game in database');
 
         // Can overwrite the current one legally
         const result = await Database.updateGameEditorBlocks(gameId, game);
-        if (!result) return callback(false, gameId);
+        if (!result) return callback(false, 'Failed to overwrite game in database', gameId);
     }
 
     const def = buildGameFromJSON(jsonCheck.data);
-    if (!def) return callback(false, gameId);
+    if (!def) return callback(false, 'Failed to build the game definition from valid json', gameId);
     def.gameMeta.id = gameId;
 
     // Save game in database and available games
     const result = await Database.saveGameJson(databaseId, def);
-    if (!result) return callback(false, gameId);
+    if (!result) return callback(false, 'Failed to save valid json that built to the database', gameId);
     
     GameManager.registerGameDefinition(def, gameId, JSON.stringify(jsonCheck.data)); 
 
-    callback(true, gameId);
+    callback(true, 'Success!', gameId);
 }
 
 /**
