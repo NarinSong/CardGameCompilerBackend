@@ -113,13 +113,13 @@ export default class GameMeta {
         currentLocation = JSON.parse(JSON.stringify(currentLocation)) as Location;
 
         if (defaultLocation.direction === 'HORIZONTAL') {
-            const base = GameMeta.locationOffset(currentLocation.x, defaultLocation.horizontalOffset, defaultLocation.wraptAt, defaultLocation.wrapTo);
+            const base = GameMeta.locationOffset(currentLocation.x, defaultLocation.horizontalOffset, defaultLocation.wrapAt, defaultLocation.wrapTo);
             if (base.wrapped) {
                 currentLocation.y += defaultLocation.verticalOffset;
             }
             currentLocation.x = base.value;
         } else if (defaultLocation.direction === 'VERTICAL') {
-            const base = GameMeta.locationOffset(currentLocation.y, defaultLocation.verticalOffset, defaultLocation.wraptAt, defaultLocation.wrapTo);
+            const base = GameMeta.locationOffset(currentLocation.y, defaultLocation.verticalOffset, defaultLocation.wrapAt, defaultLocation.wrapTo);
             if (base.wrapped) {
                 currentLocation.x += defaultLocation.horizontalOffset;
             }

@@ -98,7 +98,7 @@ export const DefaultLocationSchema = z.object({
     direction: z.union([z.literal('VERTICAL'), z.literal('HORIZONTAL')]),
     verticalOffset: z.number(),
     horizontalOffset: z.number(),
-    wraptAt: z.number(),
+    wrapAt: z.number(),
     wrapTo: z.number(),
 });
 export const LocationResolverSchema = z.discriminatedUnion('locationType', [
@@ -194,7 +194,7 @@ export const DEFAULT_PILE_LOCATION: DefaultLocation = {
     direction: "HORIZONTAL",
     verticalOffset: -200,
     horizontalOffset: 130,
-    wraptAt: 800,
+    wrapAt: 800,
     wrapTo: -800,
 };
 export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
@@ -205,7 +205,7 @@ export const DEFAULT_COUNTER_LOCATION: DefaultLocation = {
     direction: "HORIZONTAL",
     verticalOffset: -150,
     horizontalOffset: 150,
-    wraptAt: 800,
+    wrapAt: 800,
     wrapTo: -800,
 };
 export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
@@ -216,7 +216,7 @@ export const DEFAULT_BUTTON_LOCATION: DefaultLocation = {
     direction: "HORIZONTAL",
     verticalOffset: 100,
     horizontalOffset: 250,
-    wraptAt: 780,
+    wrapAt: 780,
     wrapTo: -780,
 };
 export const DEFAULT_TEXT_LOCATION: DefaultLocation = {
@@ -227,7 +227,7 @@ export const DEFAULT_TEXT_LOCATION: DefaultLocation = {
     direction: "VERTICAL",
     verticalOffset: -100,
     horizontalOffset: 250,
-    wraptAt: -450,
+    wrapAt: -450,
     wrapTo: 450,
 };
 

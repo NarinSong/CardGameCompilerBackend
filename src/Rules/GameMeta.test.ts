@@ -58,7 +58,7 @@ describe("GameMeta constructor defaults", () => {
             direction: "VERTICAL" as const,
             verticalOffset: 1,
             horizontalOffset: 1,
-            wraptAt: 10,
+            wrapAt: 10,
             wrapTo: 0,
         };
         const meta = new GameMeta({ name: "Poker", locations: { CUSTOM: customLocation } });
@@ -148,7 +148,7 @@ describe("GameMeta.nextLocation", () => {
     it("wraps and bumps the vertical axis when the horizontal threshold is exceeded", () => {
         const meta = new GameMeta({ name: "Poker" });
         const start = {
-            x: DEFAULT_PILE_LOCATION.wraptAt - DEFAULT_PILE_LOCATION.horizontalOffset + 1,
+            x: DEFAULT_PILE_LOCATION.wrapAt - DEFAULT_PILE_LOCATION.horizontalOffset + 1,
             y: 50,
         };
 

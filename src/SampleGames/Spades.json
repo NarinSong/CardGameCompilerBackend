@@ -47,7 +47,7 @@
                 "direction": "HORIZONTAL",
                 "verticalOffset": -180,
                 "horizontalOffset": 130,
-                "wraptAt": 800,
+                "wrapAt": 800,
                 "wrapTo": -800
             },
             "opponentright": {
@@ -58,7 +58,7 @@
                 "direction": "VERTICAL",
                 "verticalOffset": -180,
                 "horizontalOffset": -130,
-                "wraptAt": -410,
+                "wrapAt": -410,
                 "wrapTo": 410
             },
             "deck": {
@@ -69,7 +69,7 @@
                 "direction": "HORIZONTAL",
                 "verticalOffset": -180,
                 "horizontalOffset": 250,
-                "wraptAt": 800,
+                "wrapAt": 800,
                 "wrapTo": -800
             },
             "yours": {
@@ -80,7 +80,7 @@
                 "direction": "HORIZONTAL",
                 "verticalOffset": 180,
                 "horizontalOffset": 130,
-                "wraptAt": 800,
+                "wrapAt": 800,
                 "wrapTo": -800
             },
             "yoursright": {
@@ -91,7 +91,7 @@
                 "direction": "VERTICAL",
                 "verticalOffset": 180,
                 "horizontalOffset": -130,
-                "wraptAt": 410,
+                "wrapAt": 410,
                 "wrapTo": -410
             }
         }

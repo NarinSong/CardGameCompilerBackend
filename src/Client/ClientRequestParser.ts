@@ -337,7 +337,7 @@ export async function clientRequestGetGameInfo(clientId: number, gameId: unknown
  * @returns void if callback is not a function, returns callback(true, gameId) if save was successful, else callback(false).
  */
 export async function clientRequestSaveGame(clientId: number, json: unknown, callback: unknown = noop) {
-    if (!fCheck(callback)) return;//(success: boolean, failureReason?: string, id?: number) => void
+    if (!fCheck(callback)) return;//(success: boolean, failureReason: string, id?: number) => void
 
     // Auth check
     const client = GameManager.clientFromId(clientId);

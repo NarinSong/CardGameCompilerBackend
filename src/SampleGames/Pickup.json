@@ -13,7 +13,7 @@
                 "direction": "HORIZONTAL",
                 "verticalOffset": -180,
                 "horizontalOffset": 130,
-                "wraptAt": 800,
+                "wrapAt": 800,
                 "wrapTo": -800
             }
         }
