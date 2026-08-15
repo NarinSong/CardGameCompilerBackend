@@ -5,7 +5,7 @@ import ClientGameDefinition from '../schemas/ClientGameDefinition.js';
 import { InsertResult, InsertSchema, SelectAllGameSaves, SelectAllGameSavesSchema, SelectFullGameSavesById, SelectFullGameSavesByIdSchema, SelectGameSavesById, SelectGameSavesByIdSchema, SelectHashByUsername, SelectHashByUsernameSchema, UpdateResult, UpdateSchema } from '../schemas/DatabaseSchemas.js';
 import GameDefinition from '../Rules/GameDefinition.js';
 
-config(); // Set up environment variables
+config({ quiet: true }); // Set up environment variables
 
 if (!process.env.PASSWORD) {
     Logger.log('No password loaded in from .env - running without a database!');
