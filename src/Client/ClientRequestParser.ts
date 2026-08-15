@@ -256,6 +256,17 @@ export async function clientRequestChangeProfileDescription(clientId: number, de
     callback(success);
 }
 
+export async function clientRequestGetId(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(databaseId: number) => void
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(false);
+    if (!client.isAuthenticated) return callback(false);
+    if (!client.databaseId) return callback(false);
+
+    callback(client.databaseId);
+}
+
 /**
  * Handles the client's request to change their profile picture.
  * @param clientId - The id of the client initiating the request.

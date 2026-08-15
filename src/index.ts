@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
-import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestChangeProfileDescription, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestGetSavedEditorGameList, clientRequestGetSavedGameBlocks, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestReactWithEmote, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestChangeProfileDescription, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestGetId, clientRequestGetSavedEditorGameList, clientRequestGetSavedGameBlocks, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestReactWithEmote, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 import { LobbyView } from './Components/Lobby.js';
 import { ClientID } from './schemas/types.js';
 
@@ -59,7 +59,7 @@ io.on('connection', (socket: Socket) => {
     socket.on('setDisplayName', (displayName, callback) => {clientRequestChangeDisplayName(id, displayName, callback);});
     socket.on('setDescription', (description, callback) => {clientRequestChangeProfileDescription(id, description, callback);});
     socket.on('setProfilePicture', (profileUrl, callback) => {clientRequestChangeDisplayName(id, profileUrl, callback);});
-
+    socket.on('getId', (callback) => {clientRequestGetId(id, callback);});
 
     // Game Builder
     socket.on('getAvailableBlocks', (callback) => {clientRequestGetAvailableBlocks(id, callback);});
