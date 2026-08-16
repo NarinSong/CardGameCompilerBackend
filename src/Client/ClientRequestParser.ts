@@ -4,7 +4,8 @@ import { BLOCKS } from "../schemas/Blocks.js";
 import { buildGameFromJSON } from "./GameBuilder.js";
 import Database from "../Components/Database.js";
 import { ClientGameDefinitionSchema } from "../schemas/ClientGameDefinition.js";
-import { safeBuildClientGameDefinitionFromBlocks } from "./ClientBlocksBuilder.js";
+import { buildClientGameDefinitionFromblocks, safeBuildClientGameDefinitionFromBlocks } from "./ClientBlocksBuilder.js";
+import { ClientBuiltBlocksSchema } from "../schemas/BuiltBlocks.js";
 
 // This file is for handling incoming socket requests from the client
 // All incoming requests come through here
@@ -361,12 +362,12 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
 
     // Verify client input
     const jsonCheck = 
-        ClientGameDefinitionSchema
+        ClientBuiltBlocksSchema
         .safeParse(json);
 
     if (!jsonCheck.success) return callback(false, JSON.stringify(jsonCheck.error));
 
-    const clientGameDef = safeBuildClientGameDefinitionFromBlocks(jsonCheck.data);
+    const clientGameDef = buildClientGameDefinitionFromblocks(jsonCheck.data);
 
     const game = jsonCheck.data;
     let gameId = game.gameMeta.id;
