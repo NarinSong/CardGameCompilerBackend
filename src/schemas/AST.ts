@@ -211,7 +211,6 @@ export type AST_Node =
   location: AST_Node;
 } | {
   type: typeof NODE_NAMES.CreateButton;
-  state: AST_Node;
   name: AST_Node;
   visibility: AST_Node;
   actionRoles: AST_Node;
@@ -302,7 +301,6 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
 
     z.object({
       type: z.literal(NODE_NAMES.CreateButton),
-      state: ValueNodeSchema,
       name: ValueNodeSchema,
       visibility: ValueNodeSchema,
       actionRoles: ValueNodeSchema,
