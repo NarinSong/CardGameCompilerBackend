@@ -329,7 +329,7 @@ export default class Database {
 
         try {
             conn = await pool.getConnection();
-            const maybeGame = await conn.query("SELECT gameRules FROM savedrules WHERE id = ?", [gameId]);
+            const maybeGame = await conn.query("SELECT gamerules FROM savedrules WHERE id = ?", [gameId]);
             const g = SelectGameRulesSchema.array().parse(maybeGame);
             return g;
         } catch (error) {
