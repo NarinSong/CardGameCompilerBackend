@@ -1,5 +1,6 @@
 import z from "zod";
 import { NumericSchema } from "./types.js";
+import { ClientGameDefinitionSchema } from "./ClientGameDefinition.js";
 
 export const InsertSchema = z.object({
   affectedRows: NumericSchema,
@@ -37,7 +38,7 @@ export const SelectAllGameSavesSchema = z.object({
 });
 
 export const SelectGameRulesSchema = z.object({
-    gamerules: z.string()
+    gamerules: ClientGameDefinitionSchema
 });
 
 export type InsertResult = z.infer<typeof InsertSchema>;

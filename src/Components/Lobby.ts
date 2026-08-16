@@ -5,6 +5,8 @@ import GameManager from "../GameManager.js";
 import { sendLobbyClosed, sendLobbyStatus } from "../index.js";
 import Room from "./Room.js";
 import { ClientID, GameID, LobbyID, RoomID } from "../schemas/types.js";
+import { ConstantArg } from "../schemas/GameDefinitionArgs.js";
+import Game from "../Game/Game.js";
 
 const A = "A".charCodeAt(0);
 
@@ -26,6 +28,7 @@ export class LobbyView {
     readonly code: string;
     readonly game: string;
     readonly gameDescription: string;
+    readonly constants: Record<string, ConstantArg>;
 
     /**
      * Creates a LobbyView from a Lobby instance.
@@ -40,6 +43,7 @@ export class LobbyView {
         this.code = lobby.joinCode;
         this.game = lobby.gameName; // defaults to "No Game Selected"
         this.gameDescription = lobby.gameDescription;
+        this.constants = lobby.constants;
     }
 }
 
@@ -56,6 +60,7 @@ export default class Lobby {
     #maxPlayers: number = 32;
     #joinCode: string;
     #rooms: RoomID[];
+    #constants: Record<string, ConstantArg>;
 
     /**
      * Creates a new lobby.
@@ -75,6 +80,7 @@ export default class Lobby {
         this.#game = null;
         this.#joinCode = joinCode;
         this.#rooms = [];
+        this.#constants = {};
 
         this.update();
     }
@@ -111,12 +117,38 @@ export default class Lobby {
         return true;
     }
 
+    updateConstants() {
+        this.#constants = {};
+        if (!this.#game)
+            return;
+        
+        const game = GameManager.getRegisteredGameDefinition(this.#game);
+        if (!game || !game?.gameMeta.constants)
+            return;
+
+        for (const c in game.gameMeta.constants) {
+            this.#constants[c] = {
+                displayName: game.gameMeta.constants[c]?.displayName ?? c,
+                variableType: game.gameMeta.constants[c]?.variableType ?? 'Unknown',
+                defaultValue: game.gameMeta.constants[c]?.defaultValue
+            }
+        }
+    }
+
+    changeConstant(name: string, value: unknown) {
+        if (this.#constants[name])
+            this.#constants[name].defaultValue = value;
+
+        this.update();
+    }
+
     /**
      * Sets the selected game for the lobby.
      * @param gameId - The id of the game to select.
      */
     selectGame(gameId: GameID): void {
         this.#game = gameId;
+        this.updateConstants();
         this.update();
     }
 
@@ -371,5 +403,9 @@ export default class Lobby {
             return clientId;
         }
         return null;
+    }
+
+    get constants() {
+        return this.#constants;
     }
 }

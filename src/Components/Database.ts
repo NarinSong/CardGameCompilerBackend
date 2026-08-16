@@ -333,8 +333,7 @@ export default class Database {
             const g = SelectGameRulesSchema.array().parse(maybeGame);
             if (!g || !g[0]) return null;
 
-            // TypeScript is throwing a fit so hopefully this will help
-            return ClientGameDefinitionSchema.parse(g[0].gamerules);
+            return g[0].gamerules;
         } catch (error) {
             console.error(error);
         } finally {
