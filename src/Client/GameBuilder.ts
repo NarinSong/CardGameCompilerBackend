@@ -114,6 +114,12 @@ export async function buildGameFromDatabase(id: number) {
     const g = await Database.getGameFromId(id);
 
     if (!g || !g[0]) return null;
+    
+    try {
+        return buildGameFromJSON(JSON.parse(g[0].gamerules));
+    } catch (error) {
+        console.error(error);
+    }
 
-    return buildGameFromJSON(JSON.parse(g[0].gameRules));
+    return null;
 }

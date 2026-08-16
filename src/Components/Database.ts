@@ -2,7 +2,7 @@ import * as mariadb from 'mariadb';
 import { config } from 'dotenv';
 import Logger from './Logger.js';
 import ClientGameDefinition from '../schemas/ClientGameDefinition.js';
-import { InsertResult, InsertSchema, SelectAllGameSaves, SelectAllGameSavesSchema, SelectFullGameSavesById, SelectFullGameSavesByIdSchema, SelectGameSavesById, SelectGameSavesByIdSchema, SelectHashByUsername, SelectHashByUsernameSchema, UpdateResult, UpdateSchema } from '../schemas/DatabaseSchemas.js';
+import { InsertResult, InsertSchema, SelectAllGameSaves, SelectAllGameSavesSchema, SelectFullGameSavesById, SelectFullGameSavesByIdSchema, SelectGameRules, SelectGameRulesSchema, SelectGameSavesById, SelectGameSavesByIdSchema, SelectHashByUsername, SelectHashByUsernameSchema, UpdateResult, UpdateSchema } from '../schemas/DatabaseSchemas.js';
 import GameDefinition from '../Rules/GameDefinition.js';
 
 config({ quiet: true }); // Set up environment variables
@@ -324,20 +324,21 @@ export default class Database {
      * @param gameId - the id for the game.
      * @returns Promise for the game JSON if successful, else null.
      */
-    static async getGameFromId(gameId: number): Promise<{ gameRules: string }[] | null> {
+    static async getGameFromId(gameId: number): Promise<SelectGameRules[] | null> {
         let conn;
-        let game = null;
 
         try {
             conn = await pool.getConnection();
-            game = await conn.query("SELECT gameRules FROM savedrules WHERE id = ?", [gameId]);
+            const maybeGame = await conn.query("SELECT gameRules FROM savedrules WHERE id = ?", [gameId]);
+            const g = SelectGameRulesSchema.array().parse(maybeGame);
+            return g;
         } catch (error) {
             console.error(error);
         } finally {
             if (conn) conn.release();
         }
 
-        return game;
+        return null;
     }
 
     /**

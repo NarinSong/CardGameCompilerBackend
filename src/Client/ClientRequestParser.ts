@@ -608,7 +608,7 @@ export async function clientRequestSelectGame(clientId: number, gameId: unknown,
     if (!GameManager.getRegisteredGameDefinitionJson(gameIdCheck.data)) {
         const result = await Database.getGameFromId(gameIdCheck.data);
         if (result?.[0]) {
-            GameManager.registerGameDefinition(game, gameIdCheck.data, result[0].gameRules);
+            GameManager.registerGameDefinition(game, gameIdCheck.data, result[0].gamerules);
         }
     }
 

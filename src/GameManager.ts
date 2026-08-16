@@ -211,7 +211,11 @@ export default class GameManager {
     static async getGameDefinition(id: GameID): Promise<GameDefinition | null> {
         if (GameManager.availableGames[id]) return GameManager.availableGames[id];
         
-        return await buildGameFromDatabase(id);
+        const game = await buildGameFromDatabase(id);
+        if (!game) return null;
+
+        GameManager.availableGames[id] = game;
+        return game;
     }
 
     /**
