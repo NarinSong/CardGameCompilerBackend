@@ -10,6 +10,7 @@ import { sendGameEnded } from './index.js';
 import GameDefinition from './Rules/GameDefinition.js';
 import { ClientID, GameID, LobbyID, RoomID } from './schemas/types.js';
 import { SelectAllGameSaves } from './schemas/DatabaseSchemas.js';
+import ClientGameDefinition from './schemas/ClientGameDefinition.js';
 
 /**
  * Manages all global server state including clients, lobbies, rooms, and available games.
@@ -173,9 +174,9 @@ export default class GameManager {
      * @param id - The id to register the game under.
      * @param json - The JSON string representation of the game definition.
      */
-    static registerGameDefinition(game: GameDefinition, id: GameID , json: string): void {
+    static registerGameDefinition(game: GameDefinition, id: GameID , json: ClientGameDefinition): void {
         GameManager.availableGames[id] = game;
-        GameManager.availableGamesJson[id] = json;
+        GameManager.availableGamesJson[id] = JSON.stringify(json);
     }
 
     /**

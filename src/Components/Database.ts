@@ -1,7 +1,7 @@
 import * as mariadb from 'mariadb';
 import { config } from 'dotenv';
 import Logger from './Logger.js';
-import ClientGameDefinition from '../schemas/ClientGameDefinition.js';
+import ClientGameDefinition, { ClientGameDefinitionSchema } from '../schemas/ClientGameDefinition.js';
 import { InsertResult, InsertSchema, SelectAllGameSaves, SelectAllGameSavesSchema, SelectFullGameSavesById, SelectFullGameSavesByIdSchema, SelectGameRules, SelectGameRulesSchema, SelectGameSavesById, SelectGameSavesByIdSchema, SelectHashByUsername, SelectHashByUsernameSchema, UpdateResult, UpdateSchema } from '../schemas/DatabaseSchemas.js';
 import GameDefinition from '../Rules/GameDefinition.js';
 
@@ -293,7 +293,7 @@ export default class Database {
      * @param game - The GameDefinition to save.
      * @returns Promise resolving to the insert result if successful, or null on failure.
      */
-    static async saveGameJson(databaseId: number, game: GameDefinition): Promise<InsertResult | null> {
+    static async saveGameJson(databaseId: number, game: ClientGameDefinition): Promise<InsertResult | null> {
         let conn;
 
         try {
@@ -301,7 +301,7 @@ export default class Database {
             const result = await conn.query("INSERT INTO savedrules (id, gameRules, gameName, creator, parent, gameDescription, privateGame) VALUES (?, ?, ?, ?, ?, ?, ?)", 
                 [
                     game.gameMeta.id,
-                    JSON.stringify(game),
+                    game,
                     game.gameMeta.name,
                     databaseId,
                     game.gameMeta.parentGameId ?? null,
@@ -324,14 +324,17 @@ export default class Database {
      * @param gameId - the id for the game.
      * @returns Promise for the game JSON if successful, else null.
      */
-    static async getGameFromId(gameId: number): Promise<SelectGameRules[] | null> {
+    static async getGameFromId(gameId: number): Promise<ClientGameDefinition | null> {
         let conn;
 
         try {
             conn = await pool.getConnection();
             const maybeGame = await conn.query("SELECT gamerules FROM savedrules WHERE id = ?", [gameId]);
             const g = SelectGameRulesSchema.array().parse(maybeGame);
-            return g;
+            if (!g || !g[0]) return null;
+
+            // TypeScript is throwing a fit so hopefully this will help
+            return ClientGameDefinitionSchema.parse(g[0].gamerules);
         } catch (error) {
             console.error(error);
         } finally {

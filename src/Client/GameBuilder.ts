@@ -4,7 +4,7 @@
 import Database from "../Components/Database.js";
 import Action from "../Rules/ActionDefinition.js";
 import GameDefinition from "../Rules/GameDefinition.js";
-import { verifyClientGameDefintion } from "../schemas/ClientGameDefinition.js";
+import ClientGameDefinition, { verifyClientGameDefintion } from "../schemas/ClientGameDefinition.js";
 
 /**
  * Create a new game definition from the JSON the client sends.
@@ -13,12 +13,7 @@ import { verifyClientGameDefintion } from "../schemas/ClientGameDefinition.js";
  * @todo the remaining game meta :)
  * @todo verify labels, actionRoles, etc.
  */
-export function buildGameFromJSON(clientJson: unknown) {
-    const data = verifyClientGameDefintion(clientJson);
-    if (!data) return null;
-
-    // JSON is verified, let's build a game
-
+export function buildGameFromJSON(data: ClientGameDefinition) {
     const game = new GameDefinition(data.gameMeta);
 
     /*
@@ -113,10 +108,10 @@ export function buildGameFromJSON(clientJson: unknown) {
 export async function buildGameFromDatabase(id: number) {
     const g = await Database.getGameFromId(id);
 
-    if (!g || !g[0]) return null;
+    if (!g) return null;
     
     try {
-        return buildGameFromJSON(JSON.parse(g[0].gamerules));
+        return buildGameFromJSON(g);
     } catch (error) {
         console.error(error);
     }

@@ -140,9 +140,8 @@ function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDe
  * Wraps buildClientGameDefinitionFromBlocks in a try-catch.
  * @param json - The raw JSON payload from the client.
  * @returns The built ClientGameDefinition, or null if parsing or conversion fails.
- * @todo fix typo in function name: "Form" should be "From"
  */
-export function safeBuildClientGameDefinitionFormBlocks(json: unknown): ClientGameDefinition | null {
+export function safeBuildClientGameDefinitionFromBlocks(json: unknown): ClientGameDefinition | null {
     try {
         return buildClientGameDefinitionFromblocks(json);
     } catch (error) {}

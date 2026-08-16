@@ -4,6 +4,7 @@ import { BLOCKS } from "../schemas/Blocks.js";
 import { buildGameFromJSON } from "./GameBuilder.js";
 import Database from "../Components/Database.js";
 import { ClientGameDefinitionSchema } from "../schemas/ClientGameDefinition.js";
+import { safeBuildClientGameDefinitionFromBlocks } from "./ClientBlocksBuilder.js";
 
 // This file is for handling incoming socket requests from the client
 // All incoming requests come through here
@@ -365,8 +366,16 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
 
     if (!jsonCheck.success) return callback(false, JSON.stringify(jsonCheck.error));
 
+    const clientGameDef = safeBuildClientGameDefinitionFromBlocks(jsonCheck.data);
+
     const game = jsonCheck.data;
     let gameId = game.gameMeta.id;
+
+    if (!clientGameDef) return callback(false, 'Failed to convert blocks to AST');
+
+    const def = buildGameFromJSON(clientGameDef);
+    if (!def) return callback(false, 'Failed to build the game definition from valid json');
+    def.gameMeta.id = gameId;
 
     if (!gameId) {
         const result = await Database.saveGameEditorBlocks(databaseId, game);
@@ -383,15 +392,12 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
         if (!result) return callback(false, 'Failed to overwrite game in database', gameId);
     }
 
-    const def = buildGameFromJSON(jsonCheck.data);
-    if (!def) return callback(false, 'Failed to build the game definition from valid json', gameId);
-    def.gameMeta.id = gameId;
 
     // Save game in database and available games
-    const result = await Database.saveGameJson(databaseId, def);
+    const result = await Database.saveGameJson(databaseId, clientGameDef);
     if (!result) return callback(false, 'Failed to save valid json that built to the database', gameId);
     
-    GameManager.registerGameDefinition(def, gameId, JSON.stringify(jsonCheck.data)); 
+    GameManager.registerGameDefinition(def, gameId, clientGameDef); 
 
     callback(true, 'Success!', gameId);
 }
@@ -607,8 +613,8 @@ export async function clientRequestSelectGame(clientId: number, gameId: unknown,
 
     if (!GameManager.getRegisteredGameDefinitionJson(gameIdCheck.data)) {
         const result = await Database.getGameFromId(gameIdCheck.data);
-        if (result?.[0]) {
-            GameManager.registerGameDefinition(game, gameIdCheck.data, result[0].gamerules);
+        if (result) {
+            GameManager.registerGameDefinition(game, gameIdCheck.data, result);
         }
     }
 
