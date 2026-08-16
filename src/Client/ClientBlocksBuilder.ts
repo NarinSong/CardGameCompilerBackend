@@ -144,7 +144,9 @@ function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDe
 export function safeBuildClientGameDefinitionFromBlocks(json: unknown): ClientGameDefinition | null {
     try {
         return buildClientGameDefinitionFromblocks(json);
-    } catch (error) {}
+    } catch (error) {
+        console.error(error);
+    }
 
     return null;
 }
