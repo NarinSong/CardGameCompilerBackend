@@ -352,7 +352,18 @@ export async function clientRequestGetGameInfo(clientId: number, gameId: unknown
 export async function clientRequestSaveGame(clientId: number, json: unknown, callback: unknown = noop) {
     if (!fCheck(callback)) return;//(success: boolean, failureReason: string, id?: number) => void
 
-    // Auth check
+    /*
+        Overview:
+        1. Verify client
+        2. Verify client's built blocks json
+        3. Transform the built blocks into AST (ClientGameDefinition)
+        4. Build executable GameDefinition from AST
+        5. Save into database as appropriate (using gameId)
+        6. Save GameDefinition to GM
+        7. Return success to client
+    */
+
+    // 1. Auth check
     const client = GameManager.clientFromId(clientId);
     if (!client) return callback(false, 'Client was disconnected');
     const username = client.username;
@@ -360,13 +371,14 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
     const databaseId = client.databaseId;
     if (!databaseId) return callback(false, 'Client is not present in the database');
 
-    // Verify client input
+    // 2. Verify client input
     const jsonCheck = 
         ClientBuiltBlocksSchema
         .safeParse(json);
 
     if (!jsonCheck.success) return callback(false, JSON.stringify(jsonCheck.error));
 
+    // 3
     const clientGameDef = buildClientGameDefinitionFromblocks(jsonCheck.data);
 
     const game = jsonCheck.data;
@@ -374,10 +386,12 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
 
     if (!clientGameDef) return callback(false, 'Failed to convert blocks to AST');
 
+    // 4
     const def = buildGameFromJSON(clientGameDef);
     if (!def) return callback(false, 'Failed to build the game definition from valid json');
     def.gameMeta.id = gameId;
 
+    // 5
     if (!gameId) {
         const result = await Database.saveGameEditorBlocks(databaseId, game);
         if (!result) return callback(false, 'Failed to store game in database');
@@ -396,12 +410,13 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
     clientGameDef.gameMeta.id = gameId;
 
 
-    // Save game in database and available games
+    // 6. Save game in database and available games
     const result = await Database.saveGameJson(databaseId, clientGameDef);
     if (!result) return callback(false, 'Failed to save valid json that built to the database', gameId);
     
     GameManager.registerGameDefinition(def, gameId, clientGameDef); 
 
+    // 7
     callback(true, 'Success!', gameId);
 }
 
