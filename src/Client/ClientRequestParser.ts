@@ -379,7 +379,7 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
     if (!jsonCheck.success) return callback(false, JSON.stringify(jsonCheck.error));
 
     // 3
-    const clientGameDef = buildClientGameDefinitionFromblocks(jsonCheck.data);
+    const clientGameDef = safeBuildClientGameDefinitionFromBlocks(jsonCheck.data);
 
     const game = jsonCheck.data;
     let gameId = game.gameMeta.id;

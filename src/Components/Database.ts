@@ -306,7 +306,7 @@ export default class Database {
                     databaseId,
                     game.gameMeta.parentGameId ?? null,
                     game.gameMeta.description,
-                    game.gameMeta.private,
+                    game.gameMeta.private ?? false,
                 ]
             );
 
