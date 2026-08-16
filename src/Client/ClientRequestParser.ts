@@ -392,6 +392,8 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
         if (!result) return callback(false, 'Failed to overwrite game in database', gameId);
     }
 
+    clientGameDef.gameMeta.id = gameId;
+
 
     // Save game in database and available games
     const result = await Database.saveGameJson(databaseId, clientGameDef);
