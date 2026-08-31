@@ -312,6 +312,15 @@ export async function clientRequestGetAvailableGames(clientId: number, callback:
     callback(games);
 }
 
+export async function clientRequestGetMyGames(clientId: number, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(games: { [name: string]: number }) => void
+
+    // Get the available games from the database and send those to the client
+    const games = await GameManager.getAvailableGameNames();
+
+    callback(games.filter((value) => value.id === clientId));
+}
+
 /**
  * Sends the client info about a specific game.
  * @param clientId - The id of the client initiating the request.

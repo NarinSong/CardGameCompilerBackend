@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import GameManager from './GameManager.js';
 import ClientView from './Client/ClientView.js';
 import Logger from './Components/Logger.js';
-import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestChangeProfileDescription, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestGetId, clientRequestGetSavedEditorGameList, clientRequestGetSavedGameBlocks, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestReactWithEmote, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
+import { clientRequestChangeColor, clientRequestChangeDisplayName, clientRequestChangeProfileDescription, clientRequestClickLabel, clientRequestEndGame, clientRequestGetAvailableBlocks, clientRequestGetAvailableGames, clientRequestGetColor, clientRequestGetGameInfo, clientRequestGetId, clientRequestGetMyGames, clientRequestGetSavedEditorGameList, clientRequestGetSavedGameBlocks, clientRequestHostLobby, clientRequestJoinLobby, clientRequestLeaveGame, clientRequestLeaveLobby, clientRequestPing, clientRequestReactWithEmote, clientRequestRemoveFromLobby, clientRequestSaveGame, clientRequestSelectGame, clientRequestSignIn, clientRequestSignOut, clientRequestSignUp, clientRequestStartNewGame } from './Client/ClientRequestParser.js';
 import { LobbyView } from './Components/Lobby.js';
 import { ClientID } from './schemas/types.js';
 
@@ -73,6 +73,7 @@ io.on('connection', (socket: Socket) => {
     socket.on('leaveLobby', (callback) => {clientRequestLeaveLobby(id, callback);});
     socket.on('removeFromLobby', (username, callback) => {clientRequestRemoveFromLobby(id, username, callback);});
     socket.on('getAvailableGames', (callback) => {clientRequestGetAvailableGames(id, callback);});
+    socket.on('getMyGames', (callback) => {clientRequestGetMyGames(id, callback);});
     socket.on('getGameInfo', (gameId, callback) => {clientRequestGetGameInfo(id, gameId, callback);});
     socket.on('selectGame', (gameId, callback) => {clientRequestSelectGame(id, gameId, callback);});
     socket.on('startNewGame', (callback) => {clientRequestStartNewGame(id, callback);});
