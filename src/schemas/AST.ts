@@ -33,7 +33,6 @@ const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.TextValueOf,
   NODE_NAMES.RemoveButton,
   NODE_NAMES.RemoveText,
-  NODE_NAMES.RelativeLocation,
   NODE_NAMES.BroadcastPopup,
   NODE_NAMES.NumberToString,
   NODE_NAMES.DisplayName,
@@ -82,6 +81,7 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.SendPopup,
   NODE_NAMES.SetScore,
   NODE_NAMES.EndGame,
+  NODE_NAMES.RelativeLocation,
 ]);
 
 const TernaryOperatorsSchema = z.enum([

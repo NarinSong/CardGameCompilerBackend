@@ -1048,6 +1048,12 @@ const RELATIVE_LOCATION = defineBlock({
             "displayName": "Resolver",
             "type": "LocationName",
             "optional": false,
+        },
+        {
+            "name": "secondary",
+            "displayName": "Owner Location",
+            "type": "LocationName",
+            "optional": true
         }
     ]
 })
