@@ -434,11 +434,11 @@ export async function clientRequestDeleteGame(clientId: number, gameId: unknown,
 
     // Auth check
     const client = GameManager.clientFromId(clientId);
-    if (!client) return callback(false, 'Client was disconnected');
+    if (!client) return callback(false);
     const username = client.username;
-    if (!username) return callback(false, 'Client has no username');
+    if (!username) return callback(false);
     const databaseId = client.databaseId;
-    if (!databaseId) return callback(false, 'Client is not present in the database');
+    if (!databaseId) return callback(false);
 
     // Verify client input
     const gameIdCheck = 
@@ -447,12 +447,12 @@ export async function clientRequestDeleteGame(clientId: number, gameId: unknown,
 
     if (!gameIdCheck.success) return callback(false);
 
-    // Try saving over the current one
+    // Check who owns the game
     const owner = await Database.getSavedEditorBlocksById(gameIdCheck.data);
     if (!owner || !owner[0] || owner[0].creator != databaseId)
         return callback(false);
 
-    // Can overwrite the current one legally
+    // Client is the owner of the game
     const result = await Database.deleteGame(gameIdCheck.data);
     if (!result) return callback(false);
 
