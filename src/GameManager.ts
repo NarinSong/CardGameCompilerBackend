@@ -179,6 +179,11 @@ export default class GameManager {
         GameManager.availableGamesJson[id] = JSON.stringify(json);
     }
 
+    static unregisterGameDefinition(gameId: GameID) {
+        delete GameManager.availableGames[gameId];
+        delete GameManager.availableGamesJson[gameId];
+    }
+
     /**
      * Returns all block editor saves visible to a given client.
      * Includes public games and games created by the client.

@@ -4,6 +4,7 @@ import Logger from './Logger.js';
 import ClientGameDefinition, { ClientGameDefinitionSchema } from '../schemas/ClientGameDefinition.js';
 import { InsertResult, InsertSchema, SelectAllGameSaves, SelectAllGameSavesSchema, SelectFullGameSavesById, SelectFullGameSavesByIdSchema, SelectGameRules, SelectGameRulesSchema, SelectGameSavesById, SelectGameSavesByIdSchema, SelectHashByUsername, SelectHashByUsernameSchema, UpdateResult, UpdateSchema } from '../schemas/DatabaseSchemas.js';
 import GameDefinition from '../Rules/GameDefinition.js';
+import { GameID } from '../schemas/types.js';
 
 config({ quiet: true }); // Set up environment variables
 
@@ -361,5 +362,22 @@ export default class Database {
         }
 
         return games;
+    }
+
+    static async deleteGame(gameId: GameID): Promise<boolean> {
+        let conn;
+
+        try {
+            conn = await pool.getConnection();
+            await conn.query("DELETE FROM savedrules WHERE id = ?", gameId);
+            await conn.query("DELETE FROM blockeditorsaves WHERE id = ?", gameId);
+        } catch (error) {
+            console.error(error);
+            return false;
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return true;
     }
 }

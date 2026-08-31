@@ -429,6 +429,38 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
     callback(true, 'Success!', gameId);
 }
 
+export async function clientRequestDeleteGame(clientId: number, gameId: unknown, callback: unknown = noop) {
+    if (!fCheck(callback)) return;//(success: boolean) => void
+
+    // Auth check
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback(false, 'Client was disconnected');
+    const username = client.username;
+    if (!username) return callback(false, 'Client has no username');
+    const databaseId = client.databaseId;
+    if (!databaseId) return callback(false, 'Client is not present in the database');
+
+    // Verify client input
+    const gameIdCheck = 
+        z.number()
+        .safeParse(gameId);
+
+    if (!gameIdCheck.success) return callback(false);
+
+    // Try saving over the current one
+    const owner = await Database.getSavedEditorBlocksById(gameIdCheck.data);
+    if (!owner || !owner[0] || owner[0].creator != databaseId)
+        return callback(false);
+
+    // Can overwrite the current one legally
+    const result = await Database.deleteGame(gameIdCheck.data);
+    if (!result) return callback(false);
+
+    GameManager.unregisterGameDefinition(gameIdCheck.data); 
+
+    callback(true);
+}
+
 /**
  * Sends the client the list of games they have saved in the editor.
  * @param clientId - The id of the client initiating the request.
