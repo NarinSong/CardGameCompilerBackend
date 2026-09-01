@@ -313,12 +313,19 @@ export async function clientRequestGetAvailableGames(clientId: number, callback:
 }
 
 export async function clientRequestGetMyGames(clientId: number, callback: unknown = noop) {
-    if (!fCheck(callback)) return;//(games: { [name: string]: number }) => void
+    if (!fCheck(callback)) return;//(games: {name: string, id: number | bigint, description: string}[]) => void
+
+    const client = GameManager.clientFromId(clientId);
+    if (!client) return callback([]);
+    const username = client.username;
+    if (!username) return callback([]);
+    const databaseId = client.databaseId;
+    if (!databaseId) return callback([]);
 
     // Get the available games from the database and send those to the client
-    const games = await GameManager.getAvailableGameNames();
+    const games = await GameManager.getMyGames(databaseId);
 
-    callback(games.filter((value) => value.id === clientId));
+    callback(games);
 }
 
 /**

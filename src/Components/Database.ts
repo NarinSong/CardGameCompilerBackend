@@ -2,7 +2,7 @@ import * as mariadb from 'mariadb';
 import { config } from 'dotenv';
 import Logger from './Logger.js';
 import ClientGameDefinition, { ClientGameDefinitionSchema } from '../schemas/ClientGameDefinition.js';
-import { InsertResult, InsertSchema, SelectAllGameSaves, SelectAllGameSavesSchema, SelectFullGameSavesById, SelectFullGameSavesByIdSchema, SelectGameRules, SelectGameRulesSchema, SelectGameSavesById, SelectGameSavesByIdSchema, SelectHashByUsername, SelectHashByUsernameSchema, UpdateResult, UpdateSchema } from '../schemas/DatabaseSchemas.js';
+import { InsertResult, InsertSchema, SelectAllGameSaves, SelectAllGameSavesSchema, SelectFullGameSavesById, SelectFullGameSavesByIdSchema, SelectGameRules, SelectGameRulesSchema, SelectGameSavesById, SelectGameSavesByIdSchema, SelectHashByUsername, SelectHashByUsernameSchema, SelectMyGamesSchema, UpdateResult, UpdateSchema } from '../schemas/DatabaseSchemas.js';
 import GameDefinition from '../Rules/GameDefinition.js';
 import { GameID } from '../schemas/types.js';
 
@@ -362,6 +362,23 @@ export default class Database {
         }
 
         return games;
+    }
+
+    static async getMyGamesList(clientId: number): Promise<{ name: string; id: number | bigint, description: string }[] | null> {
+        let conn;
+        let games = null;
+
+        try {
+            conn = await pool.getConnection();
+            games = await conn.query("SELECT gameName AS name, id, gameDescription AS description FROM savedrules WHERE creator = ?", clientId);
+            return SelectMyGamesSchema.array().parse(games);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            if (conn) conn.release();
+        }
+
+        return [];
     }
 
     static async deleteGame(gameId: GameID): Promise<boolean> {

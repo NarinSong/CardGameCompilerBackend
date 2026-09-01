@@ -37,6 +37,12 @@ export const SelectAllGameSavesSchema = z.object({
     privateGame: NumericSchema,
 });
 
+export const SelectMyGamesSchema = z.object({
+    name: z.string(),
+    id: NumericSchema,
+    description: z.string(),
+});
+
 export const SelectGameRulesSchema = z.object({
     gamerules: ClientGameDefinitionSchema
 });
@@ -47,4 +53,5 @@ export type SelectHashByUsername = z.infer<typeof SelectHashByUsernameSchema>;
 export type SelectGameSavesById = z.infer<typeof SelectGameSavesByIdSchema>;
 export type SelectFullGameSavesById = z.infer<typeof SelectFullGameSavesByIdSchema>;
 export type SelectAllGameSaves = z.infer<typeof SelectAllGameSavesSchema>;
+export type SelectMyGames = z.infer<typeof SelectMyGamesSchema>;
 export type SelectGameRules = z.infer<typeof SelectGameRulesSchema>;

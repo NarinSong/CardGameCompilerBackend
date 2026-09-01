@@ -209,6 +209,12 @@ export default class GameManager {
         return [{name: 'Pickup', id: 1000}, {name:'Button Counter', id: 999}, {name:'Crazy Eights', id: 998}, {name:'Spades', id: 997}, {name:'In Between', id: 996}].concat(list ?? []);
     }
 
+    static async getMyGames(id: number): Promise<{name: string, id: number | bigint, description: string}[]> {
+        // Potential: caching
+        const list = await Database.getMyGamesList(id);
+        return list ?? [];
+    }
+
     /**
      * Returns a game definition by id, loading from the database if not already registered.
      * @param id - The id of the game to retrieve.
