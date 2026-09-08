@@ -37,6 +37,7 @@ export const ValueTypes = {
   ButtonType: ButtonTypeSchema,
   Rank: RankSchema,
   Suit: SuitSchema,
+  Map: z.string(),
   VariableType: z.string(),
 } as const;
 
@@ -754,7 +755,7 @@ const MAP = defineBlock({
         {
             "name": "secondary",
             "displayName": "Map Name",
-            "type": "String",
+            "type": "Map",
             "optional": false
         },
     ]
