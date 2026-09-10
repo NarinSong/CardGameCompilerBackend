@@ -400,10 +400,10 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
     const game = jsonCheck.data;
     let gameId = game.gameMeta.id;
 
-    if (!clientGameDef) return callback(false, 'Failed to convert blocks to AST');
+    if (!clientGameDef.success) return callback(false, JSON.stringify(clientGameDef.error));
 
     // 4
-    const def = buildGameFromJSON(clientGameDef);
+    const def = buildGameFromJSON(clientGameDef.data);
     if (!def) return callback(false, 'Failed to build the game definition from valid json');
     def.gameMeta.id = gameId;
 
@@ -423,14 +423,14 @@ export async function clientRequestSaveGame(clientId: number, json: unknown, cal
         if (!result) return callback(false, 'Failed to overwrite game in database', gameId);
     }
 
-    clientGameDef.gameMeta.id = gameId;
+    clientGameDef.data.gameMeta.id = gameId;
 
 
     // 6. Save game in database and available games
-    const result = await Database.saveGameJson(databaseId, clientGameDef);
+    const result = await Database.saveGameJson(databaseId, clientGameDef.data);
     if (!result) return callback(false, 'Failed to save valid json that built to the database', gameId);
     
-    GameManager.registerGameDefinition(def, gameId, clientGameDef); 
+    GameManager.registerGameDefinition(def, gameId, clientGameDef.data); 
 
     // 7
     callback(true, 'Success!', gameId);

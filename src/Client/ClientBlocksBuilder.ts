@@ -141,14 +141,13 @@ function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDe
  * @param json - The raw JSON payload from the client.
  * @returns The built ClientGameDefinition, or null if parsing or conversion fails.
  */
-export function safeBuildClientGameDefinitionFromBlocks(json: unknown): ClientGameDefinition | null {
+export function safeBuildClientGameDefinitionFromBlocks(json: unknown): { data: ClientGameDefinition, success: true } | { data: null, error: unknown, success: false } {
     try {
-        return buildClientGameDefinitionFromblocks(json);
+        return { data: buildClientGameDefinitionFromblocks(json), success: true };
     } catch (error) {
-        console.error(error);
+        //console.error(error);
+        return { data: null, error: error, success: false };
     }
-
-    return null;
 }
 
 /**
