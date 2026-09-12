@@ -170,7 +170,7 @@ export default class ClientView {
     static buttonView(button: Button, owner: number, player: Player, locations: Record<string, Location>, gameMeta: GameMeta) {
         const vis = resolveVisibility(button.visibility, owner, player);
 
-        if (vis == Visibility.INVISIBLE) return null;
+        if (vis == Visibility.INVISIBLE || vis == Visibility.FACE_DOWN || vis == Visibility.FACE_DOWN_SPREAD) return null;
 
         //let hide = vis == Visibility.FACE_DOWN;
 
