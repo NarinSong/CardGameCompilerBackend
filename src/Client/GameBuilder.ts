@@ -4,31 +4,16 @@
 import Database from "../Components/Database.js";
 import Action from "../Rules/ActionDefinition.js";
 import GameDefinition from "../Rules/GameDefinition.js";
-import ClientGameDefinition, { verifyClientGameDefintion } from "../schemas/ClientGameDefinition.js";
+import ClientGameDefinition from "../schemas/ClientGameDefinition.js";
 
 /**
  * Create a new game definition from the JSON the client sends.
  * @param clientJson - The JSON containg game meta and rules.
- * @returns The created game definition or null if the JSON is invalid.
- * @todo the remaining game meta :)
+ * @returns The created game definition
  * @todo verify labels, actionRoles, etc.
  */
-export function buildGameFromJSON(data: ClientGameDefinition) {
+export function buildGameFromJSON(data: ClientGameDefinition): GameDefinition {
     const game = new GameDefinition(data.gameMeta);
-
-    /*
-    // Define the game meta (it's already built, so we just override if we have any changes to make)
-
-    if (typeof data.gameMeta.minPlayers !== 'undefined')
-        game.minPlayers = data.gameMeta.minPlayers;
-    if (typeof data.gameMeta.maxPlayers !== 'undefined')
-        game.maxPlayers = data.gameMeta.maxPlayers;
-    if (typeof data.gameMeta.locations !== 'undefined')
-        game.gameMeta.addLocations(data.gameMeta.locations);
-
-    // TODO: the remaining game meta :)
-    // It isn't implemented in GameDefinition yet, so we'll have to make getters for it
-    */
 
     // Define the players
     if (typeof data.playerDefinition.piles !== 'undefined')

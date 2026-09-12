@@ -1172,9 +1172,11 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.And: return evaluate(g, c, node.primary) && evaluate(g, c, node.secondary);
         case NODE_NAMES.Or: return evaluate(g, c, node.primary) || evaluate(g, c, node.secondary);
         case NODE_NAMES.Not: return !evaluate(g, c, node.primary);
+        // Comparison
         case NODE_NAMES.LessThan: return zn(evaluate(g, c, node.primary)) < zn(evaluate(g, c, node.secondary));
         case NODE_NAMES.GreaterThan: return zn(evaluate(g, c, node.primary)) > zn(evaluate(g, c, node.secondary));
         case NODE_NAMES.Equal: return zn(evaluate(g, c, node.primary)) == zn(evaluate(g, c, node.secondary));
+        case NODE_NAMES.IsBetween: return evaluateIsBetween(g, c, node);
         // Arithmetic
         case NODE_NAMES.Plus: return zn(evaluate(g, c, node.primary)) + zn(evaluate(g, c, node.secondary));
         case NODE_NAMES.Times: return zn(evaluate(g, c, node.primary)) * zn(evaluate(g, c, node.secondary));
@@ -1190,32 +1192,34 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         // Location
         case NODE_NAMES.Location: return { type: 'exact', location: { x: zn(evaluate(g, c, node.primary)), y: zn(evaluate(g, c, node.secondary)) } };
         case NODE_NAMES.RelativeLocation: return { type: 'relative', location: zs(evaluate(g, c, node.primary)) };
-        // Button Range
-        case NODE_NAMES.ButtonRange: return evaluateButtonRange(g, c, node);
-        // Ternary
-        case NODE_NAMES.Ternary: return evaluate(g, c, node.primary) ? evaluate(g, c, node.secondary) : evaluate(g, c, node.tertiary);
-        case NODE_NAMES.IsBetween: return evaluateIsBetween(g, c, node);
         // Game Logic
         case NODE_NAMES.If: if (evaluate(g, c, node.primary)) { evaluate(g, c, node.secondary) } else if (node.tertiary) { evaluate(g, c, node.tertiary) }; return;
         case NODE_NAMES.Sequence: for (let action of node.primary) { evaluate(g, c, action); } return;
         case NODE_NAMES.While: while (evaluate(g,c,node.primary)) {evaluate(g,c,node.secondary)}; return;
+        case NODE_NAMES.Ternary: return evaluate(g, c, node.primary) ? evaluate(g, c, node.secondary) : evaluate(g, c, node.tertiary);
         //case 'FOR_EACH': executeForEach(g, c, node); return;
         // Game Actions
-        case NODE_NAMES.DealCards: return executeDealCards(g, c, node);
-        case NODE_NAMES.MoveCard:  return executeMoveCard(g, c, node);
+        // Create
         case NODE_NAMES.CreatePile: return executeCreatePile(g, c, node);
         case NODE_NAMES.CreateButton: return executeCreateButton(g, c, node);
         case NODE_NAMES.CreateCounter: return executeCreateCounter(g, c, node);
         case NODE_NAMES.CreateText: return executeCreateText(g, c, node);
+        // Remove
         case NODE_NAMES.RemovePile: executeRemovePile(g, c, node); return;
         case NODE_NAMES.RemoveButton: executeRemoveButton(g, c, node); return;
         case NODE_NAMES.RemoveCounter: executeRemoveCounter(g, c, node); return;
         case NODE_NAMES.RemoveText: executeRemoveText(g, c, node); return;
+        // Move and Change
+        case NODE_NAMES.DealCards: return executeDealCards(g, c, node);
+        case NODE_NAMES.MoveCard:  return executeMoveCard(g, c, node);
         case NODE_NAMES.ShuffleInto: return executeShuffleInto(g, c, node);
+        case NODE_NAMES.SortPile: return evaluateSortPile(g, c, node);
         case NODE_NAMES.MoveCounterValue: executeMoveCounterValue(g, c, node); return;
         case NODE_NAMES.SetCounterValue: return executeSetCounterValue(g, c, node);
+        // Set
         case NODE_NAMES.SetText: return executeSetText(g, c, node);
         case NODE_NAMES.SetRange: return executeSetRange(g, c, node);
+        case NODE_NAMES.ButtonRange: return evaluateButtonRange(g, c, node);
         case NODE_NAMES.SetCounterVisibility: return executeSetCounterVisibility(g, c, node);
         case NODE_NAMES.SetButtonVisisibility: return executeSetButtonVisibility(g, c, node);
         case NODE_NAMES.SetPileVisibility: return executeSetPileVisibility(g, c, node);
@@ -1253,7 +1257,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.NumCardsInPile: return (g.gameState.piles[zs(evaluate(g, c, node.primary))])?.pile.cards.length;
         case NODE_NAMES.ValueOf: return g.gameState.counters[zs(evaluate(g, c, node.primary))]?.counter.value;
         case NODE_NAMES.TextValueOf: return g.gameState.texts[zs(evaluate(g, c, node.primary))]?.text.text;
-        case NODE_NAMES.CardOfPile: return evaluateCardOfPile(g, c, node);;
+        case NODE_NAMES.CardOfPile: return evaluateCardOfPile(g, c, node);
         // Pile Evaluation
         case NODE_NAMES.PileSet: return evaluatePileSet(g, c, node);
         case NODE_NAMES.PileSetOfRank: return evaluatePileSetOfRank(g, c, node);
@@ -1261,8 +1265,7 @@ export function evaluate(g: Game, c: ActionContext, node: AST): ValueReturn {
         case NODE_NAMES.PileFlushOfSuit: return evaluatePileFlushOfSuit(g, c, node);
         case NODE_NAMES.PileRun: return evaluatePileRun(g, c, node);
         case NODE_NAMES.PileRunFrom: return evaluatePileRunFrom(g, c, node);
-        case NODE_NAMES.SortPile: return evaluateSortPile(g, c, node);
-        // Map usage
+        // Maps and Variables
         case NODE_NAMES.Map: return (g.definition.gameMeta.maps[ zs(evaluate(g, c, node.secondary)) ]?.get( evaluate(g, c, node.primary) ));
         case NODE_NAMES.UpdateVariable: return executeUpdateVariable(g, c, node);
         case NODE_NAMES.GetVariable: return g.gameState.getVariable(zs(node.variableType) as ValueTypeName, zs(evaluate(g, c, node.name) ));
