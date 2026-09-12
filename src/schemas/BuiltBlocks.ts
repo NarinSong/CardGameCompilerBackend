@@ -42,6 +42,20 @@ export type VariableNode = {
 // ClientNode is any block or literal sent by the client
 export type ClientNode = LiteralNode | BlockNode | SequenceNode | ArrayNode | VariableNode;
 
+export type NodeContext = {
+  phase: string;
+  step: string;
+  action: number;
+  path: string[];
+}
+
+export class ValidationError extends Error {
+    context: NodeContext;
+    constructor(message: unknown, context: NodeContext) {
+        super(JSON.stringify(message));
+        this.context = context;
+    }
+}
 
 // These Zod schemas verify structure only. That they are blocks, rather than what blocks they are.
 const LiteralSchema = z.object({
@@ -81,7 +95,7 @@ const ClientNodeSchema: z.ZodType<ClientNode> = z.lazy(() =>
 
 
 // Recursive type-checking function for client-sent verified block structures
-function inferNodeType(node: ClientNode): ValueTypeName {
+function inferNodeType(node: ClientNode, context: NodeContext): ValueTypeName {
   if (node.kind === "literal") {
     return node.valueType;
   }
@@ -92,63 +106,80 @@ function inferNodeType(node: ClientNode): ValueTypeName {
     return "Array";
   }
   if (node.kind === "variable") {
-    const variableTypeCheck = ValueTypeNameSchema.parse(node.variableType);
+    const variableTypeCheck = ValueTypeNameSchema.safeParse(node.variableType);
 
-    return variableTypeCheck;
+    if (!variableTypeCheck.success)
+      throw new ValidationError(variableTypeCheck.error, context);
+
+    return variableTypeCheck.data;
   }
 
   const block = BLOCKS[node.block as BlockName];
 
   if (!block) {
-    throw new Error(`Unknown block: ${node.block}`);
+    throw new ValidationError(`Unknown block: ${node.block}`, context);
   }
 
   if (block.name === NODE_NAMES.Ternary) {
-    const first = inferNodeType(node.args[1] as ClientNode);
-    const second = inferNodeType(node.args[2] as ClientNode);
+    const one = node.args[1];
+    const two = node.args[2];
+
+    if (!one || !two) throw new ValidationError('Undefined ternary argument', context);
+
+    setUpContext(one, context);
+    const first = inferNodeType(node.args[1] as ClientNode, context);
+    restoreContext(context);
+
+    setUpContext(two, context);
+    const second = inferNodeType(node.args[2] as ClientNode, context);
+    restoreContext(context);
 
     if (first === second) return first;
-    throw new Error("Ternary has invalid return type");
+    throw new ValidationError("Ternary has invalid return type", context);
   }
 
   return block.returnType;
 }
 
-function validateLiteral(node: LiteralNode): void {
+function validateLiteral(node: LiteralNode, context: NodeContext): void {
   const schema = ValueTypes[node.valueType];
-  schema.parse(node.value);
-}
+  const value = schema.safeParse(node.value);
 
-function validateSequence(node: SequenceNode): void {
-  for (const block of node.blocks) {
-    // Sequence doesn't care about the return types of the child nodes
-    validateNode(block);
+  if (!value.success) {
+    throw new ValidationError(value.error, context);
   }
 }
 
-function validateArray(node: ArrayNode): void {
+function validateSequence(node: SequenceNode, context: NodeContext): void {
+  for (const block of node.blocks) {
+    // Sequence doesn't care about the return types of the child nodes
+    validateNode(block, context);
+  }
+}
+
+function validateArray(node: ArrayNode, context: NodeContext): void {
   for (const value of node.value) {
     if (typeof value === 'undefined') {
-        throw new Error(`Undefined array value`);
+        throw new ValidationError(`Undefined array value`, context);
     }
 
-    validateNode(value);
+    validateNode(value, context);
 
-    const actualType = inferNodeType(value);
+    const actualType = inferNodeType(value, context);
 
     if (actualType !== node.valueType) {
-      throw new Error(
-        `Type mismatch for array: expected ${node.valueType}, got ${actualType}`
+      throw new ValidationError(
+        `Type mismatch for array: expected ${node.valueType}, got ${actualType}`, context
       );
     }
   }
 }
 
-function validateBlock(node: BlockNode): void {
+function validateBlock(node: BlockNode, context: NodeContext): void {
   const block = BLOCKS[node.block as BlockName];
 
   if (!block) {
-    throw new Error(`Unknown block ${node.block}`);
+    throw new ValidationError(`Unknown block ${node.block}`, context);
   }
 
   for (const argDef of block.arguments as readonly ArgDef[]) {
@@ -161,9 +192,9 @@ function validateBlock(node: BlockNode): void {
       continue;
     }
 
-    validateNode(provided);
+    validateNode(provided, context);
 
-    const actualType = inferNodeType(provided);
+    const actualType = inferNodeType(provided, context);
 
     if (argDef.type === 'Void' || argDef.type === 'Unknown') {
       // If the block doesn't care about the return type, neither should we
@@ -172,57 +203,71 @@ function validateBlock(node: BlockNode): void {
 
     // Kind of a loose comparison but it'll allow any "string" to match with any other "string" and vice-versa
     if (ValueTypes[actualType].type !== ValueTypes[argDef.type].type) {
-      throw new Error(
-        `Type mismatch for ${argDef.name}: expected ${argDef.type}, got ${actualType}`
+      throw new ValidationError(
+        `Type mismatch for ${argDef.name}: expected ${argDef.type}, got ${actualType}`, context
       );
     }
   }
 }
 
-function validateVariable(node: VariableNode): void {
+function validateVariable(node: VariableNode, context: NodeContext): void {
   // Validate variable name
   const name = node.args['name'];
 
   if (!name) {
-      throw new Error(`Missing variable name`);
+      throw new ValidationError(`Missing variable name`, context);
   }
 
-  validateNode(name);
+  validateNode(name, context);
 
-  const nameType = inferNodeType(name);
-  if (nameType !== 'String') throw new Error('Variable name is not a string');
+  const nameType = inferNodeType(name, context);
+  if (nameType !== 'String') throw new ValidationError('Variable name is not a string', context);
 
   // If UPDATE_VARIABLE, validate the value
 
   if (node.block === 'GET_VARIABLE') return;
   
-  const variableType = inferNodeType(node);
+  const variableType = inferNodeType(node, context);
   
   const value = node.args['value'];
-  if (!value) throw new Error('UPDATE_VARIABLE missing a value');
+  if (!value) throw new ValidationError('UPDATE_VARIABLE missing a value', context);
 
-  validateNode(value);
+  validateNode(value, context);
 
-  const valueType = inferNodeType(value);
-  if (valueType !== variableType) throw new Error(`Variable type mismatch. Tried to set ${variableType} variable to a ${valueType}`);
+  const valueType = inferNodeType(value, context);
+  if (valueType !== variableType) throw new ValidationError(`Variable type mismatch. Tried to set ${variableType} variable to a ${valueType}`, context);
+}
+
+function setUpContext(node: ClientNode, context: NodeContext) {
+  switch (node.kind) {
+    case 'literal':   context.path.push(node.valueType); return;
+    case 'sequence':  context.path.push(node.kind);      return;
+    case 'array':     context.path.push(node.kind);      return;
+    case 'variable':  context.path.push(node.block);     return;
+    case 'block':     context.path.push(node.block);     return;
+  }
+
+  // As any is used to tell TS that something went wrong. Normally this code is unreachable
+  context.path.push((node as any).kind);
+}
+
+function restoreContext(context: NodeContext) {
+  context.path.pop();
 }
 
 // Throws an error if something is invalid, otherwise does not throw
-export function validateNode(node: ClientNode): void {
-  if (node.kind === "literal") {
-    return validateLiteral(node);
-  }
-  if (node.kind === "sequence") {
-    return validateSequence(node);
-  }
-  if (node.kind === "array") {
-    return validateArray(node);
-  }
-  if (node.kind === "variable") {
-    return validateVariable(node);
+export function validateNode(node: ClientNode, context: NodeContext): void {
+  setUpContext(node, context);
+  
+  switch (node.kind) {
+    case 'literal':   validateLiteral(node, context);  restoreContext(context); return;
+    case 'sequence':  validateSequence(node, context); restoreContext(context); return;
+    case 'array':     validateArray(node, context);    restoreContext(context); return;
+    case 'variable':  validateVariable(node, context); restoreContext(context); return;
+    case 'block':     validateBlock(node, context);    restoreContext(context); return;
   }
 
-  return validateBlock(node);
+  throw new ValidationError('Invalid ClientNode attempted validation', context);
 }
 
 const ClientActionSchema = z.object({

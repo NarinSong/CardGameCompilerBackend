@@ -2,7 +2,7 @@
 
 import { ValueNode } from "../schemas/AST.js";
 import { BLOCKS } from "../schemas/Blocks.js";
-import { ArrayNode, BlockNode, ClientBuiltBlocksSchema, ClientNode, SequenceNode, validateNode, VariableNode } from "../schemas/BuiltBlocks.js";
+import { ArrayNode, BlockNode, ClientBuiltBlocksSchema, ClientNode, NodeContext, SequenceNode, validateNode, VariableNode } from "../schemas/BuiltBlocks.js";
 import ClientGameDefinition from "../schemas/ClientGameDefinition.js";
 import { GameDefinitionNode, GameDefinitionPhase, GameDefinitionStep } from "../schemas/GameDefinitionArgs.js";
 
@@ -192,8 +192,20 @@ export function buildClientGameDefinitionFromBlocks(json: unknown): ClientGameDe
                 const action = step.actions[actionName];
                 if (!action) continue;
 
-                validateNode(action.result);
-                if (action.filter) validateNode(action.filter);
+                // Context is *mutable* (only the "path" arg)
+                // It gets passed through the validation function and thrown as part of the error message
+                const context: NodeContext = {
+                    phase: phase.name,
+                    step: step.name,
+                    action: +actionName,
+                    path: ['result'],
+                }
+
+                // Validate node throws an error if the node is semantically invalid (e.g. incorrect types)
+                validateNode(action.result, context);
+
+                context.path = ['filter'];
+                if (action.filter) validateNode(action.filter, context);
 
                 const filter = blockNodeToAst(action.filter);
                 const result = blockNodeToAst(action.result);
