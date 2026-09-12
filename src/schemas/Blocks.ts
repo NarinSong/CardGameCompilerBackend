@@ -911,7 +911,7 @@ const NUM_CARDS_IN_PILE = defineBlock({
         {
             "name": "primary",
             "displayName": "Pile",
-            "type": "Number",
+            "type": "PileLabel",
             "optional": false
         },
     ]
