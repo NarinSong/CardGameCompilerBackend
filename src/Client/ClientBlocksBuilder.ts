@@ -143,7 +143,8 @@ function blockNodeToAst(blockNode: ClientNode | null | undefined): null | GameDe
  */
 export function safeBuildClientGameDefinitionFromBlocks(json: unknown): { data: ClientGameDefinition, success: true } | { data: null, error: unknown, success: false } {
     try {
-        return { data: buildClientGameDefinitionFromblocks(json), success: true };
+        const clientGameDef = buildClientGameDefinitionFromBlocks(json);
+        return { data: clientGameDef, success: true };
     } catch (error) {
         //console.error(error);
         return { data: null, error: error, success: false };
@@ -157,14 +158,13 @@ export function safeBuildClientGameDefinitionFromBlocks(json: unknown): { data: 
  * @param json - The raw JSON payload from the client.
  * @returns The built ClientGameDefinition.
  * @throws ZodError if the JSON fails schema validation.
- * @todo fix inconsistent casing in function name: "blocks" should be "Blocks"
  */
-export function buildClientGameDefinitionFromblocks(json: unknown): ClientGameDefinition {
-    const checkJson = ClientBuiltBlocksSchema.safeParse(json);
-    if (!checkJson.success) throw checkJson.error;
+export function buildClientGameDefinitionFromBlocks(json: unknown): ClientGameDefinition {
+    // Parse throws error on fail
+    const checkJson = ClientBuiltBlocksSchema.parse(json);
 
     // Validate all nodes
-    const phases = checkJson.data.phases;
+    const phases = checkJson.phases;
 
     const clientGamePhases: GameDefinitionPhase[] = [];
 
@@ -211,11 +211,10 @@ export function buildClientGameDefinitionFromblocks(json: unknown): ClientGameDe
         }
     }
 
-
     return {
-        gameMeta: checkJson.data.gameMeta,
-        playerDefinition: checkJson.data.playerDefinition,
-        boardDefinition: checkJson.data.boardDefinition,
+        gameMeta: checkJson.gameMeta,
+        playerDefinition: checkJson.playerDefinition,
+        boardDefinition: checkJson.boardDefinition,
         phases: clientGamePhases
     }
 }
