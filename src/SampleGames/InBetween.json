@@ -349,24 +349,26 @@
                                                     "primary": {
                                                         "type": "MAP",
                                                         "primary": {
-                                                            "type": "RANK",
+                                                            "type": "PROPERTY",
                                                             "primary": {
                                                                 "type": "CARD_OF_PILE",
                                                                 "primary": { "type": "LITERAL", "primary": "flip" },
                                                                 "secondary": { "type": "UNDEFINED" }
-                                                            }
+                                                            },
+                                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                                         },
                                                         "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     },
                                                     "secondary": {
                                                         "type": "MAP",
                                                         "primary": {
-                                                            "type": "RANK",
+                                                            "type": "PROPERTY",
                                                             "primary": {
                                                                 "type": "CARD_OF_PILE",
                                                                 "primary": { "type": "LITERAL", "primary": "card" },
                                                                 "secondary": { "type": "UNDEFINED" }
-                                                            }
+                                                            },
+                                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                                         },
                                                         "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     }
@@ -376,24 +378,26 @@
                                                     "primary": {
                                                         "type": "MAP",
                                                         "primary": {
-                                                            "type": "RANK",
+                                                            "type": "PROPERTY",
                                                             "primary": {
                                                                 "type": "CARD_OF_PILE",
                                                                 "primary": { "type": "LITERAL", "primary": "flop" },
                                                                 "secondary": { "type": "UNDEFINED" }
-                                                            }
+                                                            },
+                                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                                         },
                                                         "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     },
                                                     "secondary": {
                                                         "type": "MAP",
                                                         "primary": {
-                                                            "type": "RANK",
+                                                            "type": "PROPERTY",
                                                             "primary": {
                                                                 "type": "CARD_OF_PILE",
                                                                 "primary": { "type": "LITERAL", "primary": "card" },
                                                                 "secondary": { "type": "UNDEFINED" }
-                                                            }
+                                                            },
+                                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                                         },
                                                         "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     }
@@ -406,24 +410,26 @@
                                                     "primary": {
                                                         "type": "MAP",
                                                         "primary": {
-                                                            "type": "RANK",
+                                                            "type": "PROPERTY",
                                                             "primary": {
                                                                 "type": "CARD_OF_PILE",
                                                                 "primary": { "type": "LITERAL", "primary": "flip" },
                                                                 "secondary": { "type": "UNDEFINED" }
-                                                            }
+                                                            },
+                                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                                         },
                                                         "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     },
                                                     "secondary": {
                                                         "type": "MAP",
                                                         "primary": {
-                                                            "type": "RANK",
+                                                            "type": "PROPERTY",
                                                             "primary": {
                                                                 "type": "CARD_OF_PILE",
                                                                 "primary": { "type": "LITERAL", "primary": "card" },
                                                                 "secondary": { "type": "UNDEFINED" }
-                                                            }
+                                                            },
+                                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                                         },
                                                         "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     }
@@ -433,24 +439,26 @@
                                                     "primary": {
                                                         "type": "MAP",
                                                         "primary": {
-                                                            "type": "RANK",
+                                                            "type": "PROPERTY",
                                                             "primary": {
                                                                 "type": "CARD_OF_PILE",
                                                                 "primary": { "type": "LITERAL", "primary": "flop" },
                                                                 "secondary": { "type": "UNDEFINED" }
-                                                            }
+                                                            },
+                                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                                         },
                                                         "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     },
                                                     "secondary": {
                                                         "type": "MAP",
                                                         "primary": {
-                                                            "type": "RANK",
+                                                            "type": "PROPERTY",
                                                             "primary": {
                                                                 "type": "CARD_OF_PILE",
                                                                 "primary": { "type": "LITERAL", "primary": "card" },
                                                                 "secondary": { "type": "UNDEFINED" }
-                                                            }
+                                                            },
+                                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                                         },
                                                         "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     }
@@ -593,24 +601,26 @@
                                                 "primary": {
                                                     "type": "MAP",
                                                     "primary": {
-                                                        "type": "RANK",
+                                                        "type": "PROPERTY",
                                                         "primary": {
                                                             "type": "CARD_OF_PILE",
                                                             "primary": { "type": "LITERAL", "primary": "flip" },
                                                             "secondary": { "type": "UNDEFINED" }
-                                                        }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     },
                                                     "secondary": { "type": "LITERAL", "primary": "rank" }
                                                 },
                                                 "secondary": {
                                                     "type": "MAP",
                                                     "primary": {
-                                                        "type": "RANK",
+                                                        "type": "PROPERTY",
                                                         "primary": {
                                                             "type": "CARD_OF_PILE",
                                                             "primary": { "type": "LITERAL", "primary": "card" },
                                                             "secondary": { "type": "UNDEFINED" }
-                                                        }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     },
                                                     "secondary": { "type": "LITERAL", "primary": "rank" }
                                                 }
@@ -620,24 +630,26 @@
                                                 "primary": {
                                                     "type": "MAP",
                                                     "primary": {
-                                                        "type": "RANK",
+                                                        "type": "PROPERTY",
                                                         "primary": {
                                                             "type": "CARD_OF_PILE",
                                                             "primary": { "type": "LITERAL", "primary": "flop" },
                                                             "secondary": { "type": "UNDEFINED" }
-                                                        }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     },
                                                     "secondary": { "type": "LITERAL", "primary": "rank" }
                                                 },
                                                 "secondary": {
                                                     "type": "MAP",
                                                     "primary": {
-                                                        "type": "RANK",
+                                                        "type": "PROPERTY",
                                                         "primary": {
                                                             "type": "CARD_OF_PILE",
                                                             "primary": { "type": "LITERAL", "primary": "card" },
                                                             "secondary": { "type": "UNDEFINED" }
-                                                        }
+                                                        },
+                                                        "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     },
                                                     "secondary": { "type": "LITERAL", "primary": "rank" }
                                                 }

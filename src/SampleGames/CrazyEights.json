@@ -5,7 +5,7 @@
         "name": "CrazyEights",
         "description": "The OG Uno. First to play all their cards, wins!",
         "variables": {
-            "CurrentSuit": "Suit"
+            "CurrentSuit": "CardPropertyValue"
         },
         "locations": {
             "opponent": {
@@ -177,14 +177,15 @@
                                     {
                                         "type": "UPDATE_VARIABLE",
                                         "name": { "type": "LITERAL", "primary": "CurrentSuit" },
-                                        "variableType": "Suit",
+                                        "variableType": "CardPropertyValue",
                                         "value": {
-                                            "type": "SUIT",
+                                            "type": "PROPERTY",
                                             "primary": {
                                                 "type": "CARD_OF_PILE",
                                                 "primary": { "type": "LITERAL", "primary": "Discard" },
                                                 "secondary": { "type": "LITERAL", "primary": 0 }
-                                            }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": "suit" }
                                         }
                                     },
                                     {
@@ -224,10 +225,11 @@
                                     "primary": {
                                         "type": "STRING_EQ",
                                         "primary": {
-                                            "type":  "RANK",
+                                            "type":  "PROPERTY",
                                             "primary": {
                                                 "type":  "CTX_CARD"
-                                            }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                         },
                                         "secondary": {
                                             "type": "LITERAL",
@@ -239,18 +241,20 @@
                                         "primary": {
                                             "type":  "STRING_EQ",
                                             "primary": {
-                                                "type":  "RANK",
+                                                "type":  "PROPERTY",
                                                 "primary": {
                                                     "type":  "CARD_OF_PILE",
                                                     "primary":  { "type": "LITERAL", "primary":  "Discard" },
                                                     "secondary":  { "type": "LITERAL", "primary": 0 }
-                                                }
+                                                },
+                                                "secondary": { "type": "LITERAL", "primary": "rank" }
                                             },
                                             "secondary": {
-                                                "type":  "RANK",
+                                                "type":  "PROPERTY",
                                                 "primary": {
                                                     "type":  "CTX_CARD"
-                                                }
+                                                },
+                                                "secondary": { "type": "LITERAL", "primary": "rank" }
                                             }
                                         },
                                         "secondary": {
@@ -258,13 +262,14 @@
                                             "primary": {
                                                 "type":  "GET_VARIABLE",
                                                 "name":  { "type": "LITERAL", "primary": "CurrentSuit" },
-                                                "variableType":  "Suit"
+                                                "variableType":  "CardPropertyValue"
                                             },
                                             "secondary": {
-                                                "type":  "SUIT",
+                                                "type":  "PROPERTY",
                                                 "primary": {
                                                     "type":  "CTX_CARD"
-                                                }
+                                                },
+                                                "secondary": { "type": "LITERAL", "primary": "suit" }
                                             }
                                         }
                                     }
@@ -275,13 +280,14 @@
                                 "primary": [
                                     {
                                         "type":  "UPDATE_VARIABLE",
-                                        "variableType":  "Suit",
+                                        "variableType":  "CardPropertyValue",
                                         "name":  { "type": "LITERAL", "primary": "CurrentSuit" },
                                         "value": {
-                                            "type":  "SUIT",
+                                            "type":  "PROPERTY",
                                             "primary": {
                                                 "type":  "CTX_CARD"
-                                            }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": "suit" }
                                         }
                                     },
                                     {
@@ -319,10 +325,11 @@
                                         "primary": {
                                             "type":  "STRING_EQ",
                                             "primary": {
-                                                "type":  "RANK",
+                                                "type":  "PROPERTY",
                                                 "primary": {
                                                     "type":  "CTX_CARD"
-                                                }
+                                                },
+                                                "secondary": { "type": "LITERAL", "primary": "rank" }
                                             },
                                             "secondary":  { "type": "LITERAL", "primary":  "Eight" }
                                         },
@@ -470,7 +477,7 @@
                                 "primary": [
                                     {
                                         "type":  "UPDATE_VARIABLE",
-                                        "variableType":  "Suit",
+                                        "variableType":  "CardPropertyValue",
                                         "name":  { "type": "LITERAL", "primary": "CurrentSuit" },
                                         "value": {
                                             "type":  "CLICKED_LABEL"

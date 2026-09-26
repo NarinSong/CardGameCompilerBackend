@@ -1,7 +1,7 @@
-import ValueMap, { CardValueMap, DEFAULT_CARD_RANK_MAP, DEFAULT_CLIENT_VIEW_RANK_MAP, DEFAULT_CLIENT_VIEW_SUIT_MAP, DEFAULT_VALUE_MAP } from "../Components/ValueMap.js";
+import { DEFAULT_CLIENT_VIEW_RANK_MAP, DEFAULT_CLIENT_VIEW_SUIT_MAP, DEFAULT_VALUE_MAP } from "../Components/ValueMap.js";
 import { ValueTypeName } from "../schemas/Blocks.js";
 import { ConstantArg, GameMetaArgs } from "../schemas/GameDefinitionArgs.js";
-import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DEFAULT_TEXT_LOCATION, DefaultLocation, Location } from "../schemas/types.js";
+import { DEFAULT_BUTTON_LOCATION, DEFAULT_COUNTER_LOCATION, DEFAULT_PILE_LOCATION, DEFAULT_TEXT_LOCATION, DefaultLocation, Location, MapType } from "../schemas/types.js";
 
 
 /**
@@ -13,10 +13,10 @@ export default class GameMeta {
     #minPlayers: number;
     #maxPlayers: number;
     #name: string;
-    maps: Record<string, ValueMap<any,any>>;
-    cardValueMap: CardValueMap;
-    clientSuitMap: ValueMap<string, number>;
-    clientRankMap: ValueMap<string, number>;
+    maps: Record<string, Record<string,number>>;
+    cardValueMap: MapType[];
+    clientSuitMap: MapType;
+    clientRankMap: MapType;
     constants: Record<string, ConstantArg>;
     variables: Record<string, ValueTypeName>;
     locations: Record<string, DefaultLocation>;
@@ -33,10 +33,10 @@ export default class GameMeta {
         this.#name = obj.name;
         this.#minPlayers = obj.minPlayers || 1;
         this.#maxPlayers = obj.maxPlayers || 4;
-        this.cardValueMap = /*obj.cardValueMap ??*/ DEFAULT_VALUE_MAP;
-        this.maps = { 'CARD_RANK_MAP': DEFAULT_CARD_RANK_MAP }
-        this.clientSuitMap = obj.clientSuitMap ? new ValueMap<string, number>(obj.clientSuitMap) : DEFAULT_CLIENT_VIEW_SUIT_MAP;
-        this.clientRankMap = obj.clientRankMap ? new ValueMap<string, number>(obj.clientRankMap) : DEFAULT_CLIENT_VIEW_RANK_MAP;
+        this.cardValueMap = obj.cardValueMap ?? DEFAULT_VALUE_MAP;
+        this.maps = obj.maps ?? {};
+        this.clientSuitMap = obj.clientSuitMap ? obj.clientSuitMap : DEFAULT_CLIENT_VIEW_SUIT_MAP;
+        this.clientRankMap = obj.clientRankMap ? obj.clientRankMap : DEFAULT_CLIENT_VIEW_RANK_MAP;
         this.constants = obj.constants ?? {};
         this.variables = obj.variables ?? {};
         this.parentGameId = obj.parentGameId;
@@ -61,7 +61,7 @@ export default class GameMeta {
 
         for (let i in maps) {
             if (!maps[i]) continue;
-            this.maps[i] = new ValueMap<string, number>(maps[i]);
+            this.maps[i] = maps[i];
         }
     }
 

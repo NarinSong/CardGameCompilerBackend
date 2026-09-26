@@ -46,39 +46,8 @@ export const TriggerTypeSchema = z.enum([
 
 
 
-/**
- * Standard card ranks used by the game.
- */
-export const RANK = [
-  "Ace","Two","Three","Four","Five","Six",
-  "Seven","Eight","Nine","Ten","Jack","Queen","King"
-] as const;
-
-export const RankSchema = z.enum(RANK);
-
-/**
- * Look up table mapping a rank name to its numeric rank index
- */
-export const RankIndex = Object.fromEntries(
-  RANK.map((name, index) => [name, index])
-) as Record<rank, number>;
-
-/**
- * Standard card suits.
- */
-export const SUIT = [
-  "Clubs",
-  "Diamonds",
-  "Hearts",
-  "Spades",
-  "Jokers",
-  "Trumps",
-] as const;
-
-export const SuitSchema = z.enum(SUIT);
 export const CardSchema = z.object({
-  rank: RankSchema,
-  suit: SuitSchema,
+  properties: z.record(z.string(), z.string()),
   id: z.number()
 });
 export const DisplayNameSchema = z.string();
@@ -139,11 +108,13 @@ export const TriggerSchema = z.discriminatedUnion("type", [
 ]);
 
 // Deck constructs
-const DeckPartSchema = z.object({
-  ranks: z.array(RankSchema),
-  suits: z.array(SuitSchema),
+const DeckPropertySchema = z.object({
+  name: z.string(),
+  values: z.array(z.string())
 });
+const DeckPartSchema = z.array(DeckPropertySchema);
 const DeckDefinitionSchema = z.array(DeckPartSchema);
+const MapSchema = z.object({name: z.string(), map: z.record(z.string(),z.number())});
 
 // Enums
 export const Visibility = VisibilitySchema.enum;
@@ -163,8 +134,6 @@ export type ActionRole = z.infer<typeof ActionRoleSchema>;
 export type Label = z.infer<typeof LabelSchema>;
 export type PlayerID = z.infer<typeof PlayerIDSchema>;
 export type BoardID = z.infer<typeof BoardIDSchema>;
-export type rank = z.infer<typeof RankSchema>;
-export type suit = z.infer<typeof SuitSchema>;
 export type CardType = z.infer<typeof CardSchema>;
 export type Location = z.infer<typeof LocationSchema>;
 export type DefaultLocation = z.infer<typeof DefaultLocationSchema>;
@@ -172,6 +141,7 @@ export type LocationResolver = z.infer<typeof LocationResolverSchema>;
 export type ButtonRange = z.infer<typeof ButtonRangeSchema>;
 export type ButtonRangeArgument = z.infer<typeof ButtonRangeArgumentSchema>;
 export type DeckDefinition = z.infer<typeof DeckDefinitionSchema>;
+export type MapType = z.infer<typeof MapSchema>;
 
 // IDs
 export type ClientID = number;
@@ -231,10 +201,15 @@ export const DEFAULT_TEXT_LOCATION: DefaultLocation = {
     wrapTo: 450,
 };
 
-// Default deck. TODO: Switch to RANKENUM.ACE, etc. so that it's more readable
 export const DEFAULT_DECK_DEFINITION: DeckDefinition = [
-  {
-    ranks: [RANK[0], RANK[1], RANK[2], RANK[3], RANK[4], RANK[5], RANK[6], RANK[7], RANK[8], RANK[9], RANK[10], RANK[11], RANK[12], ],
-    suits: [SUIT[0], SUIT[1], SUIT[2], SUIT[3]],
-  }
+  [
+    {
+      name: 'rank',
+      values: ['Ace','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Jack','Queen','King'],
+      
+    }, {
+      name: 'suit',
+      values: ['Hearts','Clubs','Spades','Diamonds'],
+    }
+  ]
 ];

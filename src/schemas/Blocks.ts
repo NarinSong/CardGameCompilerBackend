@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { ButtonTypeSchema, CardSchema, LocationResolverSchema, PileStateSchema, RankSchema, SuitSchema, VisibilitySchema } from "./types.js";
+import { ButtonTypeSchema, CardSchema, LocationResolverSchema, PileStateSchema, VisibilitySchema } from "./types.js";
 import { NODE_NAMES } from "./Constants.js";
 
 // These are the values that can be used inside the blocks and their corresponding JS types
@@ -22,10 +22,10 @@ export const ValueTypes = {
   Visibility: VisibilitySchema,
   Undefined: z.undefined(),
   Array: z.array(z.any()),
-  Card: z.object({
-    rank: z.string(),
-    value: z.string()
-  }),
+  CardPropertyKey: z.string(),
+  CardPropertyValue: z.string(),
+  Card: z.record(z.string(), z.string()),
+  CardProperties: z.record(z.string(), z.string()),
   ID: z.number(),
   Player: z.number(),
   PlayerRole: z.string(),
@@ -35,8 +35,6 @@ export const ValueTypes = {
   LocationName: z.string(),
   ButtonRange: z.object({ min: z.number().or(z.undefined()), max: z.number().or(z.undefined()), increment: z.number().or(z.undefined())}),
   ButtonType: ButtonTypeSchema,
-  Rank: RankSchema,
-  Suit: SuitSchema,
   Map: z.string(),
   VariableType: z.string(),
 } as const;
@@ -713,29 +711,21 @@ const ASSIGN_ROLE_SINGULAR = defineBlock({
     ]
 });
 
-const RANK = defineBlock({
-    "name": NODE_NAMES.Rank,
-    "displayName": "Card Rank",
-    "returnType": "String",
+const PROPERTY = defineBlock({
+    "name": NODE_NAMES.Property,
+    "displayName": "Card Property",
+    "returnType": "CardPropertyValue",
     "arguments": [
         {
             "name": "primary",
             "displayName": "Card",
             "type": "Card",
             "optional": false
-        }
-    ]
-});
-
-const SUIT = defineBlock({
-    "name": NODE_NAMES.Suit,
-    "displayName": "Card Suit",
-    "returnType": "String",
-    "arguments": [
+        },
         {
-            "name": "primary",
-            "displayName": "Card",
-            "type": "Card",
+            "name": "secondary",
+            "displayName": "Card Property",
+            "type": "CardPropertyKey",
             "optional": false
         }
     ]
@@ -1581,104 +1571,14 @@ const PILE_SET = defineBlock({
         },
         {
             "name": "secondary",
-            "displayName": "Rank",
-            "type": "Rank",
-            "optional": true
-        },
-        {
-            "name": "tertiary",
-            "displayName": "Suit",
-            "type": "Suit",
-            "optional": true
-        }
-    ]
-});
-
-const PILE_SET_OF_RANK = defineBlock({
-    "name": NODE_NAMES.PileSetOfRank,
-    "displayName": "Contains Set of Cards",
-    "returnType": "Boolean",
-    "arguments": [
-        {
-            "name": "primary",
-            "displayName": "Pile",
-            "type": "PileLabel",
+            "displayName": "Property",
+            "type": "CardPropertyKey",
             "optional": false
         },
         {
-            "name": "secondary",
-            "displayName": "Number",
-            "type": "Number",
-            "optional": true // defaults to if the pile has any (1)
-        },
-        {
             "name": "tertiary",
-            "displayName": "Rank",
-            "type": "Rank",
-            "optional": true
-        },
-        {
-            "name": "fourth",
-            "displayName": "Suit",
-            "type": "Suit",
-            "optional": true
-        }
-    ]
-});
-
-const PILE_FLUSH = defineBlock({
-    "name": NODE_NAMES.PileFlush,
-    "displayName": "Pile Flush",
-    "returnType": "Number",
-    "arguments": [
-        {
-            "name": "primary",
-            "displayName": "Pile",
-            "type": "PileLabel",
-            "optional": false
-        },
-        {
-            "name": "secondary",
-            "displayName": "Suit",
-            "type": "Suit",
-            "optional": true
-        },
-        {
-            "name": "tertiary",
-            "displayName": "Rank",
-            "type": "Rank",
-            "optional": true
-        }
-    ]
-});
-
-const PILE_FLUSH_OF_SUIT = defineBlock({
-    "name": NODE_NAMES.PileFlushOfSuit,
-    "displayName": "Contains Flush of Cards",
-    "returnType": "Boolean",
-    "arguments": [
-        {
-            "name": "primary",
-            "displayName": "Pile",
-            "type": "PileLabel",
-            "optional": false
-        },
-        {
-            "name": "secondary",
-            "displayName": "Number",
-            "type": "Number",
-            "optional": true // defaults to if the pile has any (1)
-        },
-        {
-            "name": "tertiary",
-            "displayName": "Suit",
-            "type": "Suit",
-            "optional": true
-        },
-        {
-            "name": "fourth",
-            "displayName": "Rank",
-            "type": "Rank",
+            "displayName": "Restrictions",
+            "type": "CardProperties",
             "optional": true
         }
     ]
@@ -1697,8 +1597,20 @@ const PILE_RUN = defineBlock({
         },
         {
             "name": "secondary",
-            "displayName": "Suit",
-            "type": "Suit",
+            "displayName": "Property",
+            "type": "CardPropertyKey",
+            "optional": true
+        },
+        {
+            "name": "tertiary",
+            "displayName": "Restrictions",
+            "type": "CardProperties",
+            "optional": true
+        },
+        {
+            "name": "fourth",
+            "displayName": "Map",
+            "type": "Map",
             "optional": true
         }
     ]
@@ -1717,24 +1629,50 @@ const PILE_RUN_FROM = defineBlock({
         },
         {
             "name": "secondary",
-            "displayName": "Number",
-            "type": "Number",
-            "optional": true // defaults to if the pile has any (1)
+            "displayName": "Value",
+            "type": "CardPropertyValue",
+            "optional": false
         },
         {
             "name": "tertiary",
-            "displayName": "Rank",
-            "type": "Rank",
+            "displayName": "Property",
+            "type": "CardPropertyKey",
             "optional": true
         },
         {
             "name": "fourth",
-            "displayName": "Suit",
-            "type": "Suit",
+            "displayName": "Restrictions",
+            "type": "CardProperties",
+            "optional": true
+        },
+        {
+            "name": "fifth",
+            "displayName": "Map",
+            "type": "Map",
             "optional": true
         }
     ]
 });
+
+const PROPERTIES = defineBlock({
+    "name": NODE_NAMES.Properties,
+    "displayName": "Card Properties",
+    "returnType": "CardProperties",
+    "arguments": [
+        {
+            "name": "primary",
+            "displayName": "Property Names",
+            "type": "Array",
+            "optional": false
+        },
+        {
+            "name": "secondary",
+            "displayName": "Property Values",
+            "type": "Array",
+            "optional": false
+        }
+    ]
+})
 
 const COMMENT = defineBlock({
     "name": NODE_NAMES.Comment,
@@ -1918,8 +1856,7 @@ export const BLOCKS = {
     ASSIGN_ROLE,
     UNASSIGN_ROLE,
     ASSIGN_ROLE_SINGULAR,
-    RANK,
-    SUIT,
+    PROPERTY,
     MAP,
     SET_PHASE,
     SET_STEP,
@@ -1960,12 +1897,10 @@ export const BLOCKS = {
     COUNTER_OF,
     BUTTON_OF,
     PILE_SET,
-    PILE_SET_OF_RANK,
-    PILE_FLUSH,
-    PILE_FLUSH_OF_SUIT,
     PILE_RUN,
     PILE_RUN_FROM,
     SORT_PILE,
+    PROPERTIES,
     COMMENT,
     CREATE_TEXT,
     SET_TEXT,

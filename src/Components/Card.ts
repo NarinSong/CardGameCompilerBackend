@@ -1,9 +1,11 @@
 import Pile from "../Game/Pile.js";
 import { CardArgs } from "../schemas/GameComponentArgs.js";
-import { DeckDefinition, DEFAULT_DECK_DEFINITION, PileState, RANK, rank, RankIndex, SUIT, suit } from "../schemas/types.js";
+import { DeckDefinition, DEFAULT_DECK_DEFINITION, MapType, PileState } from "../schemas/types.js";
 import Logger from "./Logger.js";
-import { CardValueMap } from "./ValueMap.js";
+import { DEFAULT_CLIENT_VIEW_RANK_MAP } from "./ValueMap.js";
 
+const DEFAULT_KEY_RANK = 'rank';
+const DEFAULT_KEY_SUIT = 'suit';
 
 /**
  * Defines the properties for a card.
@@ -11,31 +13,17 @@ import { CardValueMap } from "./ValueMap.js";
  * A Card consists of its suit, rank, and unique id.
  */
 export default class Card {
-    rank: rank;
-    suit: suit;
     id: number;
+    properties: Record<string, string>;
     private static nextId: number = 1000;
 
     /**
      * Creates a card.
-     * @param args - Card arguments (rank, suit).
+     * @param args - Card arguments (rank, suit, etc.) as a Record<string, string>.
      */
     constructor(args: CardArgs) {
-        this.rank = args.rank;
-        this.suit = args.suit;
+        this.properties = args;
         this.id = Card.nextId++;
-    }
-
-    /**
-     * Returns the numeric rank index of a card.
-     * @param card - A card whose rank should be evaluated.
-     * @returns The numeric rank index of the card or -1 if rank is not found. 
-     */
-    static numberRank(card: Card): number {
-        for (let i in RANK) {
-            if (card.rank == RANK[i]) return +i;
-        }
-        return -1;
     }
 
     /**
@@ -48,11 +36,26 @@ export default class Card {
         const cards: Card[] = [];
 
         for (const part of deckDefinition) {
-            for (const suit of part.suits) {
-                for (const rank of part.ranks) {
-                    cards.push(new Card({rank: rank, suit: suit}));
+            let partCards: Card[] = [];
+
+            // start with an empty card
+            partCards.push(new Card({}));
+
+            for (const entry of part) {
+                const multCards: Card[] = [];
+                for (const val of entry.values) {
+                    for (const c of partCards) {
+                        const newCardArgs = {...c.properties};
+                        newCardArgs[entry.name] = val;
+                        multCards.push(new Card(newCardArgs));
+                    }
                 }
+
+                partCards = multCards;
             }
+
+            if (partCards.length <= 1) continue;
+            cards.concat(partCards);
         }
 
         return cards;
@@ -84,17 +87,28 @@ export default class Card {
         return cards;
     }
 
+    static cardHasProperties(card: Card, properties: Record<string,string>) {
+        for (const p in properties) {
+            if (typeof card.properties[p] == 'undefined') return false;
+            if (card.properties[p] !== properties[p]) return false;
+        }
+
+        return true;
+    }
+
     /**
      * Creates a deck of cards based on its state. Eg. "SHUFFLED".
      * @param state - The state the pile is in.
      * @returns A shuffled deck if its state is "SHUFFLED". Else it returns an empty card array.
      */
-    static fromInitialState(state: PileState): Card[] {
-        // TODO: Pile states
+    static fromInitialState(state: PileState, deckDefinition?: DeckDefinition): Card[] {
 
         if (state == PileState.SHUFFLED) {
             // Assume standard 52 card deck
-            return Card.shuffle(Card.defaultDeck())
+            return Card.shuffle(Card.defaultDeck(deckDefinition))
+        }
+        if (state == PileState.SORTED) {
+            return Card.defaultDeck(deckDefinition);
         }
 
         return [] as Card[];
@@ -122,43 +136,26 @@ export default class Card {
      * @param to - The second card.
      * @returns True if the first card has a higher rank, otherwise false.
      */
-    static isBigger(from: Card | undefined, to: Card | undefined): boolean {
+    static isBigger(from: Card | undefined, to: Card | undefined, key?: string, map?: MapType): boolean {
         Logger.debug('Checking which card is bigger');
+        key ??= DEFAULT_KEY_RANK;
+        map ??= DEFAULT_CLIENT_VIEW_RANK_MAP;
         
         if (!from || !to) return false;
 
-        const indexA = Card.numberRank(from);
-        const indexB = Card.numberRank(to);
-
-        Logger.debug(`${from.rank} is ${indexA} vs ${to.rank} is ${indexB}`);
+        const indexA = map.map[from.properties[key] ?? ''] ?? -1;
+        const indexB = map.map[to.properties[key] ?? '']   ?? -1;
 
         return indexA > indexB;
     }
 
-    /**
-     * Counts the number of cards in a pile with a given rank.
-     * @param pile - The pile of cards to search.
-     * @param rank - The rank to count.
-     * @returns The number of cards with the given rank.
-     */
-    static numOfRank(pile: Card[], rank: rank): number {
-        let num = 0;
-        for (const card of pile) {
-            if (card.rank === rank) num++;
-        }
-        return num;
-    }
+    static numWithProperty(pile: Card[], value: number, key?: string, map?: MapType): number {
+        key ??= DEFAULT_KEY_RANK;
+        map ??= DEFAULT_CLIENT_VIEW_RANK_MAP;
 
-    /**
-     * Counts the number of cards in a pile with a given suit.
-     * @param pile - The pile of cards to search.
-     * @param suit - The suit to count.
-     * @returns The number of cards with the given suit.
-     */
-    static numOfSuit(pile: Card[], suit: suit): number {
         let num = 0;
         for (const card of pile) {
-            if (card.suit === suit) num++;
+            if (map.map[card.properties[key] ?? ''] ?? -1 === value) num++;
         }
         return num;
     }
@@ -170,10 +167,12 @@ export default class Card {
      * @param suit - The suit to match.
      * @returns The number of cards matching both rank and suit.
      */
-    static numOfCard(pile: Card[], rank: rank, suit: suit): number {
+    static numOfCard(pile: Card[], properties: Record<string, string>): number {
         let num = 0;
+
         for (const card of pile) {
-            if (card.suit === suit && card.rank === rank) num++;
+            if (this.cardHasProperties(card, properties))
+                num++;
         }
         return num;
     }
@@ -184,41 +183,21 @@ export default class Card {
      * @param suit - Optional suit filter. If provided, only cards of that suit are counted.
      * @returns The size of the largest set found.
      */
-    static largestSet(pile: Card[], suit?: suit | undefined): number {
-        const ranks: Record<string, number> = {};
+    static largestSetWithProperty(pile: Card[], property: string, properties?: Record<string,string>): number {
+        // "Range" like "domain and range" - values that the property could take on
+        const range: Record<string, number> = {};
 
         let max = 0;
 
         for (const card of pile) {
-            ranks[card.rank] ??= 0;
+            const id = card.properties[property];
+            if (typeof id === 'undefined') continue;
+            range[id] ??= 0;
 
-            if (!suit || card.suit === suit) {
-                (ranks[card.rank] as number)++; 
-                if (ranks[card.rank] as number > max) max = ranks[card.rank] as number;
-            }
-        }
+            if (!properties) range[id]+=1;
+            else if (Card.cardHasProperties(card, properties)) range[id]+=1;
 
-        return max;
-    }
-
-    /**
-     * Returns the size of the largest group of cards sharing the same suit.
-     * @param pile - The pile of cards to search.
-     * @param rank - Optional rank filter. If provided, only cards of that rank are counted.
-     * @returns The size of the largest flush found.
-     */
-    static largestFlush(pile: Card[], rank?: rank | undefined): number {
-        const suits: Record<string, number> = {};
-
-        let max = 0;
-
-        for (const card of pile) {
-            suits[card.suit] ??= 0;
-
-            if (!rank || card.rank === rank) {
-                (suits[card.suit] as number)++; 
-                if (suits[card.suit] as number > max) max = suits[card.suit] as number;
-            }
+            if (range[id] > max) max = range[id];
         }
 
         return max;
@@ -230,64 +209,64 @@ export default class Card {
      * @param suit - Optional suit filter. If provided, only cards of that suit are considered.
      * @returns The length of the longest consecutive run.
      */
-    static largestRun(pile: Card[], suit?: suit | undefined): number {
-        const ranks: Record<number, boolean> = {};
+    static largestRun(pile: Card[], property?: string, properties?: Record<string,string>, map?: Record<string, number>): number {
+        const range: Record<number, boolean> = {};
+
+        property ??= DEFAULT_KEY_RANK;
+        map ??= DEFAULT_CLIENT_VIEW_RANK_MAP.map;
 
         for (const card of pile) {
-            if (!suit || card.suit === suit) {
-                // TODO: switch to using game meta's value map
-                ranks[RankIndex[card.rank]] = true;
-            }
+            const id = card.properties[property];
+            if (typeof id === 'undefined') continue;
+            const val = map[id];
+            if (typeof val === 'undefined') continue;
+
+            if (!properties) range[val] = true;
+            else if (Card.cardHasProperties(card, properties)) range[val] = true;
         }
 
         let longest = 0;
         let current = 0;
-        for (const idx in ranks) {
-            if (ranks[idx]) current++;
+        for (const idx in range) {
+            if (range[idx]) current++;
             else current = 0;
 
             if (current > longest) longest = current;
         }
 
-        // TODO: Ace high vs ace low
-
         return longest;
     }
 
-    /**
-     * Returns the length of the longest consecutive run that includes a specific rank.
-     * @param pile - The pile of cards to search.
-     * @param rank - Optional rank that must be included in the run.
-     * @param suit - Optional suit filter. If provided, only cards of that suit are considered.
-     * @returns The length of the longest run that includes the given rank, or 0 if the rank is not present.
-     */
-    static largestRunThatIncludes(pile: Card[], rank?: rank | undefined, suit?: suit | undefined): number {
-        if (!rank) return Card.largestRun(pile, suit);
-        
-        const ranks: Record<number, boolean> = {};
+    static largestRunThatIncludes(pile: Card[], value: string, property?: string, properties?: Record<string,string>, map?: Record<string, number>): number {
+        const range: Record<number, boolean> = {};
+
+        property ??= DEFAULT_KEY_RANK;
+        map ??= DEFAULT_CLIENT_VIEW_RANK_MAP.map;
+
+        const targetValue = map[value];
+        if (!targetValue) return 0;
 
         for (const card of pile) {
-            if (!suit || card.suit === suit) {
-                // TODO: switch to using game meta's value map
-                ranks[RankIndex[card.rank]] = true;
-            }
+            const id = card.properties[property];
+            if (typeof id === 'undefined') continue;
+            const val = map[id];
+            if (typeof val === 'undefined') continue;
+
+            if (!properties) range[val] = true;
+            else if (Card.cardHasProperties(card, properties)) range[val] = true;
         }
 
-        if (!ranks[RankIndex[rank]]) return 0;
+        if (!range[targetValue]) return 0;
 
         let current = 1;
         // Up
-        for (let i = RankIndex[rank] + 1; RANK[i]; i++) {
-            if (!ranks[i]) break;
+        for (let i = targetValue + 1; range[i]; i++) {
             current++;
         }
         // Down
-        for (let i = RankIndex[rank] - 1; RANK[i]; i--) {
-            if (!ranks[i]) break;
+        for (let i = targetValue - 1; range[i]; i--) {
             current++;
         }
-
-        // TODO: Ace high vs ace low
 
         return current;
     }

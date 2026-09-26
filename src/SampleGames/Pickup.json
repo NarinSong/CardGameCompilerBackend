@@ -62,7 +62,7 @@
                                             "name": { "type": "UNDEFINED" },
                                             "displayName": { "type": "UNDEFINED" },
                                             "owner": {"type": "LITERAL", "primary": -1},
-                                            "location": { "type": "RELATIVE_LOCATION", "primary": {"type": "LITERAL", "primary": "pilelocation" } }
+                                            "location": { "type": "RELATIVE_LOCATION", "primary": {"type": "LITERAL", "primary": "pilelocation" }, "secondary": { "type": "UNDEFINED" } }
                                         },
                                         "tertiary": {"type": "LITERAL", "primary": 1}
                                     }

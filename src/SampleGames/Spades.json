@@ -8,8 +8,8 @@
             "PlayerOneBid": "Number",
             "PlayerTwoBid": "Number",
             "Broken": "Boolean",
-            "LeadSuit": "Suit",
-            "LeadRank": "Rank",
+            "LeadSuit": "CardPropertyValue",
+            "LeadRank": "CardPropertyValue",
             "LeadPlayer": "Player",
             "PlayerOneWins": "Number",
             "PlayerTwoWins": "Number"
@@ -923,10 +923,11 @@
                                         "primary": {
                                             "type": "STRING_EQ",
                                             "primary": {
-                                                "type": "SUIT",
+                                                "type": "PROPERTY",
                                                 "primary": {
                                                     "type": "CTX_CARD"
-                                                }
+                                                },
+                                                "secondary": { "type": "LITERAL", "primary": "suit" }
                                             },
                                             "secondary": { "type": "LITERAL", "primary": "Spades" }
                                         }
@@ -945,10 +946,10 @@
                                                 "primary": { "type": "CLICKED_LABEL" }
                                             },
                                             "secondary": {
-                                                "type": "PILE_FLUSH",
+                                                "type": "PILE_SET",
                                                 "primary": { "type": "CLICKED_LABEL" },
-                                                "secondary": { "type": "LITERAL", "primary": "Spades" },
-                                                "tertiary": { "type": "UNDEFINED" }
+                                                "secondary": { "type": "LITERAL", "primary": "suit" },
+                                                "tertiary": { "type": "LITERAL", "primary": { "suit": "Spades" } }
                                             }
                                         }
                                     }
@@ -968,11 +969,12 @@
                                             "type": "STRING_EQ",
                                             "primary": {
                                                 "type": "UPDATE_VARIABLE",
-                                                "variableType": "Suit",
+                                                "variableType": "CardPropertyValue",
                                                 "name": { "type": "LITERAL", "primary": "LeadSuit" },
                                                 "value": {
-                                                    "type": "SUIT",
-                                                    "primary": { "type": "CTX_CARD" }
+                                                    "type": "PROPERTY",
+                                                    "primary": { "type": "CTX_CARD" },
+                                                    "secondary": { "type": "LITERAL", "primary": "suit" }
                                                 }
                                             },
                                             "secondary": { "type": "LITERAL", "primary": "Spades" }
@@ -987,11 +989,12 @@
                                     },
                                     {
                                         "type": "UPDATE_VARIABLE",
-                                        "variableType": "Rank",
+                                        "variableType": "CardPropertyValue",
                                         "name": { "type": "LITERAL", "primary": "LeadRank" },
                                         "value": {
-                                            "type": "RANK",
-                                            "primary": { "type": "CTX_CARD" }
+                                            "type": "PROPERTY",
+                                            "primary": { "type": "CTX_CARD" },
+                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                         }
                                     },
                                     {
@@ -1066,14 +1069,15 @@
                                     "primary": {
                                         "type": "STRING_EQ",
                                         "primary": {
-                                            "type": "SUIT",
+                                            "type": "PROPERTY",
                                             "primary": {
                                                 "type": "CTX_CARD"
-                                            }
+                                            },
+                                            "secondary": { "type": "LITERAL", "primary": "suit" }
                                         },
                                         "secondary": { 
                                             "type": "GET_VARIABLE", 
-                                            "variableType": "Suit",
+                                            "variableType": "CardPropertyValue",
                                             "name": { "type": "LITERAL", "primary": "LeadSuit" } 
                                         }
                                     },
@@ -1084,24 +1088,40 @@
                                             "primary": {
                                                 "type": "STRING_EQ",
                                                 "primary": {
-                                                    "type": "SUIT",
+                                                    "type": "PROPERTY",
                                                     "primary": {
                                                         "type": "CTX_CARD"
-                                                    }
+                                                    },
+                                                    "secondary": { "type": "LITERAL", "primary": "suit" }
                                                 },
                                                 "secondary": { "type": "LITERAL", "primary": "Spades" } 
                                             },
                                             "secondary": {
                                                 "type": "EQUAL",
                                                 "primary": {
-                                                    "type": "PILE_FLUSH",
+                                                    "type": "PILE_SET",
                                                     "primary": { "type": "CLICKED_LABEL" },
-                                                    "secondary": { 
-                                                        "type": "GET_VARIABLE", 
-                                                        "variableType": "Suit",
-                                                        "name": { "type": "LITERAL", "primary": "LeadSuit" } 
-                                                    },
-                                                    "tertiary": { "type": "UNDEFINED" } 
+                                                    "secondary": { "type": "LITERAL", "primary": "suit"},
+                                                    "tertiary": { 
+                                                        "type": "PROPERTIES",
+                                                        "primary": {
+                                                            "type": "ARRAY",
+                                                            "sequence": [
+                                                                { "type": "LITERAL", "primary": "suit" }
+                                                            ]
+                                                        },
+                                                        "secondary": {
+                                                            "type": "ARRAY",
+                                                            "sequence": [
+                                                                {
+                                                                    "type": "GET_VARIABLE", 
+                                                                    "variableType": "CardPropertyValue",
+                                                                    "name": { "type": "LITERAL", "primary": "LeadSuit" } 
+                                                                }
+                                                            ]
+                                                        }
+                                                        
+                                                    }
                                                 },
                                                 "secondary": { "type": "LITERAL", "primary": 0 }
                                             }
@@ -1111,24 +1131,39 @@
                                             "primary": {
                                                 "type": "EQUAL",
                                                 "primary": {
-                                                    "type": "PILE_FLUSH",
+                                                    "type": "PILE_SET",
                                                     "primary": { "type": "CLICKED_LABEL" },
-                                                    "secondary": { "type": "LITERAL", "primary": "Spades" } ,
-                                                    "tertiary": { "type": "UNDEFINED" } 
+                                                    "tertiary": { "type": "LITERAL", "primary": "suit" },
+                                                    "secondary": { "type": "LITERAL", "primary": { "suit": "Spades" } }
                                                 },
                                                 "secondary": { "type": "LITERAL", "primary": 0 }
                                             },
                                             "secondary": {
                                                 "type": "EQUAL",
                                                 "primary": {
-                                                    "type": "PILE_FLUSH",
+                                                    "type": "PILE_SET",
                                                     "primary": { "type": "CLICKED_LABEL" },
-                                                    "secondary": { 
-                                                        "type": "GET_VARIABLE", 
-                                                        "variableType": "Suit",
-                                                        "name": { "type": "LITERAL", "primary": "LeadSuit" } 
-                                                    },
-                                                    "tertiary": { "type": "UNDEFINED" } 
+                                                    "secondary": { "type": "LITERAL", "primary": "suit"},
+                                                    "tertiary": { 
+                                                        "type": "PROPERTIES",
+                                                        "primary": {
+                                                            "type": "ARRAY",
+                                                            "sequence": [
+                                                                { "type": "LITERAL", "primary": "suit" }
+                                                            ]
+                                                        },
+                                                        "secondary": {
+                                                            "type": "ARRAY",
+                                                            "sequence": [
+                                                                {
+                                                                    "type": "GET_VARIABLE", 
+                                                                    "variableType": "CardPropertyValue",
+                                                                    "name": { "type": "LITERAL", "primary": "LeadSuit" } 
+                                                                }
+                                                            ]
+                                                        }
+                                                        
+                                                    }
                                                 },
                                                 "secondary": { "type": "LITERAL", "primary": 0 }
                                             }
@@ -1144,8 +1179,9 @@
                                         "primary": {
                                             "type": "STRING_EQ",
                                             "primary": {
-                                                "type": "SUIT",
-                                                "primary": { "type": "CTX_CARD" }
+                                                "type": "PROPERTY",
+                                                "primary": { "type": "CTX_CARD" },
+                                                "secondary": { "type": "LITERAL", "primary": "suit" }
                                             },
                                             "secondary": { "type": "LITERAL", "primary": "Spades" }
                                         },
@@ -1174,12 +1210,13 @@
                                         "primary": { 
                                             "type": "STRING_EQ", 
                                             "primary": {
-                                                "type": "SUIT",
-                                                "primary": { "type": "CTX_CARD" }
+                                                "type": "PROPERTY",
+                                                "primary": { "type": "CTX_CARD" },
+                                                "secondary": { "type": "LITERAL", "primary": "suit" }
                                             },
                                             "secondary": {
                                                 "type": "GET_VARIABLE",
-                                                "variableType": "Suit",
+                                                "variableType": "CardPropertyValue",
                                                 "name": { "type": "LITERAL", "primary": "LeadSuit" }
                                             }
                                         },
@@ -1194,7 +1231,7 @@
                                                         "type": "MAP",
                                                         "primary": {
                                                             "type": "GET_VARIABLE",
-                                                            "variableType": "Rank",
+                                                            "variableType": "CardPropertyValue",
                                                             "name": { "type": "LITERAL", "primary": "LeadRank" }
                                                         },
                                                         "secondary": { "type": "LITERAL", "primary": "rank" }
@@ -1202,8 +1239,9 @@
                                                     "secondary": {
                                                         "type": "MAP",
                                                         "primary": {
-                                                            "type": "RANK",
-                                                            "primary": { "type": "CTX_CARD" }
+                                                            "type": "PROPERTY",
+                                                            "primary": { "type": "CTX_CARD" },
+                                                            "secondary": { "type": "LITERAL", "primary": "rank" }
                                                         },
                                                         "secondary": { "type": "LITERAL", "primary": "rank" }
                                                     }
@@ -1226,8 +1264,9 @@
                                                 "primary": {
                                                     "type": "STRING_EQ",
                                                     "primary": {
-                                                        "type": "SUIT",
-                                                        "primary": { "type": "CTX_CARD" }
+                                                        "type": "PROPERTY",
+                                                        "primary": { "type": "CTX_CARD" },
+                                                        "secondary": { "type": "LITERAL", "primary": "suit" }
                                                     },
                                                     "secondary": { "type": "LITERAL", "primary": "Spades" }
                                                 },

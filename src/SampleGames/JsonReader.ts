@@ -6,16 +6,13 @@ import crazyEightsJson from "./CrazyEights.json" with { type: "json" };
 import spadesJson from "./Spades.json" with { type: "json" };
 import inBetweenJson from "./InBetween.json" with { type: "json" };
 import GameManager from "../GameManager.js";
-import ClientGameDefinition from "../schemas/ClientGameDefinition.js";
+import ClientGameDefinition, { ClientGameDefinitionSchema } from "../schemas/ClientGameDefinition.js";
 
-const PickupGame = buildGameFromJSON(pickupJson as ClientGameDefinition);
-export const ButtonCounterGame = buildGameFromJSON(buttonCounterJson as ClientGameDefinition) as GameDefinition;
-export const CrazyEightsGame = buildGameFromJSON(crazyEightsJson as ClientGameDefinition) as GameDefinition;
-export const SpadesGame = buildGameFromJSON(spadesJson as ClientGameDefinition) as GameDefinition;
-export const InBetweenGame = buildGameFromJSON(inBetweenJson as ClientGameDefinition) as GameDefinition;
-
-if (PickupGame == null) throw new Error("Ooops, null game :P");
-if (ButtonCounterGame == null || CrazyEightsGame == null || SpadesGame == null || InBetweenGame == null) throw new Error("I believe Sam may have messed up");
+export const PickupGame         = buildGameFromJSON(ClientGameDefinitionSchema.parse(pickupJson));
+export const ButtonCounterGame  = buildGameFromJSON(ClientGameDefinitionSchema.parse(buttonCounterJson));
+export const CrazyEightsGame    = buildGameFromJSON(ClientGameDefinitionSchema.parse(crazyEightsJson));
+export const SpadesGame         = buildGameFromJSON(ClientGameDefinitionSchema.parse(spadesJson));
+export const InBetweenGame      = buildGameFromJSON(ClientGameDefinitionSchema.parse(inBetweenJson));
 
 export default PickupGame as GameDefinition;
 

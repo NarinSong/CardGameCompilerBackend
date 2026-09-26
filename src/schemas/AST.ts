@@ -23,8 +23,6 @@ const OperatorlessSchema = z.enum([
 ]);
 const UnaryOperatorsSchema = z.enum([
   NODE_NAMES.Not,
-  NODE_NAMES.Rank,
-  NODE_NAMES.Suit,
   NODE_NAMES.SetPhase,
   NODE_NAMES.SetStep,
   NODE_NAMES.NextPlayer,
@@ -76,12 +74,13 @@ const BinaryOperatorsSchema = z.enum([
   NODE_NAMES.CounterOf,
   NODE_NAMES.ButtonOf,
   NODE_NAMES.TextOf,
-  NODE_NAMES.PileRun,
   NODE_NAMES.SetText,
   NODE_NAMES.SendPopup,
   NODE_NAMES.SetScore,
   NODE_NAMES.EndGame,
   NODE_NAMES.RelativeLocation,
+  NODE_NAMES.Property,
+  NODE_NAMES.Properties,
 ]);
 
 const TernaryOperatorsSchema = z.enum([
@@ -95,12 +94,13 @@ const TernaryOperatorsSchema = z.enum([
   NODE_NAMES.Lose,
   NODE_NAMES.ButtonRange,
   NODE_NAMES.PileSet,
-  NODE_NAMES.PileFlush,
 ]);
 
 const QuarnaryOperatorsSchema = z.enum([
-  NODE_NAMES.PileSetOfRank,
-  NODE_NAMES.PileFlushOfSuit,
+  NODE_NAMES.PileRun,
+]);
+
+const QuintaryOperatorsSchema = z.enum([
   NODE_NAMES.PileRunFrom,
 ]);
 
@@ -128,6 +128,7 @@ type OperatorlessNames = z.infer<typeof OperatorlessSchema>;
 type BinaryOperatorsNames = z.infer<typeof BinaryOperatorsSchema>;
 type TernaryOperatorsNames = z.infer<typeof TernaryOperatorsSchema>;
 type QuarnaryOperatorsNames = z.infer<typeof QuarnaryOperatorsSchema>;
+type QuintaryOperatorsNames = z.infer<typeof QuintaryOperatorsSchema>;
 type RoleOperatorsNames = z.infer<typeof RoleOperatorsSchema>;
 type VariableGetterNames = z.infer<typeof VariableGetterSchema>;
 type VariableOperatorsNames = z.infer<typeof VariableOperatorsSchema>;
@@ -160,6 +161,13 @@ export type AST_Node =
   secondary: AST_Node;
   tertiary: AST_Node;
   fourth: AST_Node;
+} | {
+  type: QuintaryOperatorsNames;
+  primary: AST_Node;
+  secondary: AST_Node;
+  tertiary: AST_Node;
+  fourth: AST_Node;
+  fifth: AST_Node;
 } | {
   type: RoleOperatorsNames;
   id: AST_Node;
@@ -270,6 +278,15 @@ export const ValueNodeSchema: z.ZodType<AST_Node> = z.lazy(() =>
       secondary: ValueNodeSchema,
       tertiary: ValueNodeSchema,
       fourth: ValueNodeSchema,
+    }),
+
+    z.object({
+      type: QuintaryOperatorsSchema,
+      primary: ValueNodeSchema,
+      secondary: ValueNodeSchema,
+      tertiary: ValueNodeSchema,
+      fourth: ValueNodeSchema,
+      fifth: ValueNodeSchema,
     }),
 
     z.object({

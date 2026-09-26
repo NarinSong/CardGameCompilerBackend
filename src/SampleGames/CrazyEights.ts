@@ -1,3 +1,5 @@
+/*
+
 import { AST_Node, ValueNode } from "../schemas/AST.js";
 import Action from "../Rules/ActionDefinition.js";
 import GameDefinition from "../Rules/GameDefinition.js";
@@ -15,7 +17,7 @@ CrazyEights.maxPlayers = 4;
 
 // Register game variable with type 'Suit'
 const currentSuitVariable = 'CurrentSuit';
-CrazyEights.gameMeta.variables[currentSuitVariable] = 'Suit';
+CrazyEights.gameMeta.variables[currentSuitVariable] = 'CardPropertyKey';
 
 // Step 3: Define the Board
 
@@ -358,3 +360,5 @@ const pass = new Action(
 CrazyEights.addActionToStep(play, pass);
 
 export default CrazyEights;
+
+*/

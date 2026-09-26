@@ -5,7 +5,7 @@ import { ValueTypeNameSchema, ValueTypeValuesSchema } from "./Blocks.js";
 
 export const StandardStringSchema = z.string().max(16).min(1).regex(/^[a-zA-Z0-9]+$/);
 export const StandardDisplayStringSchema = z.string().max(16).min(1).regex(/^[a-zA-Z0-9 ]+$/);
-export const LongStringSchema = z.string().max(1000).min(1).regex(/^[a-zA-Z0-9 !@#$%^&*(),.?"'\n\-]+$/);
+export const LongStringSchema = z.string().max(1000).min(1).regex(/^[a-zA-Z0-9 !@#%^&*(),.?"'\n\-]+$/);
 
 export const ConstantArgSchema = z.object({
     displayName: StandardDisplayStringSchema,
@@ -22,9 +22,9 @@ export const GameMetaArgsSchema = z.object({
         StandardStringSchema, 
         z.record(StandardStringSchema, z.number())
     ).optional(),
-    cardValueMap: z.record(StandardStringSchema, z.number()).optional(),
-    clientSuitMap: z.record(StandardStringSchema, z.number()).optional(),
-    clientRankMap: z.record(StandardStringSchema, z.number()).optional(),
+    cardValueMap: z.array(z.object({name: StandardStringSchema, map: z.record(StandardStringSchema, z.number())})).optional(),
+    clientSuitMap: z.object({name: StandardStringSchema, map: z.record(StandardStringSchema, z.number())}).optional(),
+    clientRankMap: z.object({name: StandardStringSchema, map: z.record(StandardStringSchema, z.number())}).optional(),
     variables: z.record(StandardStringSchema,ValueTypeNameSchema).optional(),
     constants: z.record(StandardStringSchema, ConstantArgSchema).optional(),
     locations: z.record(StandardStringSchema, DefaultLocationSchema).optional(),

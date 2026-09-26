@@ -1,8 +1,7 @@
 // This is the JSON object that will be sent to the clients
 // Note: anything starting with # will not be sent
 
-import ValueMap from "../Components/ValueMap.js";
-import { ButtonType, Location, LocationResolver, PlayerID, PlayerType, Visibility } from "../schemas/types.js";
+import { ButtonType, Location, LocationResolver, MapType, PlayerID, PlayerType, Visibility } from "../schemas/types.js";
 import Counter from "../Game/Counter.js";
 import Game from "../Game/Game.js";
 import Pile from "../Game/Pile.js";
@@ -100,7 +99,7 @@ export default class ClientView {
      * @param gameMeta - The game meta used to resolve locations.
      * @returns Created pileView object, else null if the pile is supposed to be invisible.
      */
-    static pileView(pile: Pile, owner: number, player: Player, suitMap: ValueMap<string, number>, rankMap: ValueMap<string, number>, locations: Record<string, Location>, gameMeta: GameMeta) {
+    static pileView(pile: Pile, owner: number, player: Player, suitMap: MapType, rankMap: MapType, locations: Record<string, Location>, gameMeta: GameMeta) {
         const vis = resolveVisibility(pile.visibility, owner, player);
 
         // Do *not* mutate pile, since it's from the gamestate
@@ -113,7 +112,7 @@ export default class ClientView {
         for (let card of pile.cards) {
             if (!card) continue;
             if (hide) cards.push({suit: 0, rank: 0, id: 0});
-            else cards.push({suit: suitMap.get(card.suit) ?? 0, rank: rankMap.get(card.rank) ?? 0, id: card.id});
+            else cards.push({suit: suitMap.map[card.properties[suitMap.name] ?? ''] ?? 0, rank: rankMap.map[card.properties[rankMap.name] ?? ''] ?? 0, id: card.id});
         }
 
         const pileView: ClientPileType = {
