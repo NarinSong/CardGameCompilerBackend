@@ -1012,7 +1012,7 @@ const DISPLAY_NAME = defineBlock({
 const LOCATION = defineBlock({
     "name": NODE_NAMES.Location,
     "displayName": "Location",
-    "returnType": "Location",
+    "returnType": "True Location",
     "arguments": [
         {
             "name": "primary",
@@ -1032,7 +1032,7 @@ const LOCATION = defineBlock({
 const RELATIVE_LOCATION = defineBlock({
     "name": NODE_NAMES.RelativeLocation,
     "displayName": "Location",
-    "returnType": "Location",
+    "returnType": "Relative Location",
     "arguments": [
         {
             "name": "primary",
